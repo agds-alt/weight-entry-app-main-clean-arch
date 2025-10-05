@@ -1,0 +1,761 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Analytics - Holographic Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark: #0a0e27;
+            --bg-medium: #151934;
+            --surface: #1e2139;
+            --surface-light: #262945;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #ff00ff;
+            --accent-tertiary: #00ff88;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a9d1;
+            --gradient-aurora: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            --gradient-holographic: linear-gradient(45deg, #00d4ff, #ff00ff, #00ff88, #ffaa00, #00d4ff);
+            --shadow-neumorphic: 20px 20px 60px #0a0b1a, -20px -20px 60px #1a1f3a;
+            --shadow-neumorphic-inset: inset 5px 5px 10px #0a0b1a, inset -5px -5px 10px #1a1f3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+            /* Animated Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%);
+                animation: floatingGradient 20s ease infinite;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+        @keyframes floatingGradient {
+            0%, 100% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(180deg) scale(1.1);
+            }
+        }
+
+    
+
+   
+
+        /* 3D Header Card */
+        .header-card {
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(5deg);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
+        }
+
+            .header-card::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: var(--gradient-holographic);
+                background-size: 400% 400%;
+                border-radius: 30px;
+                opacity: 0.5;
+                z-index: -1;
+                animation: holographicWave 10s linear infinite;
+            }
+
+            .header-card:hover {
+                transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+            }
+
+        .header-title {
+            font-size: 42px;
+            font-weight: 700;
+            background: var(--gradient-holographic);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: holographicWave 5s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        /* Isometric Cards Grid */
+        /* Ganti seluruh bagian .iso-card dan animasinya dengan kode berikut: */
+
+        .iso-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .iso-card {
+            background: var(--surface);
+            border-radius: 25px;
+            padding: 30px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 25px 25px 50px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(30, 33, 57, 0.5);
+            cursor: pointer;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+            .iso-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 100%;
+                background: linear-gradient(135deg, transparent, rgba(0, 212, 255, 0.1));
+                border-radius: 25px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .iso-card:hover {
+                transform: scale(1.05);
+                box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.1);
+            }
+
+                .iso-card:hover::before {
+                    opacity: 1;
+                }
+
+            /* Animasi mengambang yang sederhana (tanpa rotasi) */
+            .iso-card:nth-child(1) {
+                animation: float-simple 6s ease-in-out infinite;
+            }
+
+            .iso-card:nth-child(2) {
+                animation: float-simple 6s ease-in-out infinite 1.5s;
+            }
+
+            .iso-card:nth-child(3) {
+                animation: float-simple 6s ease-in-out infinite 3s;
+            }
+
+            .iso-card:nth-child(4) {
+                animation: float-simple 6s ease-in-out infinite 4.5s;
+            }
+
+        @keyframes float-simple {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Hapus animasi float1, float2, float3, float4 yang lama */
+
+        .iso-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            background: var(--gradient-aurora);
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .iso-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .iso-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .iso-trend {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent-primary);
+        }
+
+        /* 3D Chart Container */
+        .chart-3d {
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(2000px) rotateX(5deg);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 30px 30px 60px rgba(0, 0, 0, 0.4), -20px -20px 40px rgba(30, 33, 57, 0.3);
+        }
+
+            .chart-3d:hover {
+                transform: perspective(2000px) rotateX(0deg) scale(1.02);
+            }
+
+            .chart-3d::after {
+                content: '';
+                position: absolute;
+                bottom: -20px;
+                left: 10%;
+                right: 10%;
+                height: 40px;
+                background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.2) 0%, transparent 70%);
+                filter: blur(20px);
+            }
+
+        /* Holographic Data Table */
+        .holo-table {
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-neumorphic);
+        }
+
+            .holo-table::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: var(--gradient-holographic);
+                background-size: 400% 400%;
+                opacity: 0.03;
+                animation: holographicWave 20s linear infinite;
+            }
+
+        .data-table {
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+            .data-table thead th {
+                padding: 20px;
+                background: linear-gradient(135deg, var(--surface-light), var(--surface));
+                color: var(--accent-primary);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 12px;
+                border: none;
+            }
+
+            .data-table tbody tr {
+                transition: all 0.3s;
+                border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            }
+
+                .data-table tbody tr:hover {
+                    background: rgba(0, 212, 255, 0.05);
+                    transform: scale(1.02);
+                    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.2);
+                }
+
+            .data-table tbody td {
+                padding: 20px;
+                color: var(--text-secondary);
+                font-size: 14px;
+            }
+
+        /* Floating Action Buttons */
+        .fab-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-aurora);
+            background-size: 200% 200%;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3), var(--shadow-neumorphic);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: gradientShift 5s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .fab:hover {
+                transform: scale(1.1) rotate(360deg);
+                box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5), 0 0 60px rgba(255, 0, 255, 0.3);
+            }
+
+        /* Period Pills */
+        .period-pills {
+            display: flex;
+            gap: 10px;
+            padding: 8px;
+            background: var(--surface-light);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphic-inset);
+        }
+
+        .period-pill {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .period-pill::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: var(--gradient-aurora);
+                transform: translate(-50%, -50%);
+                transition: all 0.5s;
+            }
+
+            .period-pill:hover {
+                transform: translateY(-2px);
+            }
+
+            .period-pill.active {
+                background: var(--gradient-aurora);
+                background-size: 200% 200%;
+                color: white;
+                animation: gradientShift 3s ease infinite;
+                box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.1);
+            }
+
+       
+
+        /* Loading Animation */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+
+    <script src="/js/sidebar.js"></script>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- 3D Header -->
+        <div class="header-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="header-title">Weight Analytics</h1>
+                    <p class="text-secondary">Real-time holographic data visualization</p>
+                </div>
+                <div class="period-pills">
+                    <button class="period-pill active" data-period="daily">Daily</button>
+                    <button class="period-pill" data-period="weekly">Weekly</button>
+                    <button class="period-pill" data-period="monthly">Monthly</button>
+                    <button class="period-pill" data-period="quarterly">90 Days</button>
+                    <button class="period-pill" data-period="yearly">Yearly</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Isometric Cards -->
+        <div class="iso-grid">
+            <div class="iso-card">
+                <div class="iso-icon">
+                    <i class="fas fa-weight"></i>
+                </div>
+                <div class="iso-value">-3.2 kg</div>
+                <div class="iso-label">Total Weight Loss</div>
+                <span class="iso-trend">
+                    <i class="fas fa-arrow-trend-down"></i> Excellent Progress
+                </span>
+            </div>
+
+            <div class="iso-card">
+                <div class="iso-icon" style="animation-delay: 1s;">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="iso-value">2,450</div>
+                <div class="iso-label">Calories Burned</div>
+                <span class="iso-trend">
+                    <i class="fas fa-arrow-trend-up"></i> +15% This Week
+                </span>
+            </div>
+
+            <div class="iso-card">
+                <div class="iso-icon" style="animation-delay: 2s;">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="iso-value">28</div>
+                <div class="iso-label">Days Tracked</div>
+                <span class="iso-trend">
+                    <i class="fas fa-star"></i> 100% Consistency
+                </span>
+            </div>
+
+            <div class="iso-card">
+                <div class="iso-icon" style="animation-delay: 3s;">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="iso-value">85%</div>
+                <div class="iso-label">Goal Progress</div>
+                <span class="iso-trend">
+                    <i class="fas fa-rocket"></i> On Track
+                </span>
+            </div>
+        </div>
+
+        <!-- 3D Charts -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="chart-3d">
+                    <h3 class="mb-4" style="color: var(--accent-primary);">
+                        <i class="fas fa-chart-area"></i> Weight Difference Timeline
+                    </h3>
+                    <canvas id="mainChart" height="135"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="chart-3d">
+                    <h3 class="mb-4" style="color: var(--accent-secondary);">
+                        <i class="fas fa-chart-pie"></i> Distribution
+                    </h3>
+                    <canvas id="pieChart" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Holographic Table -->
+        <div class="holo-table">
+            <h3 class="mb-4" style="color: var(--accent-primary);">
+                <i class="fas fa-database"></i> Recent Entries
+            </h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Initial</th>
+                        <th>Final</th>
+                        <th>Difference</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Oct 5, 2025</strong></td>
+                        <td>75.2 kg</td>
+                        <td>74.8 kg</td>
+                        <td><span style="color: var(--accent-tertiary);">-0.4 kg</span></td>
+                        <td>
+                            <div style="width: 100px; height: 6px; background: var(--surface-light); border-radius: 3px;">
+                                <div style="width: 85%; height: 100%; background: var(--gradient-aurora); border-radius: 3px;"></div>
+                            </div>
+                        </td>
+                        <td><span style="color: var(--accent-tertiary);">✓ Success</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Oct 4, 2025</strong></td>
+                        <td>75.5 kg</td>
+                        <td>75.2 kg</td>
+                        <td><span style="color: var(--accent-tertiary);">-0.3 kg</span></td>
+                        <td>
+                            <div style="width: 100px; height: 6px; background: var(--surface-light); border-radius: 3px;">
+                                <div style="width: 70%; height: 100%; background: var(--gradient-aurora); border-radius: 3px;"></div>
+                            </div>
+                        </td>
+                        <td><span style="color: var(--accent-tertiary);">✓ Success</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Oct 3, 2025</strong></td>
+                        <td>75.3 kg</td>
+                        <td>75.5 kg</td>
+                        <td><span style="color: var(--accent-secondary);">+0.2 kg</span></td>
+                        <td>
+                            <div style="width: 100px; height: 6px; background: var(--surface-light); border-radius: 3px;">
+                                <div style="width: 30%; height: 100%; background: var(--gradient-aurora); border-radius: 3px;"></div>
+                            </div>
+                        </td>
+                        <td><span style="color: var(--accent-secondary);">↑ Gain</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Floating Action Buttons -->
+    <div class="fab-container">
+        <button class="fab" title="Export Data">
+            <i class="fas fa-download"></i>
+        </button>
+        <button class="fab" title="Add Entry">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="fab" title="Settings">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+
+    <script>
+        // Toggle Sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Period Pills
+        document.querySelectorAll('.period-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                document.querySelectorAll('.period-pill').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                updateCharts(this.dataset.period);
+            });
+        });
+
+        // Main Chart with Gradient
+        const ctx1 = document.getElementById('mainChart').getContext('2d');
+        const gradient = ctx1.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(0, 212, 255, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(255, 0, 255, 0.5)');
+        gradient.addColorStop(1, 'rgba(0, 255, 136, 0.2)');
+
+        const mainChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                datasets: [{
+                    label: 'Weight Difference',
+                    data: [-0.3, -0.5, 0.2, -0.4, -0.6, -0.2, -0.3],
+                    borderColor: '#00d4ff',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    pointBackgroundColor: '#00d4ff',
+                    pointBorderColor: '#0a0e27',
+                    pointBorderWidth: 3,
+                    pointStyle: 'rectRounded'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(10, 14, 39, 0.9)',
+                        titleColor: '#00d4ff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#00d4ff',
+                        borderWidth: 1,
+                        displayColors: false,
+                        padding: 15,
+                        bodyFont: {
+                            size: 14
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y < 0 ?
+                                    '📉 Lost: ' + Math.abs(context.parsed.y) + ' kg' :
+                                    '📈 Gained: ' + context.parsed.y + ' kg';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(0, 212, 255, 0.1)',
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            color: '#a0a9d1',
+                            callback: function(value) {
+                                return value + ' kg';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 212, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#a0a9d1'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const ctx2 = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Weight Loss', 'Weight Gain', 'Stable'],
+                datasets: [{
+                    data: [65, 20, 15],
+                    backgroundColor: [
+                        '#00ff88',
+                        '#ff00ff',
+                        '#00d4ff'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#a0a9d1',
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(10, 14, 39, 0.9)',
+                        titleColor: '#00d4ff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#00d4ff',
+                        borderWidth: 1
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // Update charts animation
+        function updateCharts(period) {
+            // Simulate data loading
+            mainChart.data.datasets[0].data = generateRandomData();
+            mainChart.update('active');
+
+            pieChart.data.datasets[0].data = generateRandomPieData();
+            pieChart.update('active');
+        }
+
+        function generateRandomData() {
+            return Array.from({length: 7}, () => (Math.random() - 0.5) * 2);
+        }
+
+        function generateRandomPieData() {
+            const a = Math.floor(Math.random() * 30) + 50;
+            const b = Math.floor(Math.random() * 20) + 10;
+            const c = 100 - a - b;
+            return [a, b, c];
+        }
+
+        // Add parallax effect on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.iso-card');
+            const x = (e.clientX - window.innerWidth / 2) / 50;
+            const y = (e.clientY - window.innerHeight / 2) / 50;
+
+            cards.forEach((card, index) => {
+                const factor = (index + 1) * 0.5;
+                card.style.transform = `rotateX(${10 - y * factor}deg) rotateY(${-10 + x * factor}deg)`;
+            });
+        });
+
+        // FAB animations
+        document.querySelectorAll('.fab').forEach(fab => {
+            fab.addEventListener('click', function() {
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>

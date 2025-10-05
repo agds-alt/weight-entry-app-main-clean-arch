@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen User - WeightTracker Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #ff00ff;
+            --neon-lime: #00ff9d;
+            --neon-blue: #0066ff;
+            --dark-bg: #0a0a1a;
+            --card-bg: rgba(16, 16, 32, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --hologram-gradient: linear-gradient(
+                45deg,
+                var(--neon-cyan) 0%,
+                var(--neon-magenta) 25%,
+                var(--neon-lime) 50%,
+                var(--neon-blue) 75%,
+                var(--neon-cyan) 100%
+            );
+        }
+
+        body {
+            background: var(--dark-bg);
+            min-height: 100vh;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #fff;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        /* 3D Header Card with Holographic Effect */
+        .header-card {
+            background: linear-gradient(135deg, 
+                rgba(0, 102, 255, 0.2) 0%, 
+                rgba(255, 0, 255, 0.2) 50%, 
+                rgba(0, 255, 157, 0.2) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            transform: perspective(1000px) rotateX(2deg);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.4),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+        }
+
+        .header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                conic-gradient(
+                    from 0deg at 50% 50%,
+                    rgba(0, 255, 255, 0.1) 0%,
+                    rgba(255, 0, 255, 0.1) 25%,
+                    rgba(0, 255, 0, 0.1) 50%,
+                    rgba(0, 102, 255, 0.1) 75%,
+                    rgba(0, 255, 255, 0.1) 100%
+                );
+            animation: aurora 20s linear infinite;
+            z-index: 0;
+            border-radius: 20px;
+        }
+
+        .header-card:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.5),
+                0 0 20px rgba(0, 255, 255, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-lime));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Stats Cards with 3D Holographic Effect */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            transform: perspective(500px) rotateX(0deg);
+            box-shadow: 
+                0 10px 25px rgba(0,0,0,0.3),
+                inset 0 0 0 1px var(--glass-border);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--hologram-gradient);
+            z-index: 1;
+        }
+
+        .stat-card:hover {
+            transform: perspective(500px) rotateX(-5deg) translateY(-5px);
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.4),
+                0 0 15px rgba(0, 255, 255, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-card.users { border-left: 4px solid var(--neon-blue); }
+        .stat-card.active { border-left: 4px solid var(--neon-lime); }
+        .stat-card.admins { border-left: 4px solid var(--neon-magenta); }
+        .stat-card.new { border-left: 4px solid var(--neon-cyan); }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card.users .stat-icon { 
+            background: linear-gradient(135deg, var(--neon-blue), #3182ce);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
+        }
+        .stat-card.active .stat-icon { 
+            background: linear-gradient(135deg, var(--neon-lime), #38a169);
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.4);
+        }
+        .stat-card.admins .stat-icon { 
+            background: linear-gradient(135deg, var(--neon-magenta), #dd6b20);
+            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
+        }
+        .stat-card.new .stat-icon { 
+            background: linear-gradient(135deg, var(--neon-cyan), #805ad5);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .stat-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            font-weight: 700;
+            background: var(--hologram-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* User Table with Holographic Design */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.3),
+                inset 0 0 0 1px var(--glass-border);
+            transform: perspective(2000px) rotateX(1deg);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--hologram-gradient);
+            z-index: 1;
+        }
+
+        .table-card:hover {
+            transform: perspective(2000px) rotateX(0deg);
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.4),
+                0 0 15px rgba(0, 255, 255, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            background: rgba(10, 10, 20, 0.5);
+            border: 2px solid var(--glass-border);
+            border-radius: 10px;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .search-box input:focus {
+            background: rgba(10, 10, 20, 0.7);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
+            color: white;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neon-cyan);
+        }
+
+        /* Modern Table */
+        .user-table {
+            width: 100%;
+            color: white;
+        }
+
+        .user-table thead th {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            border: none;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .user-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .user-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .user-table tbody td {
+            padding: 20px 15px;
+            vertical-align: middle;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: var(--hologram-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-bg);
+            font-weight: 600;
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-avatar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 3px;
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Status Badges */
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--neon-lime);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+        }
+
+        .badge-inactive {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .badge-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        /* Role Badges */
+        .badge-role {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-admin {
+            background: linear-gradient(135deg, var(--neon-magenta), #f5576c);
+            color: white;
+            box-shadow: 0 3px 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .badge-user {
+            background: linear-gradient(135deg, var(--neon-blue), #00f2fe);
+            color: white;
+            box-shadow: 0 3px 10px rgba(0, 102, 255, 0.3);
+        }
+
+        .badge-moderator {
+            background: linear-gradient(135deg, var(--neon-lime), #38f9d7);
+            color: var(--dark-bg);
+            box-shadow: 0 3px 10px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .btn-action:hover::before {
+            opacity: 1;
+            animation: shine 0.5s;
+        }
+
+        .btn-edit {
+            background: rgba(0, 181, 173, 0.2);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 181, 173, 0.3);
+        }
+
+        .btn-edit:hover {
+            background: rgba(0, 181, 173, 0.4);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,181,173,0.4);
+        }
+
+        .btn-delete {
+            background: rgba(252, 92, 101, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(252, 92, 101, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: rgba(252, 92, 101, 0.4);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(252,92,101,0.4);
+        }
+
+        .btn-view {
+            background: rgba(49, 130, 206, 0.2);
+            color: var(--neon-blue);
+            border: 1px solid rgba(49, 130, 206, 0.3);
+        }
+
+        .btn-view:hover {
+            background: rgba(49, 130, 206, 0.4);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(49,130,206,0.4);
+        }
+
+        /* Add User Button */
+        .btn-add-user {
+            background: var(--hologram-gradient);
+            color: var(--dark-bg);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-add-user::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .btn-add-user:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 243, 255, 0.6);
+            color: var(--dark-bg);
+        }
+
+        .btn-add-user:hover::before {
+            left: 100%;
+        }
+
+        /* Modal with Holographic Effect */
+        .modal-content {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transform: perspective(1000px) rotateX(0deg);
+            animation: modalSlideIn 0.3s ease-out;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: white;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: perspective(1000px) rotateX(-15deg) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: perspective(1000px) rotateX(0deg) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: var(--hologram-gradient);
+            color: var(--dark-bg);
+            border-radius: 20px 20px 0 0;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                conic-gradient(
+                    from 0deg at 50% 50%,
+                    rgba(255, 255, 255, 0.2) 0%,
+                    rgba(255, 255, 255, 0.1) 25%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    rgba(255, 255, 255, 0.1) 75%,
+                    rgba(255, 255, 255, 0.2) 100%
+                );
+            animation: aurora 10s linear infinite;
+        }
+
+        .modal-title {
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            background: rgba(10, 10, 20, 0.5);
+            border: 2px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .form-control:focus {
+            background: rgba(10, 10, 20, 0.7);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Pagination */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 5px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--glass-border);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            border-color: var(--neon-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .page-btn.active {
+            background: var(--hologram-gradient);
+            color: var(--dark-bg);
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .page-info {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes aurora {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.2);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                transform: rotate(45deg) translateX(-100%);
+            }
+            100% {
+                transform: rotate(45deg) translateX(200%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar will be injected here -->
+    
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header-card">
+            <h1 class="header-title">
+                <i class="fas fa-users me-3"></i>
+                Manajemen User
+            </h1>
+            <p class="mb-0" style="position: relative; z-index: 1;">Kelola user, role, dan permission dengan mudah</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-container">
+            <div class="stat-card users">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="h2 mb-1">1,248</h3>
+                <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">Total Users</p>
+            </div>
+            
+            <div class="stat-card active">
+                <div class="stat-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h3 class="h2 mb-1">892</h3>
+                <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">Active Users</p>
+            </div>
+            
+            <div class="stat-card admins">
+                <div class="stat-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="h2 mb-1">12</h3>
+                <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">Admins</p>
+            </div>
+            
+            <div class="stat-card new">
+                <div class="stat-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3 class="h2 mb-1">48</h3>
+                <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">New This Month</p>
+            </div>
+        </div>
+
+        <!-- User Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h5 class="mb-0" style="color: var(--neon-cyan);">
+                    <i class="fas fa-list me-2"></i>
+                    Daftar User
+                </h5>
+                <div class="d-flex gap-3">
+                    <div class="search-box">
+                        <input type="text" placeholder="Cari user...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="btn-add-user" onclick="showAddUserModal()">
+                        <i class="fas fa-plus"></i>
+                        Tambah User
+                    </button>
+                </div>
+            </div>
+
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th width="5%">ID</th>
+                        <th width="30%">User</th>
+                        <th width="15%">Role</th>
+                        <th width="15%">Status</th>
+                        <th width="15%">Joined</th>
+                        <th width="10%">Entries</th>
+                        <th width="10%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Sample data -->
+                    <tr>
+                        <td>#001</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">JD</div>
+                                <div>
+                                    <div class="user-name">John Doe</div>
+                                    <div class="user-email">john.doe@example.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge-role badge-admin">Admin</span></td>
+                        <td><span class="badge-status badge-active">Active</span></td>
+                        <td>Jan 15, 2024</td>
+                        <td>245</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action btn-delete" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#002</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">AS</div>
+                                <div>
+                                    <div class="user-name">Alice Smith</div>
+                                    <div class="user-email">alice.smith@example.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge-role badge-user">User</span></td>
+                        <td><span class="badge-status badge-active">Active</span></td>
+                        <td>Feb 20, 2024</td>
+                        <td>128</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action btn-delete" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#003</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">RJ</div>
+                                <div>
+                                    <div class="user-name">Robert Johnson</div>
+                                    <div class="user-email">robert.j@example.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge-role badge-moderator">Moderator</span></td>
+                        <td><span class="badge-status badge-pending">Pending</span></td>
+                        <td>Mar 5, 2024</td>
+                        <td>0</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action btn-delete" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination-wrapper">
+                <div class="page-info">
+                    Showing 1-10 of 1,248 users
+                </div>
+                <div class="pagination">
+                    <button class="page-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">...</button>
+                    <button class="page-btn">125</button>
+                    <button class="page-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Tambah User Baru
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" placeholder="Enter username">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" placeholder="Enter email">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter full name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Role</label>
+                                    <select class="form-control">
+                                        <option>User</option>
+                                        <option>Admin</option>
+                                        <option>Moderator</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" placeholder="Enter password">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" placeholder="Confirm password">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" style="background: var(--hologram-gradient); border: none; color: var(--dark-bg); font-weight: 600;">Add User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script>
+        function showAddUserModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>

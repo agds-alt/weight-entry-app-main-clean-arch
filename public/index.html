@@ -1,0 +1,1130 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeightTracker Pro - Aplikasi Manajemen Berat Badan Professional</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00f5ff; /* Cyan neon */
+            --secondary: #ff00ff; /* Magenta neon */
+            --accent: #00ff7f; /* Lime neon */
+            --dark: #0a0a12;
+            --darker: #050508;
+            --light: #f0f8ff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            line-height: 1.6;
+        }
+
+        /* Holographic Hero Section */
+        .hero {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 245, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(0, 255, 127, 0.1) 0%, transparent 50%);
+            overflow: hidden;
+        }
+
+        /* Aurora Animation */
+        .aurora {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .aurora-layer {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.7;
+            animation: auroraFloat 15s ease-in-out infinite;
+        }
+
+        .aurora-1 {
+            width: 60%;
+            height: 60%;
+            top: -10%;
+            left: -10%;
+            background: var(--primary);
+            animation-delay: 0s;
+        }
+
+        .aurora-2 {
+            width: 50%;
+            height: 50%;
+            bottom: -10%;
+            right: -10%;
+            background: var(--secondary);
+            animation-delay: 5s;
+        }
+
+        .aurora-3 {
+            width: 40%;
+            height: 40%;
+            top: 40%;
+            left: 50%;
+            background: var(--accent);
+            animation-delay: 10s;
+        }
+
+        @keyframes auroraFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(5%, 5%) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-5%, -5%) scale(0.9);
+            }
+        }
+
+        /* Holographic Floating Cards */
+        .holographic-card {
+            position: absolute;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: holographicFloat 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .holographic-card-1 {
+            width: 300px;
+            height: 200px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 50%, rgba(0, 255, 127, 0.1) 100%);
+        }
+
+        .holographic-card-2 {
+            width: 250px;
+            height: 150px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.1) 0%, rgba(0, 255, 127, 0.1) 50%, rgba(0, 245, 255, 0.1) 100%);
+        }
+
+        .holographic-card-3 {
+            width: 200px;
+            height: 200px;
+            bottom: 10%;
+            left: 10%;
+            animation-delay: 4s;
+            background: linear-gradient(135deg, rgba(0, 255, 127, 0.1) 0%, rgba(0, 245, 255, 0.1) 50%, rgba(255, 0, 255, 0.1) 100%);
+        }
+
+        @keyframes holographicFloat {
+            0%, 100% {
+                transform: translateY(0) rotateX(0) rotateY(0);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+
+            50% {
+                transform: translateY(-20px) rotateX(10deg) rotateY(10deg);
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 245, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: rgba(10, 10, 18, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+            .navbar.scrolled {
+                background: rgba(10, 10, 18, 0.95);
+                box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        .navbar.scrolled .logo {
+            color: var(--light);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .navbar.scrolled .nav-link {
+            color: var(--light);
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Hero Content */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: var(--light);
+            padding: 0 20px;
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Holographic Buttons */
+        .btn-holographic {
+            display: inline-block;
+            padding: 18px 40px;
+            margin: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 50px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+            .btn-holographic::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(0, 245, 255, 0.3) 0%, rgba(255, 0, 255, 0.3) 50%, rgba(0, 255, 127, 0.3) 100%);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .btn-holographic:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 245, 255, 0.3);
+            }
+
+                .btn-holographic:hover::before {
+                    opacity: 1;
+                }
+
+            .btn-holographic:active {
+                transform: translateY(-2px);
+            }
+
+            .btn-holographic.primary {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+                color: var(--darker);
+                font-weight: 700;
+            }
+
+            .btn-holographic.secondary {
+                background: transparent;
+                color: var(--light);
+                border: 1px solid var(--glass-border);
+            }
+
+        /* Features Section */
+        .features {
+            padding: 100px 20px;
+            background: var(--darker);
+            position: relative;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: rgba(240, 248, 255, 0.7);
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        /* Holographic Feature Cards */
+        .holographic-feature-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+            border: 1px solid var(--glass-border);
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(0) rotateY(0);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+            .holographic-feature-card.animate {
+                opacity: 1;
+                transform: translateY(0);
+                transition: opacity 0.8s ease, transform 0.8s ease;
+            }
+
+            .holographic-feature-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(0, 245, 255, 0.05) 0%, rgba(255, 0, 255, 0.05) 50%, rgba(0, 255, 127, 0.05) 100%);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .holographic-feature-card:hover {
+                transform: perspective(1000px) rotateX(-5deg) rotateY(5deg) translateY(-10px);
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 245, 255, 0.2);
+            }
+
+                .holographic-feature-card:hover::before {
+                    opacity: 1;
+                }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--darker);
+            transform: translateZ(20px);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        .feature-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+
+        .feature-description {
+            color: rgba(240, 248, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Stats Section with Holographic Effects */
+        .stats {
+            padding: 100px 20px;
+            background: radial-gradient(circle at 30% 70%, rgba(0, 245, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .holographic-stat-box {
+            text-align: center;
+            color: var(--light);
+            transform: perspective(500px) rotateX(0);
+            transition: all 0.3s;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+        }
+
+            .holographic-stat-box.animate {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                transition: opacity 0.6s ease, transform 0.6s ease;
+            }
+
+            .holographic-stat-box:hover {
+                transform: perspective(500px) rotateX(-10deg) scale(1.05);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 245, 255, 0.2);
+            }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 20px;
+            background: var(--darker);
+            text-align: center;
+        }
+
+        .holographic-cta-box {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            color: var(--light);
+            position: relative;
+            transform: perspective(1000px) rotateX(0);
+            transition: all 0.3s;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+        }
+
+            .holographic-cta-box.animate {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                transition: opacity 0.8s ease, transform 0.8s ease;
+            }
+
+            .holographic-cta-box::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(0, 245, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 50%, rgba(0, 255, 127, 0.1) 100%);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .holographic-cta-box:hover {
+                transform: perspective(1000px) rotateX(-2deg);
+                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 245, 255, 0.3);
+            }
+
+                .holographic-cta-box:hover::before {
+                    opacity: 1;
+                }
+
+        .cta-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 50px 20px;
+            background: var(--darker);
+            color: var(--light);
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+            .footer.animate {
+                opacity: 1;
+                transform: translateY(0);
+                transition: opacity 0.8s ease, transform 0.8s ease;
+            }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-link {
+            color: var(--light);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+            .footer-link:hover {
+                opacity: 1;
+                text-shadow: 0 0 10px var(--primary);
+            }
+
+        /* Progress Scroll Indicator */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            z-index: 1001;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.7);
+        }
+
+        /* Scroll to Top Button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light);
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+            .scroll-to-top.visible {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .scroll-to-top:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 245, 255, 0.5);
+                background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .holographic-card {
+                display: none;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .scroll-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--darker);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+
+            .loader.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        .holographic-loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Staggered Animation for Feature Cards */
+        .holographic-feature-card:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .holographic-feature-card:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .holographic-feature-card:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+
+        .holographic-feature-card:nth-child(4) {
+            transition-delay: 0.4s;
+        }
+
+        .holographic-feature-card:nth-child(5) {
+            transition-delay: 0.5s;
+        }
+
+        .holographic-feature-card:nth-child(6) {
+            transition-delay: 0.6s;
+        }
+
+        /* Staggered Animation for Stats */
+        .holographic-stat-box:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .holographic-stat-box:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .holographic-stat-box:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+
+        .holographic-stat-box:nth-child(4) {
+            transition-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-chevron-up"></i>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="holographic-loader-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-weight-hanging"></i>
+                WeightTracker Pro
+            </a>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#stats" class="nav-link">Statistics</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="/login.html" class="btn-holographic primary" style="padding: 12px 30px; font-size: 14px;">
+                    Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Aurora Background -->
+        <div class="aurora">
+            <div class="aurora-layer aurora-1"></div>
+            <div class="aurora-layer aurora-2"></div>
+            <div class="aurora-layer aurora-3"></div>
+        </div>
+
+        <!-- Holographic Floating Elements -->
+        <div class="holographic-card holographic-card-1"></div>
+        <div class="holographic-card holographic-card-2"></div>
+        <div class="holographic-card holographic-card-3"></div>
+
+        <div class="hero-content">
+            <h1 class="hero-title">Track Your Weight Journey</h1>
+            <p class="hero-subtitle">
+                Aplikasi manajemen berat badan professional dengan analytics canggih
+                dan visualisasi data yang memukau
+            </p>
+            <div class="hero-buttons">
+                <a href="/signup.html" class="btn-holographic primary">
+                    <i class="fas fa-rocket me-2"></i> Get Started Free
+                </a>
+                <a href="#features" class="btn-holographic secondary">
+                    <i class="fas fa-play-circle me-2"></i> Watch Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need to track and achieve your weight goals</p>
+
+            <div class="features-grid">
+                <div class="holographic-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Advanced Analytics</h3>
+                    <p class="feature-description">
+                        Visualisasi data real-time dengan grafik interaktif dan insight mendalam tentang progress Anda
+                    </p>
+                </div>
+
+                <div class="holographic-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3 class="feature-title">Progress Photos</h3>
+                    <p class="feature-description">
+                        Dokumentasikan perjalanan Anda dengan foto progress yang terorganisir dengan baik
+                    </p>
+                </div>
+
+                <div class="holographic-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="feature-title">Goal Setting</h3>
+                    <p class="feature-description">
+                        Tetapkan target yang realistis dan dapatkan reminder untuk mencapai tujuan Anda
+                    </p>
+                </div>
+
+                <div class="holographic-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Mobile Ready</h3>
+                    <p class="feature-description">
+                        Akses dari mana saja dengan desain responsive yang sempurna di semua device
+                    </p>
+                </div>
+
+                <div class="holographic-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Secure & Private</h3>
+                    <p class="feature-description">
+                        Data Anda aman dengan enkripsi end-to-end dan privacy controls yang ketat
+                    </p>
+                </div>
+
+                <div class="holographic-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3 class="feature-title">Export Data</h3>
+                    <p class="feature-description">
+                        Export data Anda dalam berbagai format untuk analisis lebih lanjut
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats" id="stats">
+        <div class="stats-grid">
+            <div class="holographic-stat-box">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="holographic-stat-box">
+                <div class="stat-number">1M+</div>
+                <div class="stat-label">Weight Entries</div>
+            </div>
+            <div class="holographic-stat-box">
+                <div class="stat-number">95%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="holographic-stat-box">
+                <div class="stat-number">4.9⭐</div>
+                <div class="stat-label">User Rating</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="holographic-cta-box">
+            <h2 class="cta-title">Start Your Journey Today</h2>
+            <p class="cta-text">
+                Join thousands of users who have transformed their lives with WeightTracker Pro
+            </p>
+            <a href="/signup.html" class="btn-holographic primary">
+                Get Started - It's Free!
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#" class="footer-link">Privacy Policy</a>
+            <a href="#" class="footer-link">Terms of Service</a>
+            <a href="#" class="footer-link">Contact</a>
+            <a href="#" class="footer-link">Support</a>
+        </div>
+        <p>&copy; 2025 Weight Tracker Pro. All right reserved. Made with hearth by agds corp (Abdul Gofur Dream Star Corp)</p>
+    </footer>
+
+    <script>
+        // Hide loader when page loads
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 500);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Parallax effect for hero
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+
+        // Add ripple effect to buttons
+        document.querySelectorAll('.btn-holographic').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = `${size}px`;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                ripple.classList.add('ripple');
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Scroll progress indicator
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+        });
+
+        // Scroll to top button
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll animation for elements
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+
+                    // Animate numbers in stats section
+                    if (entry.target.classList.contains('holographic-stat-box')) {
+                        const statNumber = entry.target.querySelector('.stat-number');
+                        if (statNumber && !statNumber.hasAttribute('data-animated')) {
+                            animateValue(statNumber, 0, parseInt(statNumber.textContent), 1500);
+                            statNumber.setAttribute('data-animated', 'true');
+                        }
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.holographic-feature-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        document.querySelectorAll('.holographic-stat-box').forEach(box => {
+            observer.observe(box);
+        });
+
+        document.querySelectorAll('.holographic-cta-box').forEach(box => {
+            observer.observe(box);
+        });
+
+        document.querySelectorAll('.footer').forEach(footer => {
+            observer.observe(footer);
+        });
+
+        // Number animation function
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+
+                // Format numbers with commas
+                element.textContent = value.toLocaleString() + (element.textContent.includes('%') ? '%' :
+                                    element.textContent.includes('⭐') ? '⭐' : '');
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Add subtle parallax to floating cards on scroll
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const cards = document.querySelectorAll('.holographic-card');
+
+            cards.forEach((card, index) => {
+                const speed = 0.1 + (index * 0.05);
+                card.style.transform = `translateY(${scrolled * speed}px) rotateX(${scrolled * 0.01}deg) rotateY(${scrolled * 0.01}deg)`;
+            });
+        });
+
+        // Add typing effect to hero title
+        function typeWriter(element, text, speed) {
+            let i = 0;
+            element.textContent = '';
+
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+
+            type();
+        }
+
+        // Uncomment to enable typing effect (optional)
+        // window.addEventListener('load', function() {
+        //     const heroTitle = document.querySelector('.hero-title');
+        //     const originalText = heroTitle.textContent;
+        //     typeWriter(heroTitle, originalText, 100);
+        // });
+    </script>
+</body>
+</html>

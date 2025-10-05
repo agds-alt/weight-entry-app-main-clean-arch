@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Management - WeightTracker Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark: #0a0e27;
+            --bg-medium: #151934;
+            --surface: #1e2139;
+            --surface-light: #262945;
+            --accent-cyan: #00d4ff;
+            --accent-magenta: #ff00ff;
+            --accent-lime: #00ff88;
+            --accent-orange: #ffaa00;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a9d1;
+            --gradient-holographic: linear-gradient(45deg, var(--accent-cyan), var(--accent-magenta), var(--accent-lime), var(--accent-orange), var(--accent-cyan));
+            --gradient-aurora: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            --shadow-holographic: 0 10px 30px rgba(0, 212, 255, 0.3), 0 0 20px rgba(255, 0, 255, 0.2), 0 0 10px rgba(0, 255, 136, 0.1);
+            --shadow-neumorphic: 20px 20px 60px #0a0b1a, -20px -20px 60px #1a1f3a;
+            --shadow-neumorphic-inset: inset 5px 5px 10px #0a0b1a, inset -5px -5px 10px #1a1f3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+            /* Animated Holographic Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%), radial-gradient(circle at 60% 70%, rgba(255, 170, 0, 0.1) 0%, transparent 50%);
+                animation: holographicFloat 20s ease infinite;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+        @keyframes holographicFloat {
+            0%, 100% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            33% {
+                transform: rotate(3deg) scale(1.05);
+            }
+
+            66% {
+                transform: rotate(-2deg) scale(1.02);
+            }
+        }
+
+       
+
+        @keyframes holographicWave {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 400% 50%;
+            }
+        }
+
+        .sidebar-logo i {
+            font-size: 28px;
+            color: white;
+        }
+
+        .sidebar-logo h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            transform: perspective(500px) rotateY(0deg);
+        }
+
+            .nav-link::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: var(--gradient-holographic);
+                background-size: 400% 400%;
+                opacity: 0;
+                transition: all 0.5s;
+            }
+
+            .nav-link:hover {
+                color: var(--text-primary);
+                transform: perspective(500px) rotateY(10deg) translateX(5px);
+                background: var(--surface-light);
+                box-shadow: var(--shadow-neumorphic-inset);
+            }
+
+            .nav-link.active {
+                color: var(--accent-cyan);
+                background: var(--surface-light);
+                box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), var(--shadow-neumorphic-inset);
+            }
+
+                .nav-link.active::before {
+                    left: 0;
+                    opacity: 0.1;
+                    animation: holographicWave 3s linear infinite;
+                }
+
+
+        /* Isometric Header */
+        .isometric-header {
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(5deg) rotateY(-2deg);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-holographic);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+            .isometric-header::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: var(--gradient-holographic);
+                background-size: 400% 400%;
+                border-radius: 30px;
+                opacity: 0.5;
+                z-index: -1;
+                animation: holographicWave 10s linear infinite;
+            }
+
+            .isometric-header:hover {
+                transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-10px);
+            }
+
+        .header-title {
+            font-size: 42px;
+            font-weight: 700;
+            background: var(--gradient-holographic);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: holographicWave 8s linear infinite;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Holographic Stats Grid */
+        .holographic-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .holo-stat-card {
+            background: var(--surface);
+            border-radius: 25px;
+            padding: 30px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(5deg) rotateY(2deg);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-holographic);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            overflow: hidden;
+        }
+
+            .holo-stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                transition: left 0.6s;
+            }
+
+            .holo-stat-card:hover::before {
+                left: 100%;
+            }
+
+            .holo-stat-card:hover {
+                transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-10px);
+                box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3), 0 0 20px rgba(0, 255, 136, 0.2);
+            }
+
+        .holo-stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+            background: var(--gradient-holographic);
+            background-size: 400% 400%;
+            animation: holographicWave 6s linear infinite;
+            box-shadow: var(--shadow-holographic);
+            transform: perspective(500px) rotateY(15deg);
+        }
+
+        .holo-stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .holo-stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .holo-stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: var(--accent-lime);
+        }
+
+        /* Glassmorphic Filter Card */
+        .glass-filter-card {
+            background: rgba(30, 33, 57, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: var(--shadow-holographic);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .glass-filter-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--gradient-holographic);
+                background-size: 400% 400%;
+                opacity: 0.05;
+                animation: holographicWave 15s linear infinite;
+                z-index: -1;
+            }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .holographic-input {
+            background: rgba(38, 41, 69, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 14px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+            .holographic-input:focus {
+                background: rgba(38, 41, 69, 0.9);
+                border-color: var(--accent-cyan);
+                box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+                outline: none;
+                transform: translateY(-2px);
+            }
+
+        .holographic-select {
+            background: rgba(38, 41, 69, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+            .holographic-select:focus {
+                background: rgba(38, 41, 69, 0.9);
+                border-color: var(--accent-cyan);
+                box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+                outline: none;
+            }
+
+        /* Holographic Buttons */
+        .btn-holographic {
+            background: var(--gradient-holographic);
+            background-size: 400% 400%;
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: holographicWave 8s linear infinite;
+            box-shadow: var(--shadow-holographic);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-holographic::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+                transition: left 0.6s;
+            }
+
+            .btn-holographic:hover::before {
+                left: 100%;
+            }
+
+            .btn-holographic:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 30px rgba(0, 212, 255, 0.5), 0 0 25px rgba(255, 0, 255, 0.4);
+            }
+
+        .btn-export {
+            background: linear-gradient(45deg, var(--accent-lime), #00cc7a);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-reset {
+            background: linear-gradient(45deg, var(--accent-magenta), #cc00cc);
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
+        }
+
+        /* 3D Data Table */
+        .table-3d-container {
+            background: var(--surface);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(3deg);
+            transition: all 0.5s;
+            box-shadow: var(--shadow-holographic);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .table-3d-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--gradient-holographic);
+                background-size: 400% 400%;
+                opacity: 0.03;
+                animation: holographicWave 20s linear infinite;
+                z-index: -1;
+            }
+
+            .table-3d-container:hover {
+                transform: perspective(1000px) rotateX(0deg);
+            }
+
+        .holographic-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            color: var(--text-primary);
+            transform: perspective(1000px) rotateX(0deg);
+        }
+
+            .holographic-table thead th {
+                background: rgba(0, 212, 255, 0.1);
+                color: var(--accent-cyan);
+                padding: 15px;
+                text-align: left;
+                font-weight: 600;
+                border-bottom: 2px solid var(--accent-cyan);
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                backdrop-filter: blur(10px);
+                text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+            }
+
+            .holographic-table tbody td {
+                padding: 15px;
+                border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+                transition: all 0.3s;
+            }
+
+            .holographic-table tbody tr {
+                transition: all 0.3s;
+                transform-style: preserve-3d;
+            }
+
+                .holographic-table tbody tr:hover {
+                    background: rgba(0, 212, 255, 0.05);
+                    transform: perspective(500px) rotateX(2deg) translateZ(10px);
+                    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+                }
+
+        .table-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+            .table-image:hover {
+                transform: scale(2) rotate(5deg);
+                box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            }
+
+        /* Holographic Badges */
+        .badge-holographic {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-diet {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent-lime);
+            border: 1px solid var(--accent-lime);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .badge-bulking {
+            background: rgba(255, 0, 255, 0.2);
+            color: var(--accent-magenta);
+            border: 1px solid var(--accent-magenta);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .badge-maintain {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .badge-medical {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--accent-orange);
+            border: 1px solid var(--accent-orange);
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            transform: perspective(500px) rotateY(0deg);
+        }
+
+        .btn-edit {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .btn-delete {
+            background: rgba(255, 0, 255, 0.2);
+            color: var(--accent-magenta);
+            border: 1px solid var(--accent-magenta);
+        }
+
+        .btn-action:hover {
+            transform: perspective(500px) rotateY(15deg) translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% {
+                transform: perspective(1000px) rotateX(5deg) rotateY(2deg) translateY(0);
+            }
+
+            50% {
+                transform: perspective(1000px) rotateX(5deg) rotateY(2deg) translateY(-10px);
+            }
+        }
+
+        .holo-stat-card:nth-child(1) {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .holo-stat-card:nth-child(2) {
+            animation: float 6s ease-in-out infinite 1.5s;
+        }
+
+        .holo-stat-card:nth-child(3) {
+            animation: float 6s ease-in-out infinite 3s;
+        }
+
+        .holo-stat-card:nth-child(4) {
+            animation: float 6s ease-in-out infinite 4.5s;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+                .sidebar.active {
+                    transform: translateX(0);
+                }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                width: 50px;
+                height: 50px;
+                border-radius: 15px;
+                background: var(--surface);
+                border: none;
+                color: var(--accent-cyan);
+                font-size: 20px;
+                cursor: pointer;
+                box-shadow: var(--shadow-neumorphic);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .holographic-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-section {
+                flex-direction: column;
+            }
+
+            .filter-item {
+                min-width: 100%;
+            }
+
+            .header-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+           
+
+    <!-- Main Content -->
+            <main class="main-content">
+                <!-- Isometric Header -->
+                <div class="isometric-header">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h1 class="header-title">
+                                <i class="fas fa-database me-2"></i>
+                                Data Management
+                            </h1>
+                            <p style="color: var(--text-secondary);">Kelola dan analisis data pengukuran berat dengan presisi</p>
+                        </div>
+                        <div class="text-end">
+                            <div style="color: var(--text-secondary); font-size: 14px;">Last Updated</div>
+                            <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--accent-cyan);">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <script src="/js/sidebar.js"></script>
+                <script src="/js/data-management.js"></script>
+
+                <!-- Holographic Stats Grid -->
+                <div class="holographic-stats">
+                    <div class="holo-stat-card">
+                        <div class="holo-stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="holo-stat-value" id="totalEntries">1,247</div>
+                        <div class="holo-stat-label">Total Data Entries</div>
+                        <span class="holo-stat-change">
+                            <i class="fas fa-arrow-up"></i> +12.5% this month
+                        </span>
+                    </div>
+
+                    <div class="holo-stat-card">
+                        <div class="holo-stat-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div class="holo-stat-value" id="avgWeight">68.3 kg</div>
+                        <div class="holo-stat-label">Average Weight</div>
+                        <span class="holo-stat-change">
+                            <i class="fas fa-chart-line"></i> Stable trend
+                        </span>
+                    </div>
+
+                    <div class="holo-stat-card">
+                        <div class="holo-stat-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="holo-stat-value" id="todayEntries">47</div>
+                        <div class="holo-stat-label">Entries Today</div>
+                        <span class="holo-stat-change">
+                            <i class="fas fa-bolt"></i> Active day
+                        </span>
+                    </div>
+
+                    <div class="holo-stat-card">
+                        <div class="holo-stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="holo-stat-value" id="weeklyGrowth">8.2%</div>
+                        <div class="holo-stat-label">Weekly Growth</div>
+                        <span class="holo-stat-change">
+                            <i class="fas fa-rocket"></i> Accelerating
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Glassmorphic Filter Card -->
+                <div class="glass-filter-card">
+                    <h5 class="mb-3" style="color: var(--accent-cyan);">
+                        <i class="fas fa-filter me-2"></i> Advanced Data Filters
+                    </h5>
+                    <div class="filter-section">
+                        <div class="filter-item">
+                            <div class="filter-label">Date Range</div>
+                            <input type="date" class="holographic-input w-100" id="startDate">
+                        </div>
+
+                        <div class="filter-item">
+                            <div class="filter-label">To Date</div>
+                            <input type="date" class="holographic-input w-100" id="endDate">
+                        </div>
+
+                        <div class="filter-item">
+                            <div class="filter-label">Category</div>
+                            <select class="holographic-select w-100" id="filterCategory">
+                                <option value="">All Categories</option>
+                                <option value="diet">Diet Program</option>
+                                <option value="bulking">Bulking Program</option>
+                                <option value="maintain">Maintenance</option>
+                                <option value="medical">Medical Check</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <div class="filter-label">Search Name</div>
+                            <input type="text" class="holographic-input w-100" id="filterName" placeholder="Enter name...">
+                        </div>
+
+                        <div class="filter-item">
+                            <button class="btn-holographic" id="applyFilter">
+                                <i class="fas fa-search me-2"></i> Apply Filters
+                            </button>
+                            <button class="btn-holographic btn-reset ms-2" id="resetFilter">
+                                <i class="fas fa-redo me-2"></i> Reset
+                            </button>
+                            <button class="btn-holographic btn-export ms-2" id="exportData">
+                                <i class="fas fa-download me-2"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Data Table -->
+                <div class="table-3d-container">
+                    <div class="table-wrapper">
+                        <table class="holographic-table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Photo</th>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Height (cm)</th>
+                                    <th>BMI</th>
+                                    <th>Target</th>
+                                    <th>Category</th>
+                                    <th>Difference</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                                <!-- Sample Data -->
+                                <tr>
+                                    <td>#001</td>
+                                    <td>
+                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
+                                    </td>
+                                    <td>John Doe</td>
+                                    <td>2024-01-15</td>
+                                    <td>72.5</td>
+                                    <td>175</td>
+                                    <td>23.7</td>
+                                    <td>70.0</td>
+                                    <td><span class="badge-holographic badge-diet">Diet</span></td>
+                                    <td style="color: var(--accent-lime);">-2.5 kg</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#002</td>
+                                    <td>
+                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
+                                    </td>
+                                    <td>Sarah Smith</td>
+                                    <td>2024-01-15</td>
+                                    <td>65.2</td>
+                                    <td>165</td>
+                                    <td>24.0</td>
+                                    <td>63.0</td>
+                                    <td><span class="badge-holographic badge-maintain">Maintain</span></td>
+                                    <td style="color: var(--accent-cyan);">+0.2 kg</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#003</td>
+                                    <td>
+                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
+                                    </td>
+                                    <td>Mike Johnson</td>
+                                    <td>2024-01-14</td>
+                                    <td>85.7</td>
+                                    <td>182</td>
+                                    <td>25.9</td>
+                                    <td>90.0</td>
+                                    <td><span class="badge-holographic badge-bulking">Bulking</span></td>
+                                    <td style="color: var(--accent-magenta);">+4.3 kg</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-action btn-delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+    <script>
+        // Toggle Sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Fungsi Logout
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            window.location.href = '/index.html';
+        }
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+
+        // Initialize functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to table rows
+            const tableRows = document.querySelectorAll('.holographic-table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'perspective(500px) rotateX(2deg) translateZ(10px)';
+                });
+
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'perspective(500px) rotateX(0deg) translateZ(0px)';
+                });
+            });
+
+            // Filter functionality
+            document.getElementById('applyFilter').addEventListener('click', function() {
+                // Add filter animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+
+                // Filter logic would go here
+                console.log('Applying filters...');
+            });
+
+            // Export functionality
+            document.getElementById('exportData').addEventListener('click', function() {
+                // Add export animation
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Exporting...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-download me-2"></i> Export Complete!';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-download me-2"></i> Export';
+                    }, 2000);
+                }, 1500);
+            });
+        });
+    </script>
+
+</body>
+</html>
