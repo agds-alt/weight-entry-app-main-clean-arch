@@ -741,119 +741,168 @@
                 return;
             }
 
-            const watermarkedFile = await addWatermark(file);
-            photos[currentSlot] = watermarkedFile;
-            displayPhoto(watermarkedFile, currentSlot);
+            // Show processing indicator
+            const slot = document.getElementById(currentSlot);
+            slot.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
+
+            try {
+                const watermarkedFile = await addWatermark(file);
+                photos[currentSlot] = watermarkedFile;
+                displayPhoto(watermarkedFile, currentSlot);
+            } catch (error) {
+                console.error('Watermark error:', error);
+                showAlert('error', 'Gagal memproses foto: ' + error.message);
+                // Reset slot
+                slot.innerHTML = `<i class="fas fa-plus"></i><span>Foto ${currentSlot === 'slot1' ? '1' : '2'}</span>`;
+            }
         }
 
         function addWatermark(file) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const img = new Image();
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
 
+                img.onerror = () => {
+                    reject(new Error('Gagal memuat gambar'));
+                };
+
                 img.onload = function() {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    
-                    ctx.drawImage(img, 0, 0);
-                    
-                    // Get current date/time
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('id-ID', {
-                        day: '2-digit',
-                        month: '2-digit', 
-                        year: 'numeric'
-                    });
-                    const timeStr = now.toLocaleTimeString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                    
-                    // Build location string
-                    const locationParts = [];
-                    if (userLocation.village) locationParts.push(userLocation.village);
-                    if (userLocation.district) locationParts.push(userLocation.district);
-                    if (userLocation.city) locationParts.push(userLocation.city);
-                    const locationStr = locationParts.length > 0 
-                        ? locationParts.join(', ') 
-                        : 'Indonesia';
-                    
-                    // Coordinates string
-                    const coordsStr = userLocation.coords 
-                        ? `Lat: ${userLocation.coords.lat}, Lon: ${userLocation.coords.lon}`
-                        : '';
-                    
-                    // Text lines for watermark
-                    const lines = [
-                        userName,
-                        `${dateStr} ${timeStr}`,
-                        locationStr,
-                        coordsStr
-                    ].filter(line => line); // Remove empty lines
-                    
-                    // Font settings
-                    const fontSize = Math.max(14, canvas.width / 50);
-                    ctx.font = `bold ${fontSize}px Arial`;
-                    
-                    // Calculate text dimensions
-                    const lineHeight = fontSize * 1.3;
-                    const padding = fontSize * 0.8;
-                    
-                    // Find max width
-                    let maxWidth = 0;
-                    lines.forEach(line => {
-                        const width = ctx.measureText(line).width;
-                        if (width > maxWidth) maxWidth = width;
-                    });
-                    
-                    // Background box dimensions
-                    const boxWidth = maxWidth + (padding * 2);
-                    const boxHeight = (lines.length * lineHeight) + (padding * 1.5);
-                    
-                    // Position: bottom-right corner
-                    const boxX = canvas.width - boxWidth - 10;
-                    const boxY = canvas.height - boxHeight - 10;
-                    
-                    // Draw semi-transparent background
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                    ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-                    
-                    // Draw text lines
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-                    
-                    lines.forEach((line, index) => {
-                        const textX = boxX + padding;
-                        const textY = boxY + padding + (index * lineHeight);
+                    try {
+                        // Optimize untuk mobile - resize jika terlalu besar
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDimension = 2048; // Max 2048px untuk mobile
                         
-                        // Text with slight shadow for better readability
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-                        ctx.shadowBlur = 3;
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = (height / width) * maxDimension;
+                                width = maxDimension;
+                            } else {
+                                width = (width / height) * maxDimension;
+                                height = maxDimension;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        // Draw image dengan smooth scaling
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Get current date/time
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: '2-digit', 
+                            year: 'numeric'
+                        });
+                        const timeStr = now.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        
+                        // Build location string
+                        const locationParts = [];
+                        if (userLocation.village) locationParts.push(userLocation.village);
+                        if (userLocation.district) locationParts.push(userLocation.district);
+                        if (userLocation.city) locationParts.push(userLocation.city);
+                        const locationStr = locationParts.length > 0 
+                            ? locationParts.join(', ') 
+                            : 'Indonesia';
+                        
+                        // Coordinates string
+                        const coordsStr = userLocation.coords 
+                            ? `Lat: ${userLocation.coords.lat}, Lon: ${userLocation.coords.lon}`
+                            : '';
+                        
+                        // Text lines for watermark
+                        const lines = [
+                            userName,
+                            `${dateStr} ${timeStr}`,
+                            locationStr,
+                            coordsStr
+                        ].filter(line => line);
+                        
+                        // Font settings - scale berdasarkan canvas width
+                        const fontSize = Math.max(12, Math.min(16, width / 50));
+                        ctx.font = `bold ${fontSize}px Arial`;
+                        
+                        // Calculate text dimensions
+                        const lineHeight = fontSize * 1.4;
+                        const padding = fontSize * 1;
+                        
+                        // Find max width
+                        let maxWidth = 0;
+                        lines.forEach(line => {
+                            const textWidth = ctx.measureText(line).width;
+                            if (textWidth > maxWidth) maxWidth = textWidth;
+                        });
+                        
+                        // Background box dimensions
+                        const boxWidth = maxWidth + (padding * 2);
+                        const boxHeight = (lines.length * lineHeight) + (padding * 1.5);
+                        
+                        // Position: bottom-right corner
+                        const margin = 10;
+                        const boxX = width - boxWidth - margin;
+                        const boxY = height - boxHeight - margin;
+                        
+                        // Draw background box
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+                        
+                        // Draw text lines
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'top';
+                        ctx.fillStyle = '#FFFFFF';
+                        
+                        // Simple shadow untuk readability
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                        ctx.shadowBlur = 2;
                         ctx.shadowOffsetX = 1;
                         ctx.shadowOffsetY = 1;
                         
-                        ctx.fillStyle = '#FFFFFF';
-                        ctx.fillText(line, textX, textY);
-                    });
-                    
-                    // Reset shadow
-                    ctx.shadowColor = 'transparent';
-                    ctx.shadowBlur = 0;
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                    
-                    canvas.toBlob(blob => {
-                        const watermarkedFile = new File([blob], file.name, { 
-                            type: file.type,
-                            lastModified: Date.now()
+                        lines.forEach((line, index) => {
+                            const textX = boxX + padding;
+                            const textY = boxY + padding + (index * lineHeight);
+                            ctx.fillText(line, textX, textY);
                         });
-                        resolve(watermarkedFile);
-                    }, file.type, 0.95);
+                        
+                        // Reset shadow
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                        
+                        // Convert to blob dengan quality sesuai device
+                        const quality = width > 1500 ? 0.85 : 0.90; // Lower quality untuk size besar
+                        
+                        canvas.toBlob(blob => {
+                            if (!blob) {
+                                reject(new Error('Gagal membuat watermark'));
+                                return;
+                            }
+                            
+                            const watermarkedFile = new File([blob], file.name, { 
+                                type: file.type,
+                                lastModified: Date.now()
+                            });
+                            resolve(watermarkedFile);
+                        }, file.type, quality);
+                        
+                    } catch (error) {
+                        reject(error);
+                    }
                 };
 
-                img.src = URL.createObjectURL(file);
+                // Load image
+                try {
+                    img.src = URL.createObjectURL(file);
+                } catch (error) {
+                    reject(new Error('Gagal membaca file'));
+                }
             });
         }
 
