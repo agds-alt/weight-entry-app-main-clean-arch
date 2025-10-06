@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entry Data Resi - Holographic UI</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Entry Data Resi</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,1060 +13,827 @@
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #0a0e27;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 15px;
+            color: #333;
         }
 
-            body::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(0, 255, 157, 0.1) 0%, transparent 50%);
-                animation: aurora 15s ease-in-out infinite;
-                z-index: 0;
-            }
-
-        @keyframes aurora {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-            }
-
-            50% {
-                opacity: 0.8;
-                transform: scale(1.1) rotate(5deg);
-            }
-        }
-
-        .main-content {
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .entry-container {
-            max-width: 1100px;
+        .container {
+            max-width: 600px;
             margin: 0 auto;
-            perspective: 1500px;
         }
 
-        .entry-card {
-            background: rgba(15, 20, 45, 0.85);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 30px;
-            padding: 50px;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: rotateX(5deg) rotateY(-2deg);
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 0 80px rgba(0, 255, 255, 0.2), 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(0, 255, 255, 0.05);
-        }
-
-            .entry-card::before {
-                content: '';
-                position: absolute;
-                top: -2px;
-                left: -2px;
-                right: -2px;
-                bottom: -2px;
-                background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff9d, #00ffff);
-                border-radius: 30px;
-                z-index: -1;
-                opacity: 0;
-                transition: opacity 0.6s;
-                animation: borderRotate 4s linear infinite;
-            }
-
-            .entry-card:hover::before {
-                opacity: 0.6;
-            }
-
-        @keyframes borderRotate {
-            0% {
-                filter: hue-rotate(0deg);
-            }
-
-            100% {
-                filter: hue-rotate(360deg);
-            }
-        }
-
-        .entry-card:hover {
-            transform: rotateX(0deg) rotateY(0deg) translateY(-10px);
-            box-shadow: 0 0 120px rgba(0, 255, 255, 0.4), 0 30px 80px rgba(0, 0, 0, 0.6);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(255, 0, 255, 0.2) 100%);
-            border: 2px solid rgba(0, 255, 255, 0.4);
-            padding: 35px;
-            border-radius: 20px;
-            margin: -50px -50px 40px -50px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-            .card-header::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
-                animation: scan 3s ease-in-out infinite;
-            }
-
-        @keyframes scan {
-            0% {
-                left: -100%;
-            }
-
-            100% {
-                left: 200%;
-            }
-        }
-
-        .card-header h3 {
-            position: relative;
-            z-index: 1;
-            color: #00ffff;
-            font-weight: 700;
-            font-size: 28px;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.5), 0 0 30px rgba(0, 255, 255, 0.3);
-            margin-bottom: 10px;
-        }
-
-        .card-header p {
-            color: rgba(0, 255, 157, 0.8);
-            font-size: 14px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-section {
-            margin-bottom: 30px;
-            padding: 30px;
-            background: rgba(20, 25, 50, 0.6);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 20px;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: translateZ(20px);
-            transition: all 0.4s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        }
-
-            .form-section:hover {
-                transform: translateZ(30px) translateY(-5px);
-                border-color: rgba(0, 255, 255, 0.5);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 255, 0.2);
-            }
-
-        .section-title {
-            color: #00ffff;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-            .section-title i {
-                font-size: 24px;
-                color: #ff00ff;
-                animation: float 3s ease-in-out infinite;
-            }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-5px);
-            }
-        }
-
-        .form-control, .form-select {
-            background: rgba(10, 15, 35, 0.8);
-            border: 2px solid rgba(0, 255, 255, 0.3);
+        .card {
+            background: white;
             border-radius: 12px;
-            padding: 16px;
-            color: #00ffff;
-            font-size: 15px;
-            transition: all 0.3s;
-            font-family: 'Space Grotesk', sans-serif;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-            .form-control::placeholder {
-                color: rgba(0, 255, 255, 0.4);
-            }
-
-            .form-control:focus, .form-select:focus {
-                background: rgba(10, 15, 35, 0.95);
-                border-color: #00ffff;
-                box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
-                transform: translateY(-2px);
-                color: #00ffff;
-                outline: none;
-            }
-
-            .form-control:read-only {
-                background: rgba(0, 255, 255, 0.05);
-                border-color: rgba(0, 255, 255, 0.2);
-                cursor: not-allowed;
-                color: rgba(0, 255, 255, 0.7);
-            }
-
-        .form-label {
-            color: rgba(0, 255, 157, 0.9);
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .selisih-display {
-            padding: 30px;
-            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(255, 0, 255, 0.2) 100%);
-            border: 2px solid rgba(0, 255, 255, 0.5);
-            border-radius: 20px;
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
             text-align: center;
-            margin-top: 25px;
-            position: relative;
-            overflow: hidden;
-            transform: perspective(800px) rotateX(10deg);
-            transition: all 0.5s;
-            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2), inset 0 0 30px rgba(0, 255, 255, 0.1);
-        }
-
-            .selisih-display::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-                animation: rotate 10s linear infinite;
-            }
-
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .selisih-display:hover {
-            transform: perspective(800px) rotateX(0deg) scale(1.05);
-            box-shadow: 0 30px 60px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 255, 255, 0.2);
-        }
-
-        .selisih-value {
-            font-size: 56px;
-            font-weight: 700;
-            color: #00ffff;
-            margin: 15px 0;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.5);
-            position: relative;
-            z-index: 1;
-        }
-
-        .selisih-label {
-            font-size: 16px;
-            color: rgba(0, 255, 157, 0.9);
-            position: relative;
-            z-index: 1;
-        }
-
-        .selisih-positive {
-            border-color: rgba(255, 0, 255, 0.5);
-        }
-
-            .selisih-positive .selisih-value {
-                color: #ff00ff;
-                text-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 40px rgba(255, 0, 255, 0.5);
-            }
-
-        .selisih-negative {
-            border-color: rgba(0, 255, 157, 0.5);
-        }
-
-            .selisih-negative .selisih-value {
-                color: #00ff9d;
-                text-shadow: 0 0 20px rgba(0, 255, 157, 0.8), 0 0 40px rgba(0, 255, 157, 0.5);
-            }
-
-        /* Upload Options */
-        .upload-options {
-            display: flex;
-            gap: 15px;
             margin-bottom: 20px;
         }
 
-        .upload-btn {
-            padding: 18px;
-            background: rgba(10, 15, 35, 0.8);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 12px;
-            color: #00ffff;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
+        .header h2 {
+            font-size: 20px;
             font-weight: 600;
-            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* User Field dengan Highlight */
+        .user-field {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border: 2px solid #f39c12;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-field i {
+            color: #e67e22;
+        }
+
+        /* Form Groups */
+        .form-group {
             margin-bottom: 15px;
         }
 
-            .upload-btn:hover {
-                background: rgba(0, 255, 255, 0.1);
-                border-color: #00ffff;
-                box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-                transform: translateY(-2px);
-            }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555;
+        }
 
-            .upload-btn i {
-                display: block;
-                font-size: 28px;
-                margin-bottom: 10px;
-                color: #ff00ff;
-            }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
 
-        .upload-section {
-            border: 3px dashed rgba(0, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            background: rgba(10, 15, 35, 0.5);
-            cursor: pointer;
-            transition: all 0.4s;
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-control:disabled {
+            background: #f5f5f5;
+        }
+
+        /* Resi Input dengan Scanner */
+        .resi-group {
             position: relative;
-            overflow: hidden;
         }
 
-            .upload-section::before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 0;
-                height: 0;
-                border-radius: 50%;
-                background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
-                transform: translate(-50%, -50%);
-                transition: all 0.6s;
-            }
-
-            .upload-section:hover::before {
-                width: 400px;
-                height: 400px;
-            }
-
-            .upload-section:hover {
-                border-color: #00ffff;
-                background: rgba(0, 255, 255, 0.05);
-                box-shadow: 0 0 30px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 255, 255, 0.1);
-            }
-
-        .upload-icon {
-            font-size: 56px;
-            background: linear-gradient(135deg, #00ffff, #ff00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: pulse-glow 2s ease-in-out infinite;
+        .resi-group input {
+            padding-right: 100px;
+            text-transform: uppercase;
         }
 
-        @keyframes pulse-glow {
-            0%, 100% {
-                filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
-                transform: scale(1);
-            }
-
-            50% {
-                filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.8));
-                transform: scale(1.1);
-            }
-        }
-
-        .upload-section h6 {
-            color: #00ffff;
-            margin-top: 15px;
+        .scan-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
             font-weight: 600;
         }
 
-        .upload-section p {
-            color: rgba(0, 255, 255, 0.6);
+        .scan-btn:active {
+            background: #5568d3;
         }
 
-        .image-preview-grid {
+        /* Photo Upload Mode Selection */
+        .upload-mode {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 25px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        .image-preview-container {
-            position: relative;
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 20px;
-            overflow: hidden;
-            transform: perspective(800px) rotateY(5deg);
-            transition: all 0.5s;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 255, 0.2);
+        .mode-btn {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
         }
 
-            .image-preview-container:hover {
-                transform: perspective(800px) rotateY(0deg) scale(1.05);
-                border-color: #00ffff;
-                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 255, 255, 0.4);
-            }
+        .mode-btn.active {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
 
-        .image-preview {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
+        .mode-btn i {
+            font-size: 20px;
+            color: #667eea;
             display: block;
+            margin-bottom: 5px;
         }
 
-        .remove-image {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 0, 100, 0.9);
-            border: 2px solid rgba(255, 0, 100, 1);
-            color: white;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
+        .mode-btn span {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Photo Upload Slots */
+        .photo-slots {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-slot {
+            aspect-ratio: 1;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 0, 100, 0.5);
-            font-size: 20px;
-        }
-
-            .remove-image:hover {
-                transform: scale(1.3) rotate(90deg);
-                box-shadow: 0 0 30px rgba(255, 0, 100, 0.8);
-                background: rgba(255, 0, 100, 1);
-            }
-
-        .image-label {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            color: #00ffff;
-            padding: 20px;
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        .status-select {
-            background: rgba(10, 15, 35, 0.8);
-            border: 2px solid;
-            border-radius: 20px;
-            padding: 12px 20px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-            .status-select[value="submitted"] {
-                border-color: #ffcc00;
-                color: #ffcc00;
-                box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
-            }
-
-            .status-select[value="verified"] {
-                border-color: #00ff9d;
-                color: #00ff9d;
-                box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
-            }
-
-            .status-select[value="disputed"] {
-                border-color: #ff0064;
-                color: #ff0064;
-                box-shadow: 0 0 20px rgba(255, 0, 100, 0.3);
-            }
-
-        .btn-3d {
-            padding: 16px 40px;
-            border: none;
-            border-radius: 15px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            background: #fafafa;
             position: relative;
             overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .btn-primary-3d {
-            background: linear-gradient(135deg, #00ffff, #ff00ff);
-            color: #0a0e27;
-            border: 2px solid #00ffff;
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.2);
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #667eea;
         }
 
-            .btn-primary-3d:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 40px rgba(0, 255, 255, 0.4), 0 0 40px rgba(0, 255, 255, 0.4);
-            }
-
-        .btn-secondary-3d {
-            background: rgba(10, 15, 35, 0.8);
-            color: #00ffff;
-            border: 2px solid rgba(0, 255, 255, 0.5);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 255, 0.2);
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-            .btn-secondary-3d:hover {
-                transform: translateY(-5px);
-                background: rgba(0, 255, 255, 0.1);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 255, 255, 0.3);
-            }
+        .photo-slot i {
+            font-size: 24px;
+            color: #999;
+            margin-bottom: 5px;
+        }
 
-        .success-message {
-            background: linear-gradient(135deg, rgba(0, 255, 157, 0.2) 0%, rgba(0, 255, 255, 0.2) 100%);
-            border: 2px solid rgba(0, 255, 157, 0.5);
-            color: #00ff9d;
-            padding: 25px;
-            border-radius: 20px;
+        .photo-slot span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Weight Info */
+        .weight-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .selisih-box {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .selisih-box.positive {
+            background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+        }
+
+        .selisih-box.negative {
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+        }
+
+        .selisih-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:active {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:active {
+            background: #7f8c8d;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Scanner Modal */
+        .modal {
             display: none;
-            margin-bottom: 30px;
-            animation: slideDown 0.6s ease-out;
-            box-shadow: 0 15px 40px rgba(0, 255, 157, 0.3), 0 0 30px rgba(0, 255, 157, 0.2);
-            text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            padding: 20px;
         }
 
-        @keyframes slideDown {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 500px;
+            margin: 50px auto;
         }
 
-        @media (max-width: 768px) {
-            .entry-card {
-                padding: 30px 20px;
-                transform: none;
+        #scanner-video {
+            width: 100%;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
             }
 
-            .card-header {
-                margin: -30px -20px 30px -20px;
-                padding: 25px;
-            }
-
-                .card-header h3 {
-                    font-size: 22px;
-                }
-
-            .selisih-value {
-                font-size: 42px;
-            }
-
-            .form-section {
-                padding: 20px;
-                transform: none;
-            }
-
-            .btn-3d {
-                padding: 14px 30px;
-                font-size: 14px;
-            }
-
-            .upload-options {
-                flex-direction: column;
+            .weight-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="main-content">
-        <div class="entry-container">
-            <div class="entry-card">
-                <div class="card-header">
-                    <h3><i class="fas fa-cube me-2"></i> HOLOGRAPHIC ENTRY SYSTEM</h3>
-                    <p class="mb-0">Input data pengukuran berat aktual vs resi</p>
+    <div class="container">
+        <div class="header">
+            <h2><i class="fas fa-box-open"></i> Entry Data Resi</h2>
+            <p>Input data pengukuran berat dengan foto bukti</p>
+        </div>
+
+        <div id="alertSuccess" class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <span id="successMsg"></span>
+        </div>
+
+        <div id="alertError" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> <span id="errorMsg"></span>
+        </div>
+
+        <form id="entryForm">
+            <div class="card">
+                <!-- User Field dengan Highlight -->
+                <div class="user-field">
+                    <i class="fas fa-user-circle"></i>
+                    <input type="text" id="nama" readonly style="border: none; background: transparent; font-weight: 600; width: 100%; outline: none;">
                 </div>
 
-                <div id="successMessage" class="success-message">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <span id="successText">Data berhasil disimpan!</span>
+                <!-- Nomor Resi dengan Scanner -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-barcode"></i> Nomor Resi</label>
+                    <div class="resi-group">
+                        <input type="text" class="form-control" id="noResi" placeholder="Input atau scan barcode" required>
+                        <button type="button" class="scan-btn" id="scanBtn">
+                            <i class="fas fa-camera"></i> Scan
+                        </button>
+                    </div>
                 </div>
 
-                <form id="entryForm">
-                    <!-- Section 1: Data Resi -->
-                    <div class="form-section">
-                        <h5 class="section-title">
-                            <i class="fas fa-box"></i> INFORMASI RESI
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-user"></i> Nama Pengirim/Penerima
-                                </label>
-                                <input type="text" class="form-control" id="nama" readonly
-                                       placeholder="Loading...">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-barcode"></i> Nomor Resi
-                                </label>
-                                <input type="text" class="form-control" id="noResi" required
-                                       placeholder="Masukkan nomor resi"
-                                       style="text-transform: uppercase;">
-                            </div>
+                <!-- Data Berat -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-weight"></i> Data Berat</label>
+                    <div class="weight-row">
+                        <div>
+                            <input type="number" class="form-control" id="beratResi" placeholder="Berat Resi (kg)" step="0.01" min="0" required>
+                        </div>
+                        <div>
+                            <input type="number" class="form-control" id="beratAktual" placeholder="Berat Aktual (kg)" step="0.01" min="0" required>
                         </div>
                     </div>
+                    <div id="selisihBox" class="selisih-box" style="display: none;">
+                        <div style="font-size: 12px; opacity: 0.9;">SELISIH</div>
+                        <div class="selisih-value" id="selisihValue">0 kg</div>
+                        <div style="font-size: 12px;" id="selisihStatus">-</div>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- Section 2: Data Berat -->
-                    <div class="form-section">
-                        <h5 class="section-title">
-                            <i class="fas fa-weight"></i> DATA BERAT
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-file-alt"></i> Berat Resi (kg)
-                                </label>
-                                <input type="number" class="form-control" id="beratResi"
-                                       step="0.01" min="0" required
-                                       placeholder="Berat sesuai resi">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-balance-scale"></i> Berat Aktual (kg)
-                                </label>
-                                <input type="number" class="form-control" id="beratAktual"
-                                       step="0.01" min="0" required
-                                       placeholder="Berat hasil timbang">
-                            </div>
+            <div class="card">
+                <!-- Upload Mode Selection -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-camera"></i> Upload Foto (Pilih Mode)</label>
+                    <div class="upload-mode">
+                        <div class="mode-btn active" data-mode="gallery" id="galleryMode">
+                            <i class="fas fa-images"></i>
+                            <span>Gallery</span>
                         </div>
-
-                        <div class="selisih-display" id="selisihDisplay" style="display: none;">
-                            <div class="selisih-label">SELISIH BERAT</div>
-                            <div class="selisih-value" id="selisihValue">0 kg</div>
-                            <div class="selisih-label" id="selisihStatus">-</div>
+                        <div class="mode-btn" data-mode="camera" id="cameraMode">
+                            <i class="fas fa-camera"></i>
+                            <span>Camera</span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Section 3: Upload Foto -->
-                    <div class="form-section">
-                        <h5 class="section-title">
-                            <i class="fas fa-camera"></i> UPLOAD FOTO BUKTI
-                        </h5>
-
-                        <div class="row">
-                            <!-- Foto 1 -->
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label">Foto Bukti 1 (Resi/Label)</label>
-
-                                <div class="upload-btn" onclick="openUpload(1)">
-                                    <i class="fas fa-camera"></i>
-                                    Upload Foto
-                                </div>
-
-                                <input type="file" id="foto1" accept="image/*" capture="environment" style="display: none;">
-
-                                <div id="preview1Container" style="display: none;">
-                                    <div class="image-preview-container">
-                                        <img id="imagePreview1" class="image-preview" alt="Foto 1">
-                                        <button type="button" class="remove-image" onclick="removeImage(1)">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <div class="image-label">FOTO RESI/LABEL</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Foto 2 -->
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label">Foto Bukti 2 (Timbangan)</label>
-
-                                <div class="upload-btn" onclick="openUpload(2)">
-                                    <i class="fas fa-camera"></i>
-                                    Upload Foto
-                                </div>
-
-                                <input type="file" id="foto2" accept="image/*" capture="environment" style="display: none;">
-
-                                <div id="preview2Container" style="display: none;">
-                                    <div class="image-preview-container">
-                                        <img id="imagePreview2" class="image-preview" alt="Foto 2">
-                                        <button type="button" class="remove-image" onclick="removeImage(2)">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <div class="image-label">FOTO TIMBANGAN</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Photo Slots -->
+                <div class="photo-slots">
+                    <div class="photo-slot" id="slot1">
+                        <i class="fas fa-plus"></i>
+                        <span>Foto 1</span>
                     </div>
-
-                    <!-- Section 4: Status & Notes -->
-                    <div class="form-section">
-                        <h5 class="section-title">
-                            <i class="fas fa-info-circle"></i> INFORMASI TAMBAHAN
-                        </h5>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-flag"></i> Status
-                                </label>
-                                <select class="form-select status-select" id="status">
-                                    <option value="submitted" selected>SUBMITTED</option>
-                                    <option value="verified">VERIFIED</option>
-                                    <option value="disputed">DISPUTED</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-sticky-note"></i> Catatan
-                                </label>
-                                <textarea class="form-control" id="notes" rows="3"
-                                          placeholder="Tambahkan catatan (opsional)"></textarea>
-                            </div>
-                        </div>
+                    <div class="photo-slot" id="slot2">
+                        <i class="fas fa-plus"></i>
+                        <span>Foto 2</span>
                     </div>
+                </div>
 
-                    <!-- Buttons -->
-                    <div class="d-flex gap-3 justify-content-end">
-                        <button type="button" class="btn btn-3d btn-secondary-3d" id="resetBtn">
-                            <i class="fas fa-redo me-2"></i> RESET
-                        </button>
-                        <button type="submit" class="btn btn-3d btn-primary-3d" id="submitBtn">
-                            <i class="fas fa-save me-2"></i> SIMPAN DATA
-                        </button>
-                    </div>
-                </form>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+            </div>
+
+            <div class="card">
+                <!-- Status & Notes -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-info-circle"></i> Status</label>
+                    <select class="select" id="status">
+                        <option value="submitted">SUBMITTED</option>
+                        <option value="verified">VERIFIED</option>
+                        <option value="disputed">DISPUTED</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-sticky-note"></i> Catatan</label>
+                    <textarea id="notes" placeholder="Tambahkan catatan (opsional)"></textarea>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div id="scannerModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 10px;"><i class="fas fa-barcode"></i> Scan Barcode</h3>
+            <video id="scanner-video" autoplay playsinline></video>
+            <canvas id="scanner-canvas" style="display: none;"></canvas>
+            <div class="modal-btns">
+                <button type="button" class="btn btn-secondary" id="closeScanner">
+                    <i class="fas fa-times"></i> Tutup
+                </button>
+                <button type="button" class="btn btn-primary" id="switchCamera">
+                    <i class="fas fa-sync"></i> Switch
+                </button>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Auth check
         const token = localStorage.getItem('accessToken');
         const userName = localStorage.getItem('userName');
-
+        
         if (!token || !userName) {
             window.location.href = '/login.html';
             return;
         }
 
-        // Set nama field as readonly dengan username login
-        const namaInput = document.getElementById('nama');
-        namaInput.value = userName;
-        namaInput.readOnly = true;
+        document.getElementById('nama').value = userName;
 
-        const form = document.getElementById('entryForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const successMessage = document.getElementById('successMessage');
-
-        const beratResiInput = document.getElementById('beratResi');
-        const beratAktualInput = document.getElementById('beratAktual');
-        const selisihDisplay = document.getElementById('selisihDisplay');
-        const selisihValue = document.getElementById('selisih Value');
-        const selisihStatus = document.getElementById('selisihStatus');
-
-        let selectedFiles = {
-            foto1: null,
-            foto2: null
-        };
-
+        // Cloudinary config
         const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
         const CLOUDINARY_CLOUD_NAME = 'ddzzlusek';
         const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
-        // Upload to Cloudinary dengan AUTO RENAME berdasarkan NO RESI
-        async function uploadToCloudinary(file, photoType) {
-            const formData = new FormData();
+        // State
+        let uploadMode = 'gallery';
+        let photos = { slot1: null, slot2: null };
+        let currentSlot = null;
+        let cameraStream = null;
+        let facingMode = 'environment';
 
-            // Generate filename: noresi_timestamp_type
-            const noResi = document.getElementById('noResi').value.toUpperCase().trim();
-            const timestamp = Date.now();
-            const sanitizedNoResi = noResi.replace(/[^a-zA-Z0-9]/g, '_');
-            const customFilename = `${sanitizedNoResi}_${timestamp}_${photoType}`;
+        // Elements
+        const galleryMode = document.getElementById('galleryMode');
+        const cameraMode = document.getElementById('cameraMode');
+        const fileInput = document.getElementById('fileInput');
+        const cameraInput = document.getElementById('cameraInput');
+        const slot1 = document.getElementById('slot1');
+        const slot2 = document.getElementById('slot2');
+        const scanBtn = document.getElementById('scanBtn');
+        const scannerModal = document.getElementById('scannerModal');
+        const closeScanner = document.getElementById('closeScanner');
+        const switchCamera = document.getElementById('switchCamera');
+        const video = document.getElementById('scanner-video');
+        const canvas = document.getElementById('scanner-canvas');
+        const form = document.getElementById('entryForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
 
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            formData.append('folder', 'weight-entries');
-            formData.append('public_id', customFilename); // Auto rename berdasarkan no resi
+        // Upload mode selection
+        galleryMode.addEventListener('click', () => {
+            uploadMode = 'gallery';
+            galleryMode.classList.add('active');
+            cameraMode.classList.remove('active');
+            resetPhotos();
+        });
 
-            try {
-                console.log('Uploading with filename:', customFilename);
+        cameraMode.addEventListener('click', () => {
+            uploadMode = 'camera';
+            cameraMode.classList.add('active');
+            galleryMode.classList.remove('active');
+            resetPhotos();
+        });
 
-                const response = await fetch(CLOUDINARY_UPLOAD_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+        // Photo slot clicks
+        slot1.addEventListener('click', () => handleSlotClick('slot1'));
+        slot2.addEventListener('click', () => handleSlotClick('slot2'));
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Upload failed: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log('Upload success:', data.secure_url);
-                return data.secure_url;
-            } catch (error) {
-                console.error('Cloudinary upload error:', error);
-                throw new Error('Gagal upload foto: ' + error.message);
-            }
-        }
-
-        async function uploadAllFiles() {
-            const uploadPromises = [];
-            const uploadedUrls = { foto1: null, foto2: null };
-
-            if (selectedFiles.foto1) {
-                uploadPromises.push(
-                    uploadToCloudinary(selectedFiles.foto1, 'resi')
-                        .then(url => { uploadedUrls.foto1 = url; })
-                        .catch(error => console.error('Upload foto1 failed:', error))
-                );
-            }
-
-            if (selectedFiles.foto2) {
-                uploadPromises.push(
-                    uploadToCloudinary(selectedFiles.foto2, 'timbangan')
-                        .then(url => { uploadedUrls.foto2 = url; })
-                        .catch(error => console.error('Upload foto2 failed:', error))
-                );
-            }
-
-            await Promise.all(uploadPromises);
-            return uploadedUrls;
-        }
-
-        // Open single upload (works for both gallery and camera on mobile)
-        window.openUpload = function(photoNumber) {
-            document.getElementById(`foto${photoNumber}`).click();
-        };
-
-        // Handle file selection
-        function handleFileSelect(file, photoNumber) {
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                alert('Format tidak didukung. Gunakan JPG, PNG, atau WEBP.');
-                return;
-            }
-
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-                alert('Ukuran file terlalu besar. Maksimal 5MB.');
-                return;
-            }
-
-            if (photoNumber === 1) {
-                selectedFiles.foto1 = file;
+        function handleSlotClick(slotId) {
+            if (photos[slotId]) return; // Already has photo
+            currentSlot = slotId;
+            
+            if (uploadMode === 'gallery') {
+                fileInput.click();
             } else {
-                selectedFiles.foto2 = file;
+                cameraInput.click();
             }
-
-            displayImagePreview(file, photoNumber);
         }
 
-        // Display preview
-        function displayImagePreview(file, photoNumber) {
+        // File inputs
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        cameraInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        async function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showAlert('error', 'File harus berupa gambar');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('error', 'Ukuran file maksimal 5MB');
+                return;
+            }
+
+            // Add watermark
+            const watermarkedFile = await addWatermark(file);
+            photos[currentSlot] = watermarkedFile;
+            displayPhoto(watermarkedFile, currentSlot);
+        }
+
+        function addWatermark(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Watermark text
+                    const now = new Date();
+                    const date = now.toLocaleDateString('id-ID');
+                    const time = now.toLocaleTimeString('id-ID');
+                    const watermarkText = `${userName} | ${date} ${time} | Jakarta, ID`;
+                    
+                    // Style
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.lineWidth = 3;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    
+                    const x = canvas.width / 2;
+                    const y = canvas.height - 20;
+                    
+                    ctx.strokeText(watermarkText, x, y);
+                    ctx.fillText(watermarkText, x, y);
+                    
+                    canvas.toBlob(blob => {
+                        const watermarkedFile = new File([blob], file.name, { type: file.type });
+                        resolve(watermarkedFile);
+                    }, file.type);
+                };
+
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function displayPhoto(file, slotId) {
+            const slot = document.getElementById(slotId);
             const reader = new FileReader();
-
+            
             reader.onload = function(e) {
-                const previewContainer = document.getElementById(`preview${photoNumber}Container`);
-                const imagePreview = document.getElementById(`imagePreview${photoNumber}`);
-
-                imagePreview.src = e.target.result;
-                previewContainer.style.display = 'block';
+                slot.innerHTML = `
+                    <img src="${e.target.result}" alt="Photo">
+                    <button type="button" class="remove-photo" onclick="removePhoto('${slotId}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                slot.classList.add('has-photo');
             };
-
+            
             reader.readAsDataURL(file);
         }
 
-        // Remove image with X button
-        window.removeImage = function(photoNumber) {
-            if (photoNumber === 1) {
-                selectedFiles.foto1 = null;
-                document.getElementById('preview1Container').style.display = 'none';
-                document.getElementById('foto1').value = '';
-            } else {
-                selectedFiles.foto2 = null;
-                document.getElementById('preview2Container').style.display = 'none';
-                document.getElementById('foto2').value = '';
-            }
+        window.removePhoto = function(slotId) {
+            photos[slotId] = null;
+            const slot = document.getElementById(slotId);
+            slot.innerHTML = `
+                <i class="fas fa-plus"></i>
+                <span>Foto ${slotId === 'slot1' ? '1' : '2'}</span>
+            `;
+            slot.classList.remove('has-photo');
         };
 
-        // Event listeners for uploads
-        document.getElementById('foto1').addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0], 1);
-            }
-        });
+        function resetPhotos() {
+            photos = { slot1: null, slot2: null };
+            removePhoto('slot1');
+            removePhoto('slot2');
+        }
 
-        document.getElementById('foto2').addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0], 2);
-            }
-        });
-
+        // Weight calculation
         function calculateSelisih() {
-            const beratResi = parseFloat(beratResiInput.value) || 0;
-            const beratAktual = parseFloat(beratAktualInput.value) || 0;
-
+            const beratResi = parseFloat(document.getElementById('beratResi').value) || 0;
+            const beratAktual = parseFloat(document.getElementById('beratAktual').value) || 0;
+            
             if (beratResi > 0 && beratAktual > 0) {
                 const selisih = beratAktual - beratResi;
-
-                selisihDisplay.style.display = 'block';
-                selisihValue.textContent = `${Math.abs(selisih).toFixed(2)} kg`;
-
+                const box = document.getElementById('selisihBox');
+                
+                box.style.display = 'block';
+                document.getElementById('selisihValue').textContent = `${Math.abs(selisih).toFixed(2)} kg`;
+                
+                box.className = 'selisih-box';
                 if (selisih > 0) {
-                    selisihDisplay.classList.remove('selisih-negative');
-                    selisihDisplay.classList.add('selisih-positive');
-                    selisihStatus.textContent = 'Berat aktual lebih berat dari resi';
+                    box.classList.add('positive');
+                    document.getElementById('selisihStatus').textContent = 'Lebih berat';
                 } else if (selisih < 0) {
-                    selisihDisplay.classList.remove('selisih-positive');
-                    selisihDisplay.classList.add('selisih-negative');
-                    selisihStatus.textContent = 'Berat aktual lebih ringan dari resi';
+                    box.classList.add('negative');
+                    document.getElementById('selisihStatus').textContent = 'Lebih ringan';
                 } else {
-                    selisihDisplay.classList.remove('selisih-positive', 'selisih-negative');
-                    selisihStatus.textContent = 'Berat aktual sama dengan resi';
+                    document.getElementById('selisihStatus').textContent = 'Sama';
                 }
-
+                
                 return selisih;
             } else {
-                selisihDisplay.style.display = 'none';
+                document.getElementById('selisihBox').style.display = 'none';
                 return 0;
             }
         }
 
-        beratResiInput.addEventListener('input', calculateSelisih);
-        beratAktualInput.addEventListener('input', calculateSelisih);
+        document.getElementById('beratResi').addEventListener('input', calculateSelisih);
+        document.getElementById('beratAktual').addEventListener('input', calculateSelisih);
 
-        function showSuccessMessage(message) {
-            const successText = document.getElementById('successText');
-            if (successText) {
-                successText.textContent = message;
-                successMessage.style.display = 'block';
+        // Barcode scanner
+        scanBtn.addEventListener('click', startScanner);
+        closeScanner.addEventListener('click', stopScanner);
+        switchCamera.addEventListener('click', toggleCamera);
 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 5000);
+        async function startScanner() {
+            scannerModal.style.display = 'block';
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facingMode }
+                });
+                
+                cameraStream = stream;
+                video.srcObject = stream;
+                
+                requestAnimationFrame(scanFrame);
+            } catch (error) {
+                showAlert('error', 'Tidak dapat mengakses kamera');
+                stopScanner();
             }
         }
 
-        function validateFormData(data) {
-            const errors = [];
-
-            if (!data.nama || data.nama.trim() === '') {
-                errors.push('• Nama harus diisi');
+        function stopScanner() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
             }
-
-            if (!data.no_resi || data.no_resi.trim() === '') {
-                errors.push('• No Resi harus diisi');
-            } else if (data.no_resi.length < 3) {
-                errors.push('• No Resi minimal 3 karakter');
-            }
-
-            if (!data.berat_resi || data.berat_resi <= 0) {
-                errors.push('• Berat Resi harus lebih dari 0');
-            }
-
-            if (!data.berat_aktual || data.berat_aktual <= 0) {
-                errors.push('• Berat Aktual harus lebih dari 0');
-            }
-
-            return errors;
+            scannerModal.style.display = 'none';
         }
 
-        function resetForm() {
-            form.reset();
-            namaInput.value = userName; // Keep username
-            selectedFiles = { foto1: null, foto2: null };
-            document.getElementById('preview1Container').style.display = 'none';
-            document.getElementById('preview2Container').style.display = 'none';
-            document.getElementById('selisihDisplay').style.display = 'none';
+        function toggleCamera() {
+            facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            stopScanner();
+            startScanner();
         }
 
+        function scanFrame() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                if (typeof jsQR !== 'undefined') {
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    
+                    if (code) {
+                        document.getElementById('noResi').value = code.data.toUpperCase();
+                        showAlert('success', `Resi berhasil di-scan: ${code.data}`);
+                        stopScanner();
+                        return;
+                    }
+                }
+            }
+            
+            if (scannerModal.style.display === 'block') {
+                requestAnimationFrame(scanFrame);
+            }
+        }
+
+        // Form submission
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-
-            const beratResi = parseFloat(beratResiInput.value) || 0;
-            const beratAktual = parseFloat(beratAktualInput.value) || 0;
-            const selisih = beratAktual - beratResi;
-
-            const validationData = {
-                nama: userName,
-                no_resi: document.getElementById('noResi').value.toUpperCase().trim(),
-                berat_resi: beratResi,
-                berat_aktual: beratAktual
-            };
-
-            const validationErrors = validateFormData(validationData);
-            if (validationErrors.length > 0) {
-                alert('Error validasi:\n' + validationErrors.join('\n'));
+            
+            if (!photos.slot1 || !photos.slot2) {
+                showAlert('error', 'Upload 2 foto terlebih dahulu');
                 return;
             }
 
+            const beratResi = parseFloat(document.getElementById('beratResi').value);
+            const beratAktual = parseFloat(document.getElementById('beratAktual').value);
+            const selisih = calculateSelisih();
+
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> UPLOADING...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
             try {
-                let uploadedUrls = { foto1: null, foto2: null };
+                // Upload photos
+                const noResi = document.getElementById('noResi').value.toUpperCase().trim();
+                const timestamp = Date.now();
+                
+                const [url1, url2] = await Promise.all([
+                    uploadToCloudinary(photos.slot1, `${noResi}_${timestamp}_1`),
+                    uploadToCloudinary(photos.slot2, `${noResi}_${timestamp}_2`)
+                ]);
 
-                try {
-                    uploadedUrls = await uploadAllFiles();
-                } catch (uploadError) {
-                    console.warn('Upload failed, continuing without images:', uploadError);
-                }
-
+                // Submit data
                 const entryData = {
                     nama: userName,
-                    no_resi: validationData.no_resi,
+                    no_resi: noResi,
                     berat_resi: beratResi,
                     berat_aktual: beratAktual,
                     selisih: parseFloat(selisih.toFixed(2)),
                     status: document.getElementById('status').value,
-                    notes: document.getElementById('notes').value?.trim() || '',
+                    notes: document.getElementById('notes').value.trim() || '',
                     created_by: userName,
-                    foto_url_1: uploadedUrls.foto1,
-                    foto_url_2: uploadedUrls.foto2
+                    foto_url_1: url1,
+                    foto_url_2: url2
                 };
 
                 const response = await fetch('/api/entries', {
@@ -1080,59 +845,69 @@
                     body: JSON.stringify(entryData)
                 });
 
-                if (!response.ok) {
-                    let errorMessage = 'Gagal menyimpan data';
-                    try {
-                        const errorResult = await response.json();
-                        errorMessage = errorResult.message || errorMessage;
-                    } catch (e) {
-                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-                    }
-                    throw new Error(errorMessage);
-                }
+                if (!response.ok) throw new Error('Gagal menyimpan data');
 
                 const result = await response.json();
-
+                
                 if (result.success) {
-                    showSuccessMessage('Data berhasil disimpan! No. Resi: ' + entryData.no_resi);
-                    setTimeout(() => {
-                        resetForm();
-                    }, 2000);
-                } else {
-                    throw new Error(result.message || 'Gagal menyimpan data');
+                    showAlert('success', `Data berhasil disimpan! Resi: ${noResi}`);
+                    setTimeout(() => form.reset(), 2000);
+                    resetPhotos();
                 }
             } catch (error) {
-                console.error('Submit error:', error);
-                alert('Error: ' + error.message);
+                showAlert('error', error.message);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-save me-2"></i> SIMPAN DATA';
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan';
             }
         });
 
-        resetBtn.addEventListener('click', function() {
-            if (confirm('Reset semua data yang telah diisi?')) {
-                resetForm();
+        async function uploadToCloudinary(file, publicId) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            formData.append('folder', 'weight-entries');
+            formData.append('public_id', publicId);
+
+            const response = await fetch(CLOUDINARY_UPLOAD_URL, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Upload foto gagal');
+            const data = await response.json();
+            return data.secure_url;
+        }
+
+        // Reset button
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Reset semua data?')) {
+                form.reset();
+                resetPhotos();
+                document.getElementById('selisihBox').style.display = 'none';
             }
         });
 
-        document.getElementById('noResi').addEventListener('input', function(e) {
+        // Auto uppercase resi
+        document.getElementById('noResi').addEventListener('input', (e) => {
             e.target.value = e.target.value.toUpperCase();
         });
 
-        document.querySelectorAll('.form-section').forEach((section, index) => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-
+        // Alert helper
+        function showAlert(type, message) {
+            const alertEl = document.getElementById(type === 'success' ? 'alertSuccess' : 'alertError');
+            const msgEl = document.getElementById(type === 'success' ? 'successMsg' : 'errorMsg');
+            
+            msgEl.textContent = message;
+            alertEl.style.display = 'block';
+            
             setTimeout(() => {
-                section.style.transition = 'all 0.5s ease-out';
-                section.style.opacity = '1';
-                section.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
+                alertEl.style.display = 'none';
+            }, 5000);
+        }
     });
     </script>
-    <script src="/js/sidebar.js"></script>
-    <script src="/js/entry-form.js"></script>
+       <script src="/js/sidebar.js"></script>
+        <script src="/js/entry.form.js"></script>
 </body>
 </html>
