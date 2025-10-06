@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Management - WeightTracker Pro</title>
+    <title>Photo Management - WeightTracker Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
         :root {
             --bg-dark: #0a0e27;
-            --bg-medium: #151934;
             --surface: #1e2139;
             --surface-light: #262945;
             --accent-cyan: #00d4ff;
@@ -22,10 +21,7 @@
             --text-primary: #ffffff;
             --text-secondary: #a0a9d1;
             --gradient-holographic: linear-gradient(45deg, var(--accent-cyan), var(--accent-magenta), var(--accent-lime), var(--accent-orange), var(--accent-cyan));
-            --gradient-aurora: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
             --shadow-holographic: 0 10px 30px rgba(0, 212, 255, 0.3), 0 0 20px rgba(255, 0, 255, 0.2), 0 0 10px rgba(0, 255, 136, 0.1);
-            --shadow-neumorphic: 20px 20px 60px #0a0b1a, -20px -20px 60px #1a1f3a;
-            --shadow-neumorphic-inset: inset 5px 5px 10px #0a0b1a, inset -5px -5px 10px #1a1f3a;
         }
 
         * {
@@ -39,145 +35,63 @@
             background: var(--bg-dark);
             color: var(--text-primary);
             overflow-x: hidden;
-            position: relative;
             min-height: 100vh;
+            padding: 40px;
         }
 
-            /* Animated Holographic Background */
-            body::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%), radial-gradient(circle at 60% 70%, rgba(255, 170, 0, 0.1) 0%, transparent 50%);
-                animation: holographicFloat 20s ease infinite;
-                pointer-events: none;
-                z-index: -1;
-            }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%), 
+                        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            animation: holographicFloat 20s ease infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
 
         @keyframes holographicFloat {
-            0%, 100% {
-                transform: rotate(0deg) scale(1);
-            }
-
-            33% {
-                transform: rotate(3deg) scale(1.05);
-            }
-
-            66% {
-                transform: rotate(-2deg) scale(1.02);
-            }
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            33% { transform: rotate(3deg) scale(1.05); }
+            66% { transform: rotate(-2deg) scale(1.02); }
         }
-
-       
 
         @keyframes holographicWave {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            100% {
-                background-position: 400% 50%;
-            }
+            0% { background-position: 0% 50%; }
+            100% { background-position: 400% 50%; }
         }
 
-        .sidebar-logo i {
-            font-size: 28px;
-            color: white;
+        .container-fluid {
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
-        .sidebar-logo h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 0;
-            color: white;
-        }
-
-        .nav-item {
-            margin-bottom: 10px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 15px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            transform: perspective(500px) rotateY(0deg);
-        }
-
-            .nav-link::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                opacity: 0;
-                transition: all 0.5s;
-            }
-
-            .nav-link:hover {
-                color: var(--text-primary);
-                transform: perspective(500px) rotateY(10deg) translateX(5px);
-                background: var(--surface-light);
-                box-shadow: var(--shadow-neumorphic-inset);
-            }
-
-            .nav-link.active {
-                color: var(--accent-cyan);
-                background: var(--surface-light);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), var(--shadow-neumorphic-inset);
-            }
-
-                .nav-link.active::before {
-                    left: 0;
-                    opacity: 0.1;
-                    animation: holographicWave 3s linear infinite;
-                }
-
-
-        /* Isometric Header */
-        .isometric-header {
+        .header {
             background: var(--surface);
             border-radius: 30px;
             padding: 40px;
             margin-bottom: 40px;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: perspective(1000px) rotateX(5deg) rotateY(-2deg);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-holographic);
             border: 1px solid rgba(0, 212, 255, 0.1);
         }
 
-            .isometric-header::before {
-                content: '';
-                position: absolute;
-                top: -2px;
-                left: -2px;
-                right: -2px;
-                bottom: -2px;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                border-radius: 30px;
-                opacity: 0.5;
-                z-index: -1;
-                animation: holographicWave 10s linear infinite;
-            }
-
-            .isometric-header:hover {
-                transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-10px);
-            }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient-holographic);
+            background-size: 400% 400%;
+            border-radius: 30px;
+            opacity: 0.5;
+            z-index: -1;
+            animation: holographicWave 10s linear infinite;
+        }
 
         .header-title {
             font-size: 42px;
@@ -186,98 +100,38 @@
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
             animation: holographicWave 8s linear infinite;
-            margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
         }
 
-        /* Holographic Stats Grid */
-        .holographic-stats {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .holo-stat-card {
+        .stat-card {
             background: var(--surface);
-            border-radius: 25px;
-            padding: 30px;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: perspective(1000px) rotateX(5deg) rotateY(2deg);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px;
+            padding: 25px;
             box-shadow: var(--shadow-holographic);
             border: 1px solid rgba(0, 212, 255, 0.1);
-            overflow: hidden;
+            text-align: center;
         }
 
-            .holo-stat-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-                transition: left 0.6s;
-            }
-
-            .holo-stat-card:hover::before {
-                left: 100%;
-            }
-
-            .holo-stat-card:hover {
-                transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-10px);
-                box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3), 0 0 20px rgba(0, 255, 136, 0.2);
-            }
-
-        .holo-stat-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .stat-value {
             font-size: 32px;
-            margin-bottom: 20px;
-            background: var(--gradient-holographic);
-            background-size: 400% 400%;
-            animation: holographicWave 6s linear infinite;
-            box-shadow: var(--shadow-holographic);
-            transform: perspective(500px) rotateY(15deg);
-        }
-
-        .holo-stat-value {
-            font-size: 36px;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            color: var(--accent-cyan);
         }
 
-        .holo-stat-label {
+        .stat-label {
             color: var(--text-secondary);
             font-size: 14px;
-            margin-bottom: 10px;
+            margin-top: 5px;
         }
 
-        .holo-stat-change {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: var(--accent-lime);
-        }
-
-        /* Glassmorphic Filter Card */
-        .glass-filter-card {
+        .filter-card {
             background: rgba(30, 33, 57, 0.7);
             backdrop-filter: blur(20px);
             border-radius: 25px;
@@ -285,34 +139,13 @@
             margin-bottom: 30px;
             border: 1px solid rgba(0, 212, 255, 0.2);
             box-shadow: var(--shadow-holographic);
-            position: relative;
-            overflow: hidden;
         }
 
-            .glass-filter-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                opacity: 0.05;
-                animation: holographicWave 15s linear infinite;
-                z-index: -1;
-            }
-
-        .filter-section {
-            display: flex;
-            flex-wrap: wrap;
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            align-items: end;
-        }
-
-        .filter-item {
-            flex: 1;
-            min-width: 200px;
+            margin-bottom: 20px;
         }
 
         .filter-label {
@@ -320,7 +153,6 @@
             font-weight: 500;
             color: var(--accent-cyan);
             margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
         }
 
         .holographic-input {
@@ -330,36 +162,16 @@
             border-radius: 12px;
             padding: 12px 15px;
             font-size: 14px;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
+            width: 100%;
         }
 
-            .holographic-input:focus {
-                background: rgba(38, 41, 69, 0.9);
-                border-color: var(--accent-cyan);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-                outline: none;
-                transform: translateY(-2px);
-            }
-
-        .holographic-select {
-            background: rgba(38, 41, 69, 0.8);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            color: var(--text-primary);
-            border-radius: 12px;
-            padding: 12px 15px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
+        .holographic-input:focus {
+            background: rgba(38, 41, 69, 0.9);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            outline: none;
         }
 
-            .holographic-select:focus {
-                background: rgba(38, 41, 69, 0.9);
-                border-color: var(--accent-cyan);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-                outline: none;
-            }
-
-        /* Holographic Buttons */
         .btn-holographic {
             background: var(--gradient-holographic);
             background-size: 400% 400%;
@@ -372,185 +184,133 @@
             transition: all 0.3s;
             animation: holographicWave 8s linear infinite;
             box-shadow: var(--shadow-holographic);
-            position: relative;
-            overflow: hidden;
         }
 
-            .btn-holographic::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-                transition: left 0.6s;
-            }
-
-            .btn-holographic:hover::before {
-                left: 100%;
-            }
-
-            .btn-holographic:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 15px 30px rgba(0, 212, 255, 0.5), 0 0 25px rgba(255, 0, 255, 0.4);
-            }
-
-        .btn-export {
-            background: linear-gradient(45deg, var(--accent-lime), #00cc7a);
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        .btn-holographic:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.5);
         }
 
-        .btn-reset {
+        .btn-danger {
             background: linear-gradient(45deg, var(--accent-magenta), #cc00cc);
-            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
         }
 
-        /* 3D Data Table */
-        .table-3d-container {
-            background: var(--surface);
-            border-radius: 25px;
-            padding: 30px;
+        .btn-success {
+            background: linear-gradient(45deg, var(--accent-lime), #00cc7a);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
             margin-bottom: 30px;
-            transform-style: preserve-3d;
-            transform: perspective(1000px) rotateX(3deg);
-            transition: all 0.5s;
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .photo-card {
+            background: var(--surface);
+            border-radius: 20px;
+            overflow: hidden;
             box-shadow: var(--shadow-holographic);
             border: 1px solid rgba(0, 212, 255, 0.1);
+            transition: all 0.3s;
             position: relative;
-            overflow: hidden;
         }
 
-            .table-3d-container::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                opacity: 0.03;
-                animation: holographicWave 20s linear infinite;
-                z-index: -1;
-            }
+        .photo-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4);
+        }
 
-            .table-3d-container:hover {
-                transform: perspective(1000px) rotateX(0deg);
-            }
+        .photo-card.selected {
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+        }
 
-        .holographic-table {
+        .photo-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+
+        .photo-img-container {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            color: var(--text-primary);
-            transform: perspective(1000px) rotateX(0deg);
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+            background: var(--surface-light);
         }
 
-            .holographic-table thead th {
-                background: rgba(0, 212, 255, 0.1);
-                color: var(--accent-cyan);
-                padding: 15px;
-                text-align: left;
-                font-weight: 600;
-                border-bottom: 2px solid var(--accent-cyan);
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                backdrop-filter: blur(10px);
-                text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-            }
-
-            .holographic-table tbody td {
-                padding: 15px;
-                border-bottom: 1px solid rgba(0, 212, 255, 0.1);
-                transition: all 0.3s;
-            }
-
-            .holographic-table tbody tr {
-                transition: all 0.3s;
-                transform-style: preserve-3d;
-            }
-
-                .holographic-table tbody tr:hover {
-                    background: rgba(0, 212, 255, 0.05);
-                    transform: perspective(500px) rotateX(2deg) translateZ(10px);
-                    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
-                }
-
-        .table-image {
-            width: 50px;
-            height: 50px;
+        .photo-img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .photo-card:hover .photo-img {
+            transform: scale(1.1);
+        }
+
+        .photo-info {
+            padding: 15px;
+        }
+
+        .photo-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .photo-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .photo-size {
+            font-size: 11px;
+            color: var(--accent-lime);
+        }
+
+        .photo-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+            border: none;
             cursor: pointer;
             transition: all 0.3s;
-            border: 1px solid rgba(0, 212, 255, 0.3);
         }
 
-            .table-image:hover {
-                transform: scale(2) rotate(5deg);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-            }
-
-        /* Holographic Badges */
-        .badge-holographic {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .btn-view {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
         }
 
-        .badge-diet {
+        .btn-download {
             background: rgba(0, 255, 136, 0.2);
             color: var(--accent-lime);
             border: 1px solid var(--accent-lime);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
-
-        .badge-bulking {
-            background: rgba(255, 0, 255, 0.2);
-            color: var(--accent-magenta);
-            border: 1px solid var(--accent-magenta);
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
-        }
-
-        .badge-maintain {
-            background: rgba(0, 212, 255, 0.2);
-            color: var(--accent-cyan);
-            border: 1px solid var(--accent-cyan);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        }
-
-        .badge-medical {
-            background: rgba(255, 170, 0, 0.2);
-            color: var(--accent-orange);
-            border: 1px solid var(--accent-orange);
-            box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-action {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-            transform: perspective(500px) rotateY(0deg);
-        }
-
-        .btn-edit {
-            background: rgba(0, 212, 255, 0.2);
-            color: var(--accent-cyan);
-            border: 1px solid var(--accent-cyan);
         }
 
         .btn-delete {
@@ -559,379 +319,544 @@
             border: 1px solid var(--accent-magenta);
         }
 
-        .btn-action:hover {
-            transform: perspective(500px) rotateY(15deg) translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
         }
 
-        /* Floating Animation */
-        @keyframes float {
-            0%, 100% {
-                transform: perspective(1000px) rotateX(5deg) rotateY(2deg) translateY(0);
-            }
-
-            50% {
-                transform: perspective(1000px) rotateX(5deg) rotateY(2deg) translateY(-10px);
-            }
+        .no-photos {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
         }
 
-        .holo-stat-card:nth-child(1) {
-            animation: float 6s ease-in-out infinite;
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
         }
 
-        .holo-stat-card:nth-child(2) {
-            animation: float 6s ease-in-out infinite 1.5s;
+        .pagination button {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .holo-stat-card:nth-child(3) {
-            animation: float 6s ease-in-out infinite 3s;
+        .pagination button:hover:not(:disabled) {
+            background: rgba(0, 212, 255, 0.4);
         }
 
-        .holo-stat-card:nth-child(4) {
-            animation: float 6s ease-in-out infinite 4.5s;
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-            }
-
-                .sidebar.active {
-                    transform: translateX(0);
-                }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .menu-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                width: 50px;
-                height: 50px;
-                border-radius: 15px;
-                background: var(--surface);
-                border: none;
-                color: var(--accent-cyan);
-                font-size: 20px;
-                cursor: pointer;
-                box-shadow: var(--shadow-neumorphic);
-            }
+        .pagination button.active {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
         }
 
         @media (max-width: 768px) {
-            .holographic-stats {
-                grid-template-columns: 1fr;
+            body {
+                padding: 20px;
             }
-
-            .filter-section {
-                flex-direction: column;
-            }
-
-            .filter-item {
-                min-width: 100%;
-            }
-
             .header-title {
                 font-size: 28px;
+            }
+            .photo-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
     </style>
 </head>
 <body>
-
-           
-
-    <!-- Main Content -->
-            <main class="main-content">
-                <!-- Isometric Header -->
-                <div class="isometric-header">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <div>
-                            <h1 class="header-title">
-                                <i class="fas fa-database me-2"></i>
-                                Data Management
-                            </h1>
-                            <p style="color: var(--text-secondary);">Kelola dan analisis data pengukuran berat dengan presisi</p>
-                        </div>
-                        <div class="text-end">
-                            <div style="color: var(--text-secondary); font-size: 14px;">Last Updated</div>
-                            <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--accent-cyan);">Loading...</div>
-                        </div>
-                    </div>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="header-title">
+                        <i class="fas fa-images me-2"></i>
+                        Photo Management
+                    </h1>
+                    <p style="color: var(--text-secondary);">Kelola foto dari Cloudinary dengan mudah</p>
                 </div>
+                <button class="btn-holographic" onclick="window.location.href='/data-management.html'">
+                    <i class="fas fa-arrow-left me-2"></i> Back
+                </button>
+            </div>
+        </div>
 
-           
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPhotos">0</div>
+                <div class="stat-label">Total Photos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="selectedCount">0</div>
+                <div class="stat-label">Selected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="todayPhotos">0</div>
+                <div class="stat-label">Uploaded Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalSize">0 MB</div>
+                <div class="stat-label">Total Size</div>
+            </div>
+        </div>
 
-                <!-- Holographic Stats Grid -->
-                <div class="holographic-stats">
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="holo-stat-value" id="totalEntries">1,247</div>
-                        <div class="holo-stat-label">Total Data Entries</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-arrow-up"></i> +12.5% this month
-                        </span>
-                    </div>
-
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-weight"></i>
-                        </div>
-                        <div class="holo-stat-value" id="avgWeight">68.3 kg</div>
-                        <div class="holo-stat-label">Average Weight</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-chart-line"></i> Stable trend
-                        </span>
-                    </div>
-
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-calendar"></i>
-                        </div>
-                        <div class="holo-stat-value" id="todayEntries">47</div>
-                        <div class="holo-stat-label">Entries Today</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-bolt"></i> Active day
-                        </span>
-                    </div>
-     <script src="/js/sidebar.js"></script>
-                <script src="/js/data-management.js"></script>
-                
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="holo-stat-value" id="weeklyGrowth">8.2%</div>
-                        <div class="holo-stat-label">Weekly Growth</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-rocket"></i> Accelerating
-                        </span>
-                    </div>
+        <!-- Filters -->
+        <div class="filter-card">
+            <h5 class="mb-3" style="color: var(--accent-cyan);">
+                <i class="fas fa-filter me-2"></i> Filters
+            </h5>
+            <div class="filter-grid">
+                <div>
+                    <div class="filter-label">Start Date</div>
+                    <input type="date" class="holographic-input" id="startDate">
                 </div>
-
-                <!-- Glassmorphic Filter Card -->
-                <div class="glass-filter-card">
-                    <h5 class="mb-3" style="color: var(--accent-cyan);">
-                        <i class="fas fa-filter me-2"></i> Advanced Data Filters
-                    </h5>
-                    <div class="filter-section">
-                        <div class="filter-item">
-                            <div class="filter-label">Date Range</div>
-                            <input type="date" class="holographic-input w-100" id="startDate">
-                        </div>
-
-                        <div class="filter-item">
-                            <div class="filter-label">To Date</div>
-                            <input type="date" class="holographic-input w-100" id="endDate">
-                        </div>
-
-                        <div class="filter-item">
-                            <div class="filter-label">Category</div>
-                            <select class="holographic-select w-100" id="filterCategory">
-                                <option value="">All Categories</option>
-                                <option value="diet">Diet Program</option>
-                                <option value="bulking">Bulking Program</option>
-                                <option value="maintain">Maintenance</option>
-                                <option value="medical">Medical Check</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <div class="filter-label">Search Name</div>
-                            <input type="text" class="holographic-input w-100" id="filterName" placeholder="Enter name...">
-                        </div>
-
-                        <div class="filter-item">
-                            <button class="btn-holographic" id="applyFilter">
-                                <i class="fas fa-search me-2"></i> Apply Filters
-                            </button>
-                            <button class="btn-holographic btn-reset ms-2" id="resetFilter">
-                                <i class="fas fa-redo me-2"></i> Reset
-                            </button>
-                            <button class="btn-holographic btn-export ms-2" id="exportData">
-                                <i class="fas fa-download me-2"></i> Export
-                            </button>
-                        </div>
-                    </div>
+                <div>
+                    <div class="filter-label">End Date</div>
+                    <input type="date" class="holographic-input" id="endDate">
                 </div>
-
-                <!-- 3D Data Table -->
-                <div class="table-3d-container">
-                    <div class="table-wrapper">
-                        <table class="holographic-table" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Photo</th>
-                                    <th>Name</th>
-                                    <th>Date</th>
-                                    <th>Weight (kg)</th>
-                                    <th>Height (cm)</th>
-                                    <th>BMI</th>
-                                    <th>Target</th>
-                                    <th>Category</th>
-                                    <th>Difference</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dataTableBody">
-                                <!-- Sample Data -->
-                                <tr>
-                                    <td>#001</td>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
-                                    </td>
-                                    <td>John Doe</td>
-                                    <td>2024-01-15</td>
-                                    <td>72.5</td>
-                                    <td>175</td>
-                                    <td>23.7</td>
-                                    <td>70.0</td>
-                                    <td><span class="badge-holographic badge-diet">Diet</span></td>
-                                    <td style="color: var(--accent-lime);">-2.5 kg</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-action btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#002</td>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
-                                    </td>
-                                    <td>Sarah Smith</td>
-                                    <td>2024-01-15</td>
-                                    <td>65.2</td>
-                                    <td>165</td>
-                                    <td>24.0</td>
-                                    <td>63.0</td>
-                                    <td><span class="badge-holographic badge-maintain">Maintain</span></td>
-                                    <td style="color: var(--accent-cyan);">+0.2 kg</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-action btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#003</td>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
-                                    </td>
-                                    <td>Mike Johnson</td>
-                                    <td>2024-01-14</td>
-                                    <td>85.7</td>
-                                    <td>182</td>
-                                    <td>25.9</td>
-                                    <td>90.0</td>
-                                    <td><span class="badge-holographic badge-bulking">Bulking</span></td>
-                                    <td style="color: var(--accent-magenta);">+4.3 kg</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-action btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div>
+                    <div class="filter-label">Search Filename</div>
+                    <input type="text" class="holographic-input" id="searchInput" placeholder="Type to search...">
                 </div>
-            </main>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <button class="btn-holographic" onclick="applyFilters()">
+                    <i class="fas fa-search me-2"></i> Apply
+                </button>
+                <button class="btn-holographic" onclick="resetFilters()">
+                    <i class="fas fa-redo me-2"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn-holographic" onclick="selectAll()">
+                <i class="fas fa-check-square me-2"></i> Select All
+            </button>
+            <button class="btn-holographic" onclick="unselectAll()">
+                <i class="fas fa-square me-2"></i> Unselect All
+            </button>
+            <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
+                <i class="fas fa-download me-2"></i> Download Selected
+            </button>
+            <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
+                <i class="fas fa-trash me-2"></i> Delete Selected
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+            <div>Loading photos from Cloudinary...</div>
+        </div>
+
+        <!-- Photo Gallery -->
+        <div id="photoGallery" class="photo-gallery" style="display: none;">
+        </div>
+
+        <!-- No Photos State -->
+        <div id="noPhotosState" class="no-photos" style="display: none;">
+            <i class="fas fa-image fa-3x mb-3"></i>
+            <div>No photos found</div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+    </div>
 
     <script>
-        // Toggle Sidebar
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        const SUPABASE_URL = 'https://rwxgpbikdxlialoegghq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3eGdwYmlrZHhsaWFsb2VnZ2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1OTQwNDUsImV4cCI6MjA3NTE3MDA0NX0.qxOwPHR9XSzSwaDUyo5a11Ok2Irs7I4N45uJPiyi4Ug';
+        const CLOUDINARY_CLOUD_NAME = 'ddzzlusek';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // State
+        let allPhotos = [];
+        let filteredPhotos = [];
+        let selectedPhotos = new Set();
+        let currentPage = 1;
+        const photosPerPage = 12;
 
-        // Fungsi Logout
-        function logout() {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            window.location.href = '/index.html';
-        }
+        // ==========================================
+        // FETCH PHOTOS FROM SUPABASE
+        // ==========================================
+        async function fetchPhotos() {
+            try {
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('photoGallery').style.display = 'none';
+                document.getElementById('noPhotosState').style.display = 'none';
 
-        // Update date and time
-        function updateDateTime() {
-            const now = new Date();
-            const options = {
-                weekday: 'short',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
-        }
+                // Fetch dari entries table yang ada foto_url_1 atau foto_url_2
+                const { data, error } = await supabase
+                    .from('entries')
+                    .select('id, nama, foto_url_1, foto_url_2, created_at')
+                    .or('foto_url_1.not.is.null,foto_url_2.not.is.null')
+                    .order('created_at', { ascending: false });
 
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
+                if (error) throw error;
 
-        // Initialize functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add hover effects to table rows
-            const tableRows = document.querySelectorAll('.holographic-table tbody tr');
-            tableRows.forEach(row => {
-                row.addEventListener('mouseenter', function() {
-                    this.style.transform = 'perspective(500px) rotateX(2deg) translateZ(10px)';
+                // Transform data - pisahkan foto_url_1 dan foto_url_2
+                allPhotos = [];
+                data.forEach(entry => {
+                    if (entry.foto_url_1) {
+                        allPhotos.push({
+                            id: `${entry.id}-1`,
+                            entryId: entry.id,
+                            url: entry.foto_url_1,
+                            nama: entry.nama,
+                            created_at: entry.created_at,
+                            type: 'foto_1'
+                        });
+                    }
+                    if (entry.foto_url_2) {
+                        allPhotos.push({
+                            id: `${entry.id}-2`,
+                            entryId: entry.id,
+                            url: entry.foto_url_2,
+                            nama: entry.nama,
+                            created_at: entry.created_at,
+                            type: 'foto_2'
+                        });
+                    }
                 });
 
-                row.addEventListener('mouseleave', function() {
-                    this.style.transform = 'perspective(500px) rotateX(0deg) translateZ(0px)';
-                });
+                filteredPhotos = [...allPhotos];
+                updateStats();
+                renderGallery();
+
+            } catch (error) {
+                console.error('Error fetching photos:', error);
+                document.getElementById('loadingState').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle fa-3x mb-3"></i><div>Error loading photos</div>';
+            }
+        }
+
+        // ==========================================
+        // UPDATE STATISTICS
+        // ==========================================
+        function updateStats() {
+            document.getElementById('totalPhotos').textContent = allPhotos.length;
+            document.getElementById('selectedCount').textContent = selectedPhotos.size;
+
+            // Today's photos
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = allPhotos.filter(photo => 
+                photo.created_at && photo.created_at.startsWith(today)
+            ).length;
+            document.getElementById('todayPhotos').textContent = todayCount;
+
+            // Calculate total size (estimate 500KB per image)
+            const totalSizeMB = (allPhotos.length * 0.5).toFixed(2);
+            document.getElementById('totalSize').textContent = `${totalSizeMB} MB`;
+        }
+
+        // ==========================================
+        // RENDER GALLERY
+        // ==========================================
+        function renderGallery() {
+            const gallery = document.getElementById('photoGallery');
+            const startIndex = (currentPage - 1) * photosPerPage;
+            const endIndex = startIndex + photosPerPage;
+            const pagePhotos = filteredPhotos.slice(startIndex, endIndex);
+
+            if (filteredPhotos.length === 0) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('photoGallery').style.display = 'none';
+                document.getElementById('noPhotosState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('photoGallery').style.display = 'grid';
+            document.getElementById('noPhotosState').style.display = 'none';
+
+            gallery.innerHTML = pagePhotos.map(photo => {
+                const date = new Date(photo.created_at);
+                const dateStr = date.toLocaleDateString('id-ID');
+                const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const isSelected = selectedPhotos.has(photo.id);
+                
+                // Get filename from URL
+                const urlParts = photo.url.split('/');
+                const filename = urlParts[urlParts.length - 1];
+
+                return `
+                    <div class="photo-card ${isSelected ? 'selected' : ''}" id="card-${photo.id}">
+                        <input type="checkbox" 
+                            class="photo-checkbox" 
+                            ${isSelected ? 'checked' : ''}
+                            onchange="toggleSelect('${photo.id}')"
+                        >
+                        <div class="photo-img-container">
+                            <img src="${photo.url}" 
+                                alt="${photo.nama}" 
+                                class="photo-img"
+                                loading="lazy"
+                                onerror="this.src='https://via.placeholder.com/250?text=Error+Loading'"
+                            >
+                        </div>
+                        <div class="photo-info">
+                            <div class="photo-name" title="${photo.nama}">${photo.nama}</div>
+                            <div class="photo-date">${dateStr} ${timeStr}</div>
+                            <div class="photo-size">${photo.type}</div>
+                            <div class="photo-actions">
+                                <button class="btn-small btn-view" onclick="viewPhoto('${photo.url}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-small btn-download" onclick="downloadPhoto('${photo.url}', '${filename}')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn-small btn-delete" onclick="deletePhoto('${photo.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            renderPagination();
+        }
+
+        // ==========================================
+        // PAGINATION
+        // ==========================================
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredPhotos.length / photosPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `
+                        <button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += '<span style="color: var(--text-secondary);">...</span>';
+                }
+            }
+
+            html += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            pagination.innerHTML = html;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredPhotos.length / photosPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderGallery();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // SELECTION FUNCTIONS
+        // ==========================================
+        function toggleSelect(photoId) {
+            if (selectedPhotos.has(photoId)) {
+                selectedPhotos.delete(photoId);
+            } else {
+                selectedPhotos.add(photoId);
+            }
+            updateStats();
+            
+            const card = document.getElementById(`card-${photoId}`);
+            if (card) {
+                card.classList.toggle('selected');
+            }
+        }
+
+        function selectAll() {
+            filteredPhotos.forEach(photo => selectedPhotos.add(photo.id));
+            updateStats();
+            renderGallery();
+        }
+
+        function unselectAll() {
+            selectedPhotos.clear();
+            updateStats();
+            renderGallery();
+        }
+
+        // ==========================================
+        // FILTER FUNCTIONS
+        // ==========================================
+        function applyFilters() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredPhotos = allPhotos.filter(photo => {
+                const photoDate = new Date(photo.created_at).toISOString().split('T')[0];
+                
+                if (startDate && photoDate < startDate) return false;
+                if (endDate && photoDate > endDate) return false;
+                if (search && !photo.nama.toLowerCase().includes(search) && 
+                    !photo.url.toLowerCase().includes(search)) return false;
+
+                return true;
             });
 
-            // Filter functionality
-            document.getElementById('applyFilter').addEventListener('click', function() {
-                // Add filter animation
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 150);
+            currentPage = 1;
+            renderGallery();
+        }
 
-                // Filter logic would go here
-                console.log('Applying filters...');
-            });
+        function resetFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('searchInput').value = '';
+            filteredPhotos = [...allPhotos];
+            currentPage = 1;
+            renderGallery();
+        }
 
-            // Export functionality
-            document.getElementById('exportData').addEventListener('click', function() {
-                // Add export animation
-                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Exporting...';
-                setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-download me-2"></i> Export Complete!';
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="fas fa-download me-2"></i> Export';
-                    }, 2000);
-                }, 1500);
-            });
+        // ==========================================
+        // PHOTO ACTIONS
+        // ==========================================
+        function viewPhoto(url) {
+            window.open(url, '_blank');
+        }
+
+        async function downloadPhoto(url, filename) {
+            try {
+                // Direct download dari Cloudinary CDN - tidak melalui server
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Error downloading photo');
+            }
+        }
+
+        async function deletePhoto(photoId) {
+            if (!confirm('Hapus foto ini?')) return;
+
+            try {
+                const photo = allPhotos.find(p => p.id === photoId);
+                if (!photo) return;
+
+                // Update database - set URL to null
+                const field = photo.type === 'foto_1' ? 'foto_url_1' : 'foto_url_2';
+                const { error } = await supabase
+                    .from('entries')
+                    .update({ [field]: null })
+                    .eq('id', photo.entryId);
+
+                if (error) throw error;
+
+                alert('Foto berhasil dihapus dari database!');
+                fetchPhotos();
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Error deleting photo');
+            }
+        }
+
+        // ==========================================
+        // BATCH ACTIONS
+        // ==========================================
+        async function downloadSelected() {
+            if (selectedPhotos.size === 0) {
+                alert('Pilih foto terlebih dahulu');
+                return;
+            }
+
+            const photos = allPhotos.filter(p => selectedPhotos.has(p.id));
+            
+            for (const photo of photos) {
+                const urlParts = photo.url.split('/');
+                const filename = urlParts[urlParts.length - 1];
+                await downloadPhoto(photo.url, filename);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Delay antar download
+            }
+
+            alert(`${photos.length} foto berhasil didownload!`);
+        }
+
+        async function deleteSelected() {
+            if (selectedPhotos.size === 0) {
+                alert('Pilih foto terlebih dahulu');
+                return;
+            }
+
+            if (!confirm(`Hapus ${selectedPhotos.size} foto yang dipilih?`)) return;
+
+            try {
+                const photos = allPhotos.filter(p => selectedPhotos.has(p.id));
+                
+                for (const photo of photos) {
+                    const field = photo.type === 'foto_1' ? 'foto_url_1' : 'foto_url_2';
+                    await supabase
+                        .from('entries')
+                        .update({ [field]: null })
+                        .eq('id', photo.entryId);
+                }
+
+                alert(`${photos.length} foto berhasil dihapus!`);
+                selectedPhotos.clear();
+                fetchPhotos();
+            } catch (error) {
+                console.error('Batch delete error:', error);
+                alert('Error deleting photos');
+            }
+        }
+
+        // ==========================================
+        // REAL-TIME SEARCH
+        // ==========================================
+        document.getElementById('searchInput').addEventListener('input', function() {
+            if (this.value.length > 2 || this.value.length === 0) {
+                applyFilters();
+            }
         });
-    </script>
 
+        // ==========================================
+        // INITIALIZE
+        // ==========================================
+        fetchPhotos();
+        setInterval(fetchPhotos, 60000); // Refresh every minute
+    </script>
+    <script src="/js/delete-photos.js"></script>
+    <script src="cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/sidebar.js"></script>
 </body>
 </html>

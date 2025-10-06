@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </li>
 
                                         <li class="nav-item">
-                        <a href="/data-management.html" class="nav-link" data-page="foto-management">
+                        <a href="/foto-management.html" class="nav-link" data-page="foto-management">
                             <i class="fas fa-database"></i>
                             <span class="nav-text">Manajemen Foto</span>
                         </a>

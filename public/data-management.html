@@ -128,12 +128,7 @@
             box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
 
-        .main-content {
-            margin-left: 280px;
-            padding: 40px;
-            min-height: 100vh;
-        }
-
+  
         .menu-toggle {
             display: none;
             position: fixed;
@@ -558,46 +553,7 @@
     </button>
 
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <i class="fas fa-weight"></i>
-            <h3>WeightTracker</h3>
-        </div>
-        <nav>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a href="/dashboard-admin.html" class="nav-link">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/entry-data.html" class="nav-link">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Entry Data</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/data-management.html" class="nav-link active">
-                        <i class="fas fa-database"></i>
-                        <span>Data Management</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/analytics.html" class="nav-link">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Analytics</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+   
 
     <!-- Main Content -->
     <main class="main-content">
@@ -1165,5 +1121,6 @@
         setInterval(fetchData, 30000);
     </script>
     <script src="/js/config.js"></script>
+     <script src="/js/sidebar.js"></script>
 </body>
 </html>
