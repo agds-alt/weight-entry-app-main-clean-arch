@@ -52,7 +52,6 @@
             opacity: 0.9;
         }
 
-        /* User Field dengan Highlight */
         .user-field {
             background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
             border: 2px solid #f39c12;
@@ -70,7 +69,6 @@
             color: #e67e22;
         }
 
-        /* Form Groups */
         .form-group {
             margin-bottom: 15px;
         }
@@ -101,7 +99,6 @@
             background: #f5f5f5;
         }
 
-        /* Resi Input dengan Scanner */
         .resi-group {
             position: relative;
         }
@@ -130,7 +127,6 @@
             background: #5568d3;
         }
 
-        /* Photo Upload Mode Selection */
         .upload-mode {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -165,7 +161,6 @@
             font-weight: 600;
         }
 
-        /* Photo Upload Slots */
         .photo-slots {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -224,9 +219,9 @@
             align-items: center;
             justify-content: center;
             font-size: 12px;
+            z-index: 10;
         }
 
-        /* Weight Info */
         .weight-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -256,7 +251,6 @@
             margin: 5px 0;
         }
 
-        /* Buttons */
         .btn-group {
             display: flex;
             gap: 10px;
@@ -297,7 +291,6 @@
             cursor: not-allowed;
         }
 
-        /* Scanner Modal */
         .modal {
             display: none;
             position: fixed;
@@ -315,13 +308,39 @@
             border-radius: 12px;
             padding: 20px;
             max-width: 500px;
-            margin: 50px auto;
+            margin: 20px auto;
         }
 
-        #scanner-video {
+        #scanner-container {
+            position: relative;
             width: 100%;
+            height: 300px;
+            background: #000;
             border-radius: 8px;
+            overflow: hidden;
             margin: 15px 0;
+        }
+
+        #scanner-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #00ff00;
+            top: 50%;
+            left: 0;
+            animation: scan 2s linear infinite;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        @keyframes scan {
+            0%, 100% { top: 10%; }
+            50% { top: 90%; }
         }
 
         .modal-btns {
@@ -329,7 +348,6 @@
             gap: 10px;
         }
 
-        /* Alert Messages */
         .alert {
             padding: 12px;
             border-radius: 8px;
@@ -380,6 +398,14 @@
             border-color: #667eea;
         }
 
+        .scan-status {
+            text-align: center;
+            color: #00ff00;
+            font-weight: 600;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 10px;
@@ -412,13 +438,11 @@
 
         <form id="entryForm">
             <div class="card">
-                <!-- User Field dengan Highlight -->
                 <div class="user-field">
                     <i class="fas fa-user-circle"></i>
                     <input type="text" id="nama" readonly style="border: none; background: transparent; font-weight: 600; width: 100%; outline: none;">
                 </div>
 
-                <!-- Nomor Resi dengan Scanner -->
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-barcode"></i> Nomor Resi</label>
                     <div class="resi-group">
@@ -429,7 +453,6 @@
                     </div>
                 </div>
 
-                <!-- Data Berat -->
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-weight"></i> Data Berat</label>
                     <div class="weight-row">
@@ -449,7 +472,6 @@
             </div>
 
             <div class="card">
-                <!-- Upload Mode Selection -->
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-camera"></i> Upload Foto (Pilih Mode)</label>
                     <div class="upload-mode">
@@ -464,7 +486,6 @@
                     </div>
                 </div>
 
-                <!-- Photo Slots -->
                 <div class="photo-slots">
                     <div class="photo-slot" id="slot1">
                         <i class="fas fa-plus"></i>
@@ -481,7 +502,6 @@
             </div>
 
             <div class="card">
-                <!-- Status & Notes -->
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-info-circle"></i> Status</label>
                     <select class="select" id="status">
@@ -497,7 +517,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="btn-group">
                 <button type="button" class="btn btn-secondary" id="resetBtn">
                     <i class="fas fa-redo"></i> Reset
@@ -509,27 +528,28 @@
         </form>
     </div>
 
-    <!-- Scanner Modal -->
     <div id="scannerModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-bottom: 10px;"><i class="fas fa-barcode"></i> Scan Barcode</h3>
-            <video id="scanner-video" autoplay playsinline></video>
-            <canvas id="scanner-canvas" style="display: none;"></canvas>
+            <h3 style="margin-bottom: 10px;"><i class="fas fa-barcode"></i> Scan Barcode Resi</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Arahkan kamera ke barcode pada resi</p>
+            <div id="scanner-container">
+                <div class="scanner-line"></div>
+            </div>
+            <div class="scan-status" id="scanStatus">Mendeteksi barcode...</div>
             <div class="modal-btns">
                 <button type="button" class="btn btn-secondary" id="closeScanner">
                     <i class="fas fa-times"></i> Tutup
                 </button>
                 <button type="button" class="btn btn-primary" id="switchCamera">
-                    <i class="fas fa-sync"></i> Switch
+                    <i class="fas fa-sync"></i> Flip
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Auth check
         const token = localStorage.getItem('accessToken');
         const userName = localStorage.getItem('userName');
         
@@ -540,19 +560,17 @@
 
         document.getElementById('nama').value = userName;
 
-        // Cloudinary config
         const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
         const CLOUDINARY_CLOUD_NAME = 'ddzzlusek';
         const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
-        // State
         let uploadMode = 'gallery';
         let photos = { slot1: null, slot2: null };
         let currentSlot = null;
-        let cameraStream = null;
         let facingMode = 'environment';
+        let scannerActive = false;
+        let userLocation = { city: 'Unknown', country: 'ID', coords: null };
 
-        // Elements
         const galleryMode = document.getElementById('galleryMode');
         const cameraMode = document.getElementById('cameraMode');
         const fileInput = document.getElementById('fileInput');
@@ -563,13 +581,90 @@
         const scannerModal = document.getElementById('scannerModal');
         const closeScanner = document.getElementById('closeScanner');
         const switchCamera = document.getElementById('switchCamera');
-        const video = document.getElementById('scanner-video');
-        const canvas = document.getElementById('scanner-canvas');
+        const scanStatus = document.getElementById('scanStatus');
         const form = document.getElementById('entryForm');
         const submitBtn = document.getElementById('submitBtn');
         const resetBtn = document.getElementById('resetBtn');
 
-        // Upload mode selection
+        // Get user location on load
+        getUserLocation();
+
+        function getUserLocation() {
+            if ("geolocation" in navigator) {
+                showAlert('success', 'Meminta izin lokasi...');
+                
+                navigator.geolocation.getCurrentPosition(
+                    async function(position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        userLocation.coords = { lat, lon };
+                        
+                        try {
+                            const response = await fetch(
+                                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`,
+                                {
+                                    headers: {
+                                        'Accept-Language': 'id'
+                                    }
+                                }
+                            );
+                            
+                            if (response.ok) {
+                                const data = await response.json();
+                                const address = data.address;
+                                
+                                userLocation.city = address.city || 
+                                                   address.town || 
+                                                   address.village || 
+                                                   address.county || 
+                                                   address.state || 
+                                                   'Indonesia';
+                                userLocation.country = 'ID';
+                                
+                                showAlert('success', `Lokasi terdeteksi: ${userLocation.city}`);
+                                console.log('Location:', userLocation);
+                            } else {
+                                userLocation.city = 'Indonesia';
+                                showAlert('error', 'Gagal mendapatkan nama kota, menggunakan default');
+                            }
+                        } catch (error) {
+                            console.error('Reverse geocoding error:', error);
+                            userLocation.city = 'Indonesia';
+                            showAlert('error', 'Gagal mendapatkan lokasi detail');
+                        }
+                    },
+                    function(error) {
+                        console.error('Geolocation error:', error);
+                        userLocation.city = 'Indonesia';
+                        userLocation.country = 'ID';
+                        
+                        let errorMsg = 'Lokasi tidak tersedia';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMsg = 'Izin lokasi ditolak, menggunakan default';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMsg = 'Lokasi tidak tersedia';
+                                break;
+                            case error.TIMEOUT:
+                                errorMsg = 'Timeout mendapatkan lokasi';
+                                break;
+                        }
+                        showAlert('error', errorMsg);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000
+                    }
+                );
+            } else {
+                userLocation.city = 'Indonesia';
+                userLocation.country = 'ID';
+                showAlert('error', 'Browser tidak support GPS');
+            }
+        }
+
         galleryMode.addEventListener('click', () => {
             uploadMode = 'gallery';
             galleryMode.classList.add('active');
@@ -584,12 +679,11 @@
             resetPhotos();
         });
 
-        // Photo slot clicks
         slot1.addEventListener('click', () => handleSlotClick('slot1'));
         slot2.addEventListener('click', () => handleSlotClick('slot2'));
 
         function handleSlotClick(slotId) {
-            if (photos[slotId]) return; // Already has photo
+            if (photos[slotId]) return;
             currentSlot = slotId;
             
             if (uploadMode === 'gallery') {
@@ -599,7 +693,6 @@
             }
         }
 
-        // File inputs
         fileInput.addEventListener('change', (e) => {
             if (e.target.files[0]) handleFile(e.target.files[0]);
         });
@@ -619,7 +712,6 @@
                 return;
             }
 
-            // Add watermark
             const watermarkedFile = await addWatermark(file);
             photos[currentSlot] = watermarkedFile;
             displayPhoto(watermarkedFile, currentSlot);
@@ -637,30 +729,42 @@
                     
                     ctx.drawImage(img, 0, 0);
                     
-                    // Watermark text
                     const now = new Date();
-                    const date = now.toLocaleDateString('id-ID');
-                    const time = now.toLocaleTimeString('id-ID');
-                    const watermarkText = `${userName} | ${date} ${time} | Jakarta, ID`;
+                    const dateStr = now.toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: '2-digit', 
+                        year: 'numeric'
+                    });
+                    const timeStr = now.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
                     
-                    // Style
-                    ctx.font = 'bold 16px Arial';
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-                    ctx.lineWidth = 3;
+                    const watermarkText = `${userName} | ${dateStr} ${timeStr} | ${userLocation.city}, ${userLocation.country}`;
+                    
+                    const fontSize = Math.max(16, canvas.width / 30);
+                    ctx.font = `bold ${fontSize}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'bottom';
                     
                     const x = canvas.width / 2;
                     const y = canvas.height - 20;
                     
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                    ctx.lineWidth = 4;
                     ctx.strokeText(watermarkText, x, y);
+                    
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
                     ctx.fillText(watermarkText, x, y);
                     
                     canvas.toBlob(blob => {
-                        const watermarkedFile = new File([blob], file.name, { type: file.type });
+                        const watermarkedFile = new File([blob], file.name, { 
+                            type: file.type,
+                            lastModified: Date.now()
+                        });
                         resolve(watermarkedFile);
-                    }, file.type);
+                    }, file.type, 0.95);
                 };
 
                 img.src = URL.createObjectURL(file);
@@ -674,7 +778,7 @@
             reader.onload = function(e) {
                 slot.innerHTML = `
                     <img src="${e.target.result}" alt="Photo">
-                    <button type="button" class="remove-photo" onclick="removePhoto('${slotId}')">
+                    <button type="button" class="remove-photo" onclick="window.removePhoto('${slotId}')">
                         <i class="fas fa-times"></i>
                     </button>
                 `;
@@ -696,11 +800,10 @@
 
         function resetPhotos() {
             photos = { slot1: null, slot2: null };
-            removePhoto('slot1');
-            removePhoto('slot2');
+            window.removePhoto('slot1');
+            window.removePhoto('slot2');
         }
 
-        // Weight calculation
         function calculateSelisih() {
             const beratResi = parseFloat(document.getElementById('beratResi').value) || 0;
             const beratAktual = parseFloat(document.getElementById('beratAktual').value) || 0;
@@ -733,33 +836,71 @@
         document.getElementById('beratResi').addEventListener('input', calculateSelisih);
         document.getElementById('beratAktual').addEventListener('input', calculateSelisih);
 
-        // Barcode scanner
         scanBtn.addEventListener('click', startScanner);
         closeScanner.addEventListener('click', stopScanner);
         switchCamera.addEventListener('click', toggleCamera);
 
-        async function startScanner() {
+        function startScanner() {
             scannerModal.style.display = 'block';
+            scannerActive = true;
+            scanStatus.textContent = 'Mendeteksi barcode...';
             
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: facingMode }
-                });
-                
-                cameraStream = stream;
-                video.srcObject = stream;
-                
-                requestAnimationFrame(scanFrame);
-            } catch (error) {
-                showAlert('error', 'Tidak dapat mengakses kamera');
-                stopScanner();
-            }
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#scanner-container'),
+                    constraints: {
+                        facingMode: facingMode,
+                        aspectRatio: { min: 1, max: 2 }
+                    }
+                },
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_39_vin_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader"
+                    ]
+                },
+                locate: true,
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                }
+            }, function(err) {
+                if (err) {
+                    console.error('Quagga init error:', err);
+                    showAlert('error', 'Gagal membuka kamera');
+                    stopScanner();
+                    return;
+                }
+                Quagga.start();
+            });
+
+            Quagga.onDetected(function(result) {
+                if (result && result.codeResult && result.codeResult.code) {
+                    const code = result.codeResult.code;
+                    document.getElementById('noResi').value = code.toUpperCase();
+                    scanStatus.textContent = `Terdeteksi: ${code}`;
+                    showAlert('success', `Barcode berhasil di-scan: ${code}`);
+                    
+                    setTimeout(() => {
+                        stopScanner();
+                    }, 1000);
+                }
+            });
         }
 
         function stopScanner() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
+            if (scannerActive) {
+                Quagga.stop();
+                scannerActive = false;
             }
             scannerModal.style.display = 'none';
         }
@@ -767,36 +908,9 @@
         function toggleCamera() {
             facingMode = facingMode === 'environment' ? 'user' : 'environment';
             stopScanner();
-            startScanner();
+            setTimeout(() => startScanner(), 100);
         }
 
-        function scanFrame() {
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                
-                if (typeof jsQR !== 'undefined') {
-                    const code = jsQR(imageData.data, imageData.width, imageData.height);
-                    
-                    if (code) {
-                        document.getElementById('noResi').value = code.data.toUpperCase();
-                        showAlert('success', `Resi berhasil di-scan: ${code.data}`);
-                        stopScanner();
-                        return;
-                    }
-                }
-            }
-            
-            if (scannerModal.style.display === 'block') {
-                requestAnimationFrame(scanFrame);
-            }
-        }
-
-        // Form submission
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -813,7 +927,6 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
             try {
-                // Upload photos
                 const noResi = document.getElementById('noResi').value.toUpperCase().trim();
                 const timestamp = Date.now();
                 
@@ -822,7 +935,6 @@
                     uploadToCloudinary(photos.slot2, `${noResi}_${timestamp}_2`)
                 ]);
 
-                // Submit data
                 const entryData = {
                     nama: userName,
                     no_resi: noResi,
@@ -851,8 +963,11 @@
                 
                 if (result.success) {
                     showAlert('success', `Data berhasil disimpan! Resi: ${noResi}`);
-                    setTimeout(() => form.reset(), 2000);
-                    resetPhotos();
+                    setTimeout(() => {
+                        form.reset();
+                        resetPhotos();
+                        document.getElementById('selisihBox').style.display = 'none';
+                    }, 2000);
                 }
             } catch (error) {
                 showAlert('error', error.message);
@@ -879,7 +994,6 @@
             return data.secure_url;
         }
 
-        // Reset button
         resetBtn.addEventListener('click', () => {
             if (confirm('Reset semua data?')) {
                 form.reset();
@@ -888,12 +1002,10 @@
             }
         });
 
-        // Auto uppercase resi
         document.getElementById('noResi').addEventListener('input', (e) => {
             e.target.value = e.target.value.toUpperCase();
         });
 
-        // Alert helper
         function showAlert(type, message) {
             const alertEl = document.getElementById(type === 'success' ? 'alertSuccess' : 'alertError');
             const msgEl = document.getElementById(type === 'success' ? 'successMsg' : 'errorMsg');
@@ -907,7 +1019,6 @@
         }
     });
     </script>
-       <script src="/js/sidebar.js"></script>
-        <script src="/js/entry.form.js"></script>
 </body>
 </html>
+
