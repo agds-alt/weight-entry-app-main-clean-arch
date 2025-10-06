@@ -1230,98 +1230,104 @@
                         return;
                     }
                     
-                    // Filter 2: REJECT pure numeric (barcode produk EAN/UPC)
-                    if (/^\d+$/.test(code)) {
-                        console.log(`Rejected: Pure numeric barcode (product barcode): ${code}`);
-                        scanStatus.textContent = `❌ Bukan nomor resi (barcode produk)`;
-                        scanStatus.style.color = '#ef4444';
-                        showToast('error', 'Barcode Salah', 'Ini barcode produk, bukan nomor resi pengiriman', 4000);
-                        return;
+                    let isValid = false;
+                    let resiType = '';
+                    
+                    // Filter 2: REGULAR - Exactly 10 digit angka (pure numeric)
+                    if (/^\d{10}$/.test(code)) {
+                        isValid = true;
+                        resiType = 'REGULAR';
+                        console.log(`Valid REGULAR format: ${code}`);
                     }
-                    
-                    // Filter 3: Whitelist prefix ekspedisi yang valid
-                    const validPrefixes = [
-                        'JX', 'JP', 'JT', 'JN',  // J&T Express
-                        'JNE', 'JNT',             // JNE, JNT
-                        'SIC', 'SI',              // SiCepat
-                        'NIN', 'NJ',              // Ninja Express
-                        'ANT', 'AN',              // Anteraja
-                        'ID', 'IDP',              // ID Express
-                        'LIO', 'LE',              // Lion Parcel
-                        'POS', 'PS',              // Pos Indonesia
-                        'TIK', 'TK',              // TikTok/Tokopedia
-                        'SPX', 'SP',              // Shopee Express
-                        'SAP'                     // SAP Express
-                    ];
-                    
-                    // Extract prefix (2-3 huruf di awal)
-                    const prefixMatch = code.match(/^([A-Z]{2,3})/i);
-                    if (!prefixMatch) {
-                        console.log(`Rejected: No valid prefix found in ${code}`);
-                        scanStatus.textContent = `❌ Format salah (harus ada kode ekspedisi)`;
-                        scanStatus.style.color = '#ef4444';
-                        return;
-                    }
-                    
-                    const prefix = prefixMatch[1].toUpperCase();
-                    if (!validPrefixes.includes(prefix)) {
-                        console.log(`Rejected: Invalid prefix "${prefix}" in ${code}`);
-                        scanStatus.textContent = `❌ Kode ekspedisi tidak valid: ${prefix}`;
-                        scanStatus.style.color = '#ef4444';
-                        showToast('warning', 'Prefix Tidak Dikenal', `Kode "${prefix}" bukan ekspedisi yang dikenal`, 4000);
-                        return;
-                    }
-                    
-                    // Filter 4: Format resi - Prefix (2-3 huruf) + minimal 10 digit angka
-                    if (!/^[A-Z]{2,3}\d{10,}$/i.test(code)) {
-                        console.log(`Rejected: Invalid format ${code}`);
-                        scanStatus.textContent = `❌ Format salah: ${code}`;
-                        scanStatus.style.color = '#f59e0b';
-                        showToast('warning', 'Format Resi Salah', 'Format harus: XX1234567890 (2-3 huruf + minimal 10 angka)', 5000);
-                        return;
-                    }
-                    
-                    // Debouncing: tunggu beberapa deteksi yang sama
-                    detectionBuffer.push(code);
-                    
-                    // Keep only last 5 detections
-                    if (detectionBuffer.length > 5) {
-                        detectionBuffer.shift();
-                    }
-                    
-                    // Count occurrences
-                    const counts = {};
-                    detectionBuffer.forEach(c => {
-                        counts[c] = (counts[c] || 0) + 1;
-                    });
-                    
-                    // Find most common code
-                    let mostCommon = null;
-                    let maxCount = 0;
-                    for (const [detectedCode, count] of Object.entries(counts)) {
-                        if (count > maxCount) {
-                            maxCount = count;
-                            mostCommon = detectedCode;
+                    // Filter 3: NON-REGULAR - 2 huruf + 10 digit angka
+                    else if (/^[A-Z]{2}\d{10}$/i.test(code)) {
+                        // Whitelist prefix ekspedisi yang valid
+                        const validPrefixes = [
+                            'JX', 'JP', 'JT', 'JN',  // J&T Express
+                            'SI', 'SC',              // SiCepat
+                            'NI', 'NJ',              // Ninja Express
+                            'AN', 'AT',              // Anteraja
+                            'ID', 'IE',              // ID Express
+                            'LI', 'LE', 'LP',        // Lion Parcel
+                            'PO', 'PS',              // Pos Indonesia
+                            'TI', 'TK',              // TikTok/Tokopedia
+                            'SP', 'SX',              // Shopee Express
+                            'SA'                     // SAP Express
+                        ];
+                        
+                        const prefix = code.substring(0, 2).toUpperCase();
+                        if (validPrefixes.includes(prefix)) {
+                            isValid = true;
+                            resiType = 'NON-REGULAR';
+                            console.log(`Valid NON-REGULAR format: ${code} (prefix: ${prefix})`);
+                        } else {
+                            console.log(`Rejected: Invalid prefix "${prefix}" in ${code}`);
+                            scanStatus.textContent = `❌ Kode ekspedisi tidak valid: ${prefix}`;
+                            scanStatus.style.color = '#ef4444';
+                            showToast('warning', 'Prefix Tidak Dikenal', `Kode "${prefix}" bukan ekspedisi yang dikenal`, 4000);
+                            return;
                         }
                     }
+                    // Reject semua format lainnya
+                    else {
+                        // Special reject message untuk barcode produk (13 digit)
+                        if (/^\d{13}$/.test(code)) {
+                            console.log(`Rejected: Product barcode EAN-13: ${code}`);
+                            scanStatus.textContent = `❌ Bukan nomor resi (barcode produk)`;
+                            scanStatus.style.color = '#ef4444';
+                            showToast('error', 'Barcode Produk', 'Ini barcode produk EAN-13, bukan nomor resi', 4000);
+                        } else {
+                            console.log(`Rejected: Invalid format ${code}`);
+                            scanStatus.textContent = `❌ Format tidak valid: ${code}`;
+                            scanStatus.style.color = '#f59e0b';
+                            showToast('warning', 'Format Salah', 'Format harus: 1234567890 (10 digit) atau XX1234567890 (2 huruf + 10 digit)', 5000);
+                        }
+                        return;
+                    }
                     
-                    // Filter 5: Need at least 3 consistent detections
-                    if (maxCount >= 3 && mostCommon !== lastDetectedCode) {
-                        lastDetectedCode = mostCommon;
-                        document.getElementById('noResi').value = mostCommon.toUpperCase();
-                        scanStatus.textContent = `✓ Terdeteksi: ${mostCommon}`;
-                        scanStatus.style.color = '#22c55e';
+                    // Jika valid, lanjut ke debouncing
+                    if (isValid) {
+                        detectionBuffer.push(code);
                         
-                        showToast('success', 'Scan Berhasil', `Nomor resi: ${mostCommon}`, 3000);
+                        // Keep only last 5 detections
+                        if (detectionBuffer.length > 5) {
+                            detectionBuffer.shift();
+                        }
                         
-                        // Auto close setelah 1.5 detik
-                        setTimeout(() => {
-                            stopScanner();
-                        }, 1500);
-                    } else {
-                        // Show detection progress
-                        scanStatus.textContent = `Scanning... (${maxCount}/3)`;
-                        scanStatus.style.color = '#6366f1';
+                        // Count occurrences
+                        const counts = {};
+                        detectionBuffer.forEach(c => {
+                            counts[c] = (counts[c] || 0) + 1;
+                        });
+                        
+                        // Find most common code
+                        let mostCommon = null;
+                        let maxCount = 0;
+                        for (const [detectedCode, count] of Object.entries(counts)) {
+                            if (count > maxCount) {
+                                maxCount = count;
+                                mostCommon = detectedCode;
+                            }
+                        }
+                        
+                        // Need at least 3 consistent detections
+                        if (maxCount >= 3 && mostCommon !== lastDetectedCode) {
+                            lastDetectedCode = mostCommon;
+                            document.getElementById('noResi').value = mostCommon.toUpperCase();
+                            scanStatus.textContent = `✓ ${resiType}: ${mostCommon}`;
+                            scanStatus.style.color = '#22c55e';
+                            
+                            showToast('success', `Scan Berhasil (${resiType})`, `Nomor resi: ${mostCommon}`, 3000);
+                            
+                            // Auto close setelah 1.5 detik
+                            setTimeout(() => {
+                                stopScanner();
+                            }, 1500);
+                        } else {
+                            // Show detection progress
+                            scanStatus.textContent = `Scanning... (${maxCount}/3)`;
+                            scanStatus.style.color = '#6366f1';
+                        }
                     }
                 }
             });
@@ -1450,7 +1456,6 @@
     });
     </script>
       <script src="/js/sidebar.js"></script>
-                <script src="/js/entry-form-resi.js"></script>
-    
+                <script src="/js/data-management.js"></script>
 </body>
 </html>
