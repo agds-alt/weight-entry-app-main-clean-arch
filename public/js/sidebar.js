@@ -82,6 +82,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a>
                     </li>
 
+                                        <li class="nav-item">
+                        <a href="/data-management.html" class="nav-link" data-page="foto-management">
+                            <i class="fas fa-database"></i>
+                            <span class="nav-text">Manajemen Foto</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item nav-divider"></li>
 
                     <li class="nav-item">
@@ -735,9 +742,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            .sidebar {
-                animation: slideInLeft 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            }
+
 
             /* Aurora background effect */
             .sidebar::after {
