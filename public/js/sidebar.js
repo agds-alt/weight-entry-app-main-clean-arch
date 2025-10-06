@@ -59,21 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a href="/report.html" class="nav-link" data-page="report">
-                            <i class="fas fa-chart-bar"></i>
-                            <span class="nav-text">Report & Analytics</span>
-                        </a>
-                    </li>
-
-                    ${userRole === 'admin' ? `
-                    <li class="nav-item">
-                        <a href="/user-management.html" class="nav-link" data-page="user-management">
-                            <i class="fas fa-users"></i>
-                            <span class="nav-text">Manajemen User</span>
-                        </a>
-                    </li>
-                    ` : ''}
+                
 
                     <li class="nav-item">
                         <a href="/data-management.html" class="nav-link" data-page="data-management">
@@ -97,6 +83,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="nav-text">Profil</span>
                         </a>
                     </li>
+
+                                        ${userRole === 'admin' ? `
+                    <li class="nav-item">
+                        <a href="/user-management.html" class="nav-link" data-page="user-management">
+                            <i class="fas fa-users"></i>
+                            <span class="nav-text">Manajemen User</span>
+                        </a>
+                    </li>
+                    ` : ''}
+
 
                     <li class="nav-item">
                         <a href="/password.html" class="nav-link" data-page="password">

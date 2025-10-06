@@ -6,7 +6,7 @@
     <title>Data Management - WeightTracker Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
@@ -22,9 +22,7 @@
             --text-primary: #ffffff;
             --text-secondary: #a0a9d1;
             --gradient-holographic: linear-gradient(45deg, var(--accent-cyan), var(--accent-magenta), var(--accent-lime), var(--accent-orange), var(--accent-cyan));
-            --gradient-aurora: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
             --shadow-holographic: 0 10px 30px rgba(0, 212, 255, 0.3), 0 0 20px rgba(255, 0, 255, 0.2), 0 0 10px rgba(0, 255, 136, 0.1);
-            --shadow-neumorphic: 20px 20px 60px #0a0b1a, -20px -20px 60px #1a1f3a;
             --shadow-neumorphic-inset: inset 5px 5px 10px #0a0b1a, inset -5px -5px 10px #1a1f3a;
         }
 
@@ -43,49 +41,55 @@
             min-height: 100vh;
         }
 
-            /* Animated Holographic Background */
-            body::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%), radial-gradient(circle at 60% 70%, rgba(255, 170, 0, 0.1) 0%, transparent 50%);
-                animation: holographicFloat 20s ease infinite;
-                pointer-events: none;
-                z-index: -1;
-            }
-
-        @keyframes holographicFloat {
-            0%, 100% {
-                transform: rotate(0deg) scale(1);
-            }
-
-            33% {
-                transform: rotate(3deg) scale(1.05);
-            }
-
-            66% {
-                transform: rotate(-2deg) scale(1.02);
-            }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            animation: holographicFloat 20s ease infinite;
+            pointer-events: none;
+            z-index: -1;
         }
 
-       
+        @keyframes holographicFloat {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            33% { transform: rotate(3deg) scale(1.05); }
+            66% { transform: rotate(-2deg) scale(1.02); }
+        }
 
         @keyframes holographicWave {
-            0% {
-                background-position: 0% 50%;
-            }
+            0% { background-position: 0% 50%; }
+            100% { background-position: 400% 50%; }
+        }
 
-            100% {
-                background-position: 400% 50%;
-            }
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            padding: 30px 20px;
+            z-index: 1000;
+            border-right: 1px solid rgba(0, 212, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 10px;
         }
 
         .sidebar-logo i {
             font-size: 28px;
-            color: white;
+            color: var(--accent-cyan);
         }
 
         .sidebar-logo h3 {
@@ -110,74 +114,72 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            transform: perspective(500px) rotateY(0deg);
         }
 
-            .nav-link::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                opacity: 0;
-                transition: all 0.5s;
-            }
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--surface-light);
+            box-shadow: var(--shadow-neumorphic-inset);
+        }
 
-            .nav-link:hover {
-                color: var(--text-primary);
-                transform: perspective(500px) rotateY(10deg) translateX(5px);
-                background: var(--surface-light);
-                box-shadow: var(--shadow-neumorphic-inset);
-            }
+        .nav-link.active {
+            color: var(--accent-cyan);
+            background: var(--surface-light);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
 
-            .nav-link.active {
-                color: var(--accent-cyan);
-                background: var(--surface-light);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), var(--shadow-neumorphic-inset);
-            }
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            min-height: 100vh;
+        }
 
-                .nav-link.active::before {
-                    left: 0;
-                    opacity: 0.1;
-                    animation: holographicWave 3s linear infinite;
-                }
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            background: var(--surface);
+            border: none;
+            color: var(--accent-cyan);
+            font-size: 20px;
+            cursor: pointer;
+        }
 
-
-        /* Isometric Header */
         .isometric-header {
             background: var(--surface);
             border-radius: 30px;
             padding: 40px;
             margin-bottom: 40px;
             position: relative;
-            transform-style: preserve-3d;
-            transform: perspective(1000px) rotateX(5deg) rotateY(-2deg);
+            transform: perspective(1000px) rotateX(5deg);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-holographic);
             border: 1px solid rgba(0, 212, 255, 0.1);
         }
 
-            .isometric-header::before {
-                content: '';
-                position: absolute;
-                top: -2px;
-                left: -2px;
-                right: -2px;
-                bottom: -2px;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                border-radius: 30px;
-                opacity: 0.5;
-                z-index: -1;
-                animation: holographicWave 10s linear infinite;
-            }
+        .isometric-header::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient-holographic);
+            background-size: 400% 400%;
+            border-radius: 30px;
+            opacity: 0.5;
+            z-index: -1;
+            animation: holographicWave 10s linear infinite;
+        }
 
-            .isometric-header:hover {
-                transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-10px);
-            }
+        .isometric-header:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+        }
 
         .header-title {
             font-size: 42px;
@@ -189,10 +191,8 @@
             background-clip: text;
             animation: holographicWave 8s linear infinite;
             margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
         }
 
-        /* Holographic Stats Grid */
         .holographic-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -204,34 +204,32 @@
             background: var(--surface);
             border-radius: 25px;
             padding: 30px;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: perspective(1000px) rotateX(5deg) rotateY(2deg);
+            transform: perspective(1000px) rotateX(5deg);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-holographic);
             border: 1px solid rgba(0, 212, 255, 0.1);
             overflow: hidden;
         }
 
-            .holo-stat-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-                transition: left 0.6s;
-            }
+        .holo-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
 
-            .holo-stat-card:hover::before {
-                left: 100%;
-            }
+        .holo-stat-card:hover::before {
+            left: 100%;
+        }
 
-            .holo-stat-card:hover {
-                transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-10px);
-                box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3), 0 0 20px rgba(0, 255, 136, 0.2);
-            }
+        .holo-stat-card:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4);
+        }
 
         .holo-stat-icon {
             width: 70px;
@@ -245,8 +243,6 @@
             background: var(--gradient-holographic);
             background-size: 400% 400%;
             animation: holographicWave 6s linear infinite;
-            box-shadow: var(--shadow-holographic);
-            transform: perspective(500px) rotateY(15deg);
         }
 
         .holo-stat-value {
@@ -254,7 +250,6 @@
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
         }
 
         .holo-stat-label {
@@ -276,7 +271,6 @@
             color: var(--accent-lime);
         }
 
-        /* Glassmorphic Filter Card */
         .glass-filter-card {
             background: rgba(30, 33, 57, 0.7);
             backdrop-filter: blur(20px);
@@ -285,29 +279,14 @@
             margin-bottom: 30px;
             border: 1px solid rgba(0, 212, 255, 0.2);
             box-shadow: var(--shadow-holographic);
-            position: relative;
-            overflow: hidden;
         }
-
-            .glass-filter-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                opacity: 0.05;
-                animation: holographicWave 15s linear infinite;
-                z-index: -1;
-            }
 
         .filter-section {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             align-items: end;
+            margin-bottom: 20px;
         }
 
         .filter-item {
@@ -320,46 +299,26 @@
             font-weight: 500;
             color: var(--accent-cyan);
             margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
         }
 
-        .holographic-input {
+        .holographic-input, .holographic-select {
             background: rgba(38, 41, 69, 0.8);
             border: 1px solid rgba(0, 212, 255, 0.3);
             color: var(--text-primary);
             border-radius: 12px;
             padding: 12px 15px;
             font-size: 14px;
+            width: 100%;
             transition: all 0.3s;
-            backdrop-filter: blur(10px);
         }
 
-            .holographic-input:focus {
-                background: rgba(38, 41, 69, 0.9);
-                border-color: var(--accent-cyan);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-                outline: none;
-                transform: translateY(-2px);
-            }
-
-        .holographic-select {
-            background: rgba(38, 41, 69, 0.8);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            color: var(--text-primary);
-            border-radius: 12px;
-            padding: 12px 15px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
+        .holographic-input:focus, .holographic-select:focus {
+            background: rgba(38, 41, 69, 0.9);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            outline: none;
         }
 
-            .holographic-select:focus {
-                background: rgba(38, 41, 69, 0.9);
-                border-color: var(--accent-cyan);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-                outline: none;
-            }
-
-        /* Holographic Buttons */
         .btn-holographic {
             background: var(--gradient-holographic);
             background-size: 400% 400%;
@@ -372,111 +331,69 @@
             transition: all 0.3s;
             animation: holographicWave 8s linear infinite;
             box-shadow: var(--shadow-holographic);
-            position: relative;
-            overflow: hidden;
         }
 
-            .btn-holographic::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-                transition: left 0.6s;
-            }
-
-            .btn-holographic:hover::before {
-                left: 100%;
-            }
-
-            .btn-holographic:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 15px 30px rgba(0, 212, 255, 0.5), 0 0 25px rgba(255, 0, 255, 0.4);
-            }
+        .btn-holographic:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.5);
+        }
 
         .btn-export {
             background: linear-gradient(45deg, var(--accent-lime), #00cc7a);
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
         }
 
         .btn-reset {
             background: linear-gradient(45deg, var(--accent-magenta), #cc00cc);
-            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
         }
 
-        /* 3D Data Table */
         .table-3d-container {
             background: var(--surface);
             border-radius: 25px;
             padding: 30px;
             margin-bottom: 30px;
-            transform-style: preserve-3d;
-            transform: perspective(1000px) rotateX(3deg);
-            transition: all 0.5s;
             box-shadow: var(--shadow-holographic);
             border: 1px solid rgba(0, 212, 255, 0.1);
-            position: relative;
-            overflow: hidden;
+            overflow-x: auto;
         }
-
-            .table-3d-container::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: var(--gradient-holographic);
-                background-size: 400% 400%;
-                opacity: 0.03;
-                animation: holographicWave 20s linear infinite;
-                z-index: -1;
-            }
-
-            .table-3d-container:hover {
-                transform: perspective(1000px) rotateX(0deg);
-            }
 
         .holographic-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
             color: var(--text-primary);
-            transform: perspective(1000px) rotateX(0deg);
+            min-width: 1400px;
         }
 
-            .holographic-table thead th {
-                background: rgba(0, 212, 255, 0.1);
-                color: var(--accent-cyan);
-                padding: 15px;
-                text-align: left;
-                font-weight: 600;
-                border-bottom: 2px solid var(--accent-cyan);
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                backdrop-filter: blur(10px);
-                text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-            }
+        .holographic-table thead th {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-cyan);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+        }
 
-            .holographic-table tbody td {
-                padding: 15px;
-                border-bottom: 1px solid rgba(0, 212, 255, 0.1);
-                transition: all 0.3s;
-            }
+        .holographic-table thead th:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
 
-            .holographic-table tbody tr {
-                transition: all 0.3s;
-                transform-style: preserve-3d;
-            }
+        .holographic-table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
 
-                .holographic-table tbody tr:hover {
-                    background: rgba(0, 212, 255, 0.05);
-                    transform: perspective(500px) rotateX(2deg) translateZ(10px);
-                    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
-                }
+        .holographic-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .holographic-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
 
         .table-image {
             width: 50px;
@@ -484,54 +401,42 @@
             object-fit: cover;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s;
             border: 1px solid rgba(0, 212, 255, 0.3);
+            transition: all 0.3s;
         }
 
-            .table-image:hover {
-                transform: scale(2) rotate(5deg);
-                box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-            }
+        .table-image:hover {
+            transform: scale(1.8);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            z-index: 100;
+        }
 
-        /* Holographic Badges */
         .badge-holographic {
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .badge-diet {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--accent-lime);
-            border: 1px solid var(--accent-lime);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
-
-        .badge-bulking {
-            background: rgba(255, 0, 255, 0.2);
-            color: var(--accent-magenta);
-            border: 1px solid var(--accent-magenta);
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
-        }
-
-        .badge-maintain {
-            background: rgba(0, 212, 255, 0.2);
-            color: var(--accent-cyan);
-            border: 1px solid var(--accent-cyan);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        }
-
-        .badge-medical {
+        .badge-submitted {
             background: rgba(255, 170, 0, 0.2);
             color: var(--accent-orange);
             border: 1px solid var(--accent-orange);
-            box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
         }
 
-        /* Action Buttons */
+        .badge-approved {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent-lime);
+            border: 1px solid var(--accent-lime);
+        }
+
+        .badge-rejected {
+            background: rgba(255, 0, 255, 0.2);
+            color: var(--accent-magenta);
+            border: 1px solid var(--accent-magenta);
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -544,7 +449,6 @@
             font-size: 13px;
             cursor: pointer;
             transition: all 0.3s;
-            transform: perspective(500px) rotateY(0deg);
         }
 
         .btn-edit {
@@ -560,67 +464,72 @@
         }
 
         .btn-action:hover {
-            transform: perspective(500px) rotateY(15deg) translateY(-2px);
+            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
         }
 
-        /* Floating Animation */
+        .loading, .no-data {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pagination button.active {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+        }
+
         @keyframes float {
-            0%, 100% {
-                transform: perspective(1000px) rotateX(5deg) rotateY(2deg) translateY(0);
-            }
-
-            50% {
-                transform: perspective(1000px) rotateX(5deg) rotateY(2deg) translateY(-10px);
-            }
+            0%, 100% { transform: perspective(1000px) rotateX(5deg) translateY(0); }
+            50% { transform: perspective(1000px) rotateX(5deg) translateY(-10px); }
         }
 
-        .holo-stat-card:nth-child(1) {
-            animation: float 6s ease-in-out infinite;
-        }
+        .holo-stat-card:nth-child(1) { animation: float 6s ease-in-out infinite; }
+        .holo-stat-card:nth-child(2) { animation: float 6s ease-in-out infinite 1.5s; }
+        .holo-stat-card:nth-child(3) { animation: float 6s ease-in-out infinite 3s; }
+        .holo-stat-card:nth-child(4) { animation: float 6s ease-in-out infinite 4.5s; }
 
-        .holo-stat-card:nth-child(2) {
-            animation: float 6s ease-in-out infinite 1.5s;
-        }
-
-        .holo-stat-card:nth-child(3) {
-            animation: float 6s ease-in-out infinite 3s;
-        }
-
-        .holo-stat-card:nth-child(4) {
-            animation: float 6s ease-in-out infinite 4.5s;
-        }
-
-        /* Responsive */
         @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
                 transition: transform 0.3s;
             }
-
-                .sidebar.active {
-                    transform: translateX(0);
-                }
-
+            .sidebar.active {
+                transform: translateX(0);
+            }
             .main-content {
                 margin-left: 0;
             }
-
             .menu-toggle {
                 display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                width: 50px;
-                height: 50px;
-                border-radius: 15px;
-                background: var(--surface);
-                border: none;
-                color: var(--accent-cyan);
-                font-size: 20px;
-                cursor: pointer;
-                box-shadow: var(--shadow-neumorphic);
             }
         }
 
@@ -628,254 +537,277 @@
             .holographic-stats {
                 grid-template-columns: 1fr;
             }
-
             .filter-section {
                 flex-direction: column;
             }
-
             .filter-item {
                 min-width: 100%;
             }
-
             .header-title {
                 font-size: 28px;
+            }
+            .main-content {
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
 
-           
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-weight"></i>
+            <h3>WeightTracker</h3>
+        </div>
+        <nav>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="/dashboard-admin.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/entry-data.html" class="nav-link">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Entry Data</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/data-management.html" class="nav-link active">
+                        <i class="fas fa-database"></i>
+                        <span>Data Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/analytics.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
 
     <!-- Main Content -->
-            <main class="main-content">
-                <!-- Isometric Header -->
-                <div class="isometric-header">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <div>
-                            <h1 class="header-title">
-                                <i class="fas fa-database me-2"></i>
-                                Data Management
-                            </h1>
-                            <p style="color: var(--text-secondary);">Kelola dan analisis data pengukuran berat dengan presisi</p>
-                        </div>
-                        <div class="text-end">
-                            <div style="color: var(--text-secondary); font-size: 14px;">Last Updated</div>
-                            <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--accent-cyan);">Loading...</div>
-                        </div>
-                    </div>
+    <main class="main-content">
+        <!-- Header -->
+        <div class="isometric-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="header-title">
+                        <i class="fas fa-database me-2"></i>
+                        Data Management
+                    </h1>
+                    <p style="color: var(--text-secondary);">Kelola dan analisis data pengukuran berat dengan presisi</p>
+                </div>
+                <div class="text-end">
+                    <div style="color: var(--text-secondary); font-size: 14px;">Last Updated</div>
+                    <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--accent-cyan);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="holographic-stats">
+            <div class="holo-stat-card">
+                <div class="holo-stat-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="holo-stat-value" id="totalEntries">0</div>
+                <div class="holo-stat-label">Total Data Entries</div>
+                <span class="holo-stat-change">
+                    <i class="fas fa-database"></i> All Records
+                </span>
+            </div>
+
+            <div class="holo-stat-card">
+                <div class="holo-stat-icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="holo-stat-value" id="avgSelisih">0 kg</div>
+                <div class="holo-stat-label">Rata-rata Selisih</div>
+                <span class="holo-stat-change" id="selisihTrend">
+                    <i class="fas fa-chart-line"></i> Calculated
+                </span>
+            </div>
+
+            <div class="holo-stat-card">
+                <div class="holo-stat-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="holo-stat-value" id="todayEntries">0</div>
+                <div class="holo-stat-label">Entries Hari Ini</div>
+                <span class="holo-stat-change">
+                    <i class="fas fa-clock"></i> Today
+                </span>
+            </div>
+
+            <div class="holo-stat-card">
+                <div class="holo-stat-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="holo-stat-value" id="userRole">-</div>
+                <div class="holo-stat-label">Role Pengguna</div>
+                <span class="holo-stat-change">
+                    <i class="fas fa-id-badge"></i> Current Session
+                </span>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="glass-filter-card">
+            <h5 class="mb-3" style="color: var(--accent-cyan);">
+                <i class="fas fa-filter me-2"></i> Advanced Data Filters
+            </h5>
+            <div class="filter-section">
+                <div class="filter-item">
+                    <div class="filter-label">Tanggal Mulai</div>
+                    <input type="date" class="holographic-input" id="startDate">
                 </div>
 
-                <script src="/js/sidebar.js"></script>
-                <script src="/js/data-management.js"></script>
-
-                <!-- Holographic Stats Grid -->
-                <div class="holographic-stats">
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="holo-stat-value" id="totalEntries">1,247</div>
-                        <div class="holo-stat-label">Total Data Entries</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-arrow-up"></i> +12.5% this month
-                        </span>
-                    </div>
-
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-weight"></i>
-                        </div>
-                        <div class="holo-stat-value" id="avgWeight">68.3 kg</div>
-                        <div class="holo-stat-label">Average Weight</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-chart-line"></i> Stable trend
-                        </span>
-                    </div>
-
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-calendar"></i>
-                        </div>
-                        <div class="holo-stat-value" id="todayEntries">47</div>
-                        <div class="holo-stat-label">Entries Today</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-bolt"></i> Active day
-                        </span>
-                    </div>
-
-                    <div class="holo-stat-card">
-                        <div class="holo-stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="holo-stat-value" id="weeklyGrowth">8.2%</div>
-                        <div class="holo-stat-label">Weekly Growth</div>
-                        <span class="holo-stat-change">
-                            <i class="fas fa-rocket"></i> Accelerating
-                        </span>
-                    </div>
+                <div class="filter-item">
+                    <div class="filter-label">Tanggal Akhir</div>
+                    <input type="date" class="holographic-input" id="endDate">
                 </div>
 
-                <!-- Glassmorphic Filter Card -->
-                <div class="glass-filter-card">
-                    <h5 class="mb-3" style="color: var(--accent-cyan);">
-                        <i class="fas fa-filter me-2"></i> Advanced Data Filters
-                    </h5>
-                    <div class="filter-section">
-                        <div class="filter-item">
-                            <div class="filter-label">Date Range</div>
-                            <input type="date" class="holographic-input w-100" id="startDate">
-                        </div>
-
-                        <div class="filter-item">
-                            <div class="filter-label">To Date</div>
-                            <input type="date" class="holographic-input w-100" id="endDate">
-                        </div>
-
-                        <div class="filter-item">
-                            <div class="filter-label">Category</div>
-                            <select class="holographic-select w-100" id="filterCategory">
-                                <option value="">All Categories</option>
-                                <option value="diet">Diet Program</option>
-                                <option value="bulking">Bulking Program</option>
-                                <option value="maintain">Maintenance</option>
-                                <option value="medical">Medical Check</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-item">
-                            <div class="filter-label">Search Name</div>
-                            <input type="text" class="holographic-input w-100" id="filterName" placeholder="Enter name...">
-                        </div>
-
-                        <div class="filter-item">
-                            <button class="btn-holographic" id="applyFilter">
-                                <i class="fas fa-search me-2"></i> Apply Filters
-                            </button>
-                            <button class="btn-holographic btn-reset ms-2" id="resetFilter">
-                                <i class="fas fa-redo me-2"></i> Reset
-                            </button>
-                            <button class="btn-holographic btn-export ms-2" id="exportData">
-                                <i class="fas fa-download me-2"></i> Export
-                            </button>
-                        </div>
-                    </div>
+                <div class="filter-item">
+                    <div class="filter-label">Jam Mulai</div>
+                    <input type="time" class="holographic-input" id="startTime">
                 </div>
 
-                <!-- 3D Data Table -->
-                <div class="table-3d-container">
-                    <div class="table-wrapper">
-                        <table class="holographic-table" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Photo</th>
-                                    <th>Name</th>
-                                    <th>Date</th>
-                                    <th>Weight (kg)</th>
-                                    <th>Height (cm)</th>
-                                    <th>BMI</th>
-                                    <th>Target</th>
-                                    <th>Category</th>
-                                    <th>Difference</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dataTableBody">
-                                <!-- Sample Data -->
-                                <tr>
-                                    <td>#001</td>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
-                                    </td>
-                                    <td>John Doe</td>
-                                    <td>2024-01-15</td>
-                                    <td>72.5</td>
-                                    <td>175</td>
-                                    <td>23.7</td>
-                                    <td>70.0</td>
-                                    <td><span class="badge-holographic badge-diet">Diet</span></td>
-                                    <td style="color: var(--accent-lime);">-2.5 kg</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-action btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#002</td>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
-                                    </td>
-                                    <td>Sarah Smith</td>
-                                    <td>2024-01-15</td>
-                                    <td>65.2</td>
-                                    <td>165</td>
-                                    <td>24.0</td>
-                                    <td>63.0</td>
-                                    <td><span class="badge-holographic badge-maintain">Maintain</span></td>
-                                    <td style="color: var(--accent-cyan);">+0.2 kg</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-action btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#003</td>
-                                    <td>
-                                        <img src="https://via.placeholder.com/50" class="table-image" alt="User">
-                                    </td>
-                                    <td>Mike Johnson</td>
-                                    <td>2024-01-14</td>
-                                    <td>85.7</td>
-                                    <td>182</td>
-                                    <td>25.9</td>
-                                    <td>90.0</td>
-                                    <td><span class="badge-holographic badge-bulking">Bulking</span></td>
-                                    <td style="color: var(--accent-magenta);">+4.3 kg</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-action btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="filter-item">
+                    <div class="filter-label">Jam Akhir</div>
+                    <input type="time" class="holographic-input" id="endTime">
                 </div>
-            </main>
+
+                <div class="filter-item">
+                    <div class="filter-label">Status</div>
+                    <select class="holographic-select" id="filterStatus">
+                        <option value="">Semua Status</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <div class="filter-label">Cari Nama/No Resi</div>
+                    <input type="text" class="holographic-input" id="filterSearch" placeholder="Ketik untuk mencari...">
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn-holographic" id="applyFilter">
+                    <i class="fas fa-search me-2"></i> Terapkan Filter
+                </button>
+                <button class="btn-holographic btn-reset" id="resetFilter">
+                    <i class="fas fa-redo me-2"></i> Reset
+                </button>
+                <button class="btn-holographic btn-export" id="exportData">
+                    <i class="fas fa-download me-2"></i> Export Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-3d-container">
+            <div id="loadingState" class="loading">
+                <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                <div>Memuat data dari database...</div>
+            </div>
+            
+            <div id="tableContent" style="display: none;">
+                <table class="holographic-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('id')">ID <i class="fas fa-sort"></i></th>
+                            <th>Foto 1</th>
+                            <th>Foto 2</th>
+                            <th onclick="sortTable('nama')">Nama <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('no_resi')">No Resi <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('berat_resi')">Berat Resi <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('berat_aktual')">Berat Aktual <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('selisih')">Selisih <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('status')">Status <i class="fas fa-sort"></i></th>
+                            <th>Created By</th>
+                            <th onclick="sortTable('created_at')">Tanggal/Waktu <i class="fas fa-sort"></i></th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                    </tbody>
+                </table>
+                
+                <div class="pagination" id="pagination"></div>
+            </div>
+
+            <div id="noDataState" class="no-data" style="display: none;">
+                <i class="fas fa-inbox fa-3x mb-3"></i>
+                <div>Tidak ada data yang ditemukan</div>
+            </div>
+        </div>
+    </main>
 
     <script>
+        // ==========================================
+        // SUPABASE CONFIGURATION
+        // ==========================================
+        // GANTI dengan Supabase URL dan Anon Key Anda dari dashboard Supabase
+        const SUPABASE_URL = 'https://rwxgpbikdxlialoegghq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3eGdwYmlrZHhsaWFsb2VnZ2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1OTQwNDUsImV4cCI6MjA3NTE3MDA0NX0.qxOwPHR9XSzSwaDUyo5a11Ok2Irs7I4N45uJPiyi4Ug';
+        
+        // Initialize Supabase Client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Test Connection
+        async function testConnection() {
+            try {
+                const { data, error } = await supabase.from('entries').select('count');
+                if (error) {
+                    console.error('❌ Supabase connection error:', error);
+                    return false;
+                }
+                console.log('✅ Supabase connected successfully!');
+                return true;
+            } catch (err) {
+                console.error('❌ Connection test failed:', err);
+                return false;
+            }
+        }
+
+        let currentPage = 1;
+        const itemsPerPage = 20;
+        let allData = [];
+        let filteredData = [];
+        let sortColumn = 'created_at';
+        let sortDirection = 'desc';
+
         // Toggle Sidebar
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
 
-        // Fungsi Logout
+        // Logout
         function logout() {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            window.location.href = '/index.html';
+            if (confirm('Yakin ingin logout?')) {
+                localStorage.clear();
+                window.location.href = '/index.html';
+            }
         }
 
-        // Update date and time
+        // Update DateTime
         function updateDateTime() {
             const now = new Date();
             const options = {
@@ -886,51 +818,352 @@
                 hour: '2-digit',
                 minute: '2-digit'
             };
-            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
+            document.getElementById('currentDateTime').textContent = 
+                now.toLocaleDateString('id-ID', options);
         }
 
+        // Load User Info
+        function loadUserInfo() {
+            const userRole = localStorage.getItem('userRole') || 'User';
+            document.getElementById('userRole').textContent = userRole.toUpperCase();
+        }
+
+        // Fetch Data
+        async function fetchData() {
+            try {
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('tableContent').style.display = 'none';
+                document.getElementById('noDataState').style.display = 'none';
+
+                const { data, error } = await supabase
+                    .from('entries')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allData = data || [];
+                filteredData = [...allData];
+                
+                updateStats();
+                renderTable();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loadingState').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--accent-orange);"></i><div>Error loading data: ' + error.message + '</div>';
+            }
+        }
+
+        // Update Stats
+        function updateStats() {
+            document.getElementById('totalEntries').textContent = allData.length.toLocaleString();
+
+            const avgSelisih = allData.length > 0 
+                ? (allData.reduce((sum, item) => sum + parseFloat(item.selisih || 0), 0) / allData.length).toFixed(2)
+                : 0;
+            document.getElementById('avgSelisih').textContent = `${avgSelisih} kg`;
+
+            const avgFloat = parseFloat(avgSelisih);
+            const trendEl = document.getElementById('selisihTrend');
+            if (avgFloat > 0) {
+                trendEl.innerHTML = '<i class="fas fa-arrow-up"></i> Positif';
+                trendEl.style.background = 'rgba(255, 0, 255, 0.1)';
+                trendEl.style.borderColor = 'var(--accent-magenta)';
+                trendEl.style.color = 'var(--accent-magenta)';
+            } else if (avgFloat < 0) {
+                trendEl.innerHTML = '<i class="fas fa-arrow-down"></i> Negatif';
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = allData.filter(item => 
+                item.created_at && item.created_at.startsWith(today)
+            ).length;
+            document.getElementById('todayEntries').textContent = todayCount;
+        }
+
+        // Sort Table
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            filteredData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+
+                if (column === 'created_at') {
+                    aVal = new Date(aVal);
+                    bVal = new Date(bVal);
+                } else if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            renderTable();
+        }
+
+        // Render Table
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            if (filteredData.length === 0) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('tableContent').style.display = 'none';
+                document.getElementById('noDataState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('tableContent').style.display = 'block';
+            document.getElementById('noDataState').style.display = 'none';
+
+            tbody.innerHTML = pageData.map(item => {
+                const createdAt = new Date(item.created_at);
+                const dateStr = createdAt.toLocaleDateString('id-ID');
+                const timeStr = createdAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                
+                const statusClass = item.status === 'approved' ? 'badge-approved' : 
+                                   item.status === 'rejected' ? 'badge-rejected' : 'badge-submitted';
+
+                return `
+                    <tr>
+                        <td><strong>#${item.id}</strong></td>
+                        <td>
+                            ${item.foto_url_1 ? 
+                                `<img src="${item.foto_url_1}" class="table-image" alt="Foto 1" onclick="window.open('${item.foto_url_1}', '_blank')">` : 
+                                '<span style="color: var(--text-secondary);">-</span>'
+                            }
+                        </td>
+                        <td>
+                            ${item.foto_url_2 ? 
+                                `<img src="${item.foto_url_2}" class="table-image" alt="Foto 2" onclick="window.open('${item.foto_url_2}', '_blank')">` : 
+                                '<span style="color: var(--text-secondary);">-</span>'
+                            }
+                        </td>
+                        <td>${item.nama}</td>
+                        <td><strong style="color: var(--accent-cyan);">${item.no_resi}</strong></td>
+                        <td>${item.berat_resi} kg</td>
+                        <td>${item.berat_aktual} kg</td>
+                        <td style="color: ${item.selisih > 0 ? 'var(--accent-magenta)' : item.selisih < 0 ? 'var(--accent-lime)' : 'var(--accent-cyan)'}; font-weight: 600;">
+                            ${item.selisih > 0 ? '+' : ''}${item.selisih} kg
+                        </td>
+                        <td><span class="badge-holographic ${statusClass}">${item.status}</span></td>
+                        <td>${item.created_by || '-'}</td>
+                        <td>
+                            <div>${dateStr}</div>
+                            <small style="color: var(--text-secondary);">${timeStr}</small>
+                        </td>
+                        <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.notes || ''}">${item.notes || '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-edit" onclick="editEntry(${item.id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action btn-delete" onclick="deleteEntry(${item.id})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderPagination();
+        }
+
+        // Pagination
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `
+                        <button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += '<span style="color: var(--text-secondary);">...</span>';
+                }
+            }
+
+            html += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            pagination.innerHTML = html;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+        }
+
+        // Apply Filters
+        function applyFilters() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const status = document.getElementById('filterStatus').value;
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+
+            filteredData = allData.filter(item => {
+                const itemDate = new Date(item.created_at);
+                const itemDateStr = itemDate.toISOString().split('T')[0];
+                const itemTimeStr = itemDate.toTimeString().split(' ')[0].substring(0, 5);
+
+                if (startDate && itemDateStr < startDate) return false;
+                if (endDate && itemDateStr > endDate) return false;
+                if (startTime && itemTimeStr < startTime) return false;
+                if (endTime && itemTimeStr > endTime) return false;
+                if (status && item.status !== status) return false;
+                if (search && !item.nama.toLowerCase().includes(search) && 
+                    !item.no_resi.toLowerCase().includes(search)) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function resetFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterSearch').value = '';
+            
+            filteredData = [...allData];
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Export Excel
+        function exportToExcel() {
+            const btn = document.getElementById('exportData');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Exporting...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                const csv = convertToCSV(filteredData);
+                downloadCSV(csv, `data-entries-${new Date().toISOString().split('T')[0]}.csv`);
+                
+                btn.innerHTML = '<i class="fas fa-check me-2"></i> Export Complete!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-download me-2"></i> Export Excel';
+                    btn.disabled = false;
+                }, 2000);
+            }, 1000);
+        }
+
+        function convertToCSV(data) {
+            const headers = ['ID', 'Nama', 'No Resi', 'Berat Resi', 'Berat Aktual', 'Selisih', 'Status', 'Created By', 'Tanggal', 'Notes'];
+            const rows = data.map(item => [
+                item.id,
+                item.nama,
+                item.no_resi,
+                item.berat_resi,
+                item.berat_aktual,
+                item.selisih,
+                item.status,
+                item.created_by || '',
+                new Date(item.created_at).toLocaleString('id-ID'),
+                item.notes || ''
+            ]);
+
+            return [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // Edit Entry
+        async function editEntry(id) {
+            alert(`Edit feature coming soon! ID: ${id}`);
+        }
+
+        // Delete Entry
+        async function deleteEntry(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('entries')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Data berhasil dihapus!');
+                fetchData();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error menghapus data: ' + error.message);
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('applyFilter').addEventListener('click', applyFilters);
+        document.getElementById('resetFilter').addEventListener('click', resetFilters);
+        document.getElementById('exportData').addEventListener('click', exportToExcel);
+
+        // Real-time search
+        document.getElementById('filterSearch').addEventListener('input', function() {
+            if (this.value.length > 2 || this.value.length === 0) {
+                applyFilters();
+            }
+        });
+
+        // Initialize
         updateDateTime();
         setInterval(updateDateTime, 60000);
+        loadUserInfo();
+        fetchData();
 
-        // Initialize functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add hover effects to table rows
-            const tableRows = document.querySelectorAll('.holographic-table tbody tr');
-            tableRows.forEach(row => {
-                row.addEventListener('mouseenter', function() {
-                    this.style.transform = 'perspective(500px) rotateX(2deg) translateZ(10px)';
-                });
-
-                row.addEventListener('mouseleave', function() {
-                    this.style.transform = 'perspective(500px) rotateX(0deg) translateZ(0px)';
-                });
-            });
-
-            // Filter functionality
-            document.getElementById('applyFilter').addEventListener('click', function() {
-                // Add filter animation
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 150);
-
-                // Filter logic would go here
-                console.log('Applying filters...');
-            });
-
-            // Export functionality
-            document.getElementById('exportData').addEventListener('click', function() {
-                // Add export animation
-                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Exporting...';
-                setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-download me-2"></i> Export Complete!';
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="fas fa-download me-2"></i> Export';
-                    }, 2000);
-                }, 1500);
-            });
-        });
+        // Refresh data setiap 30 detik
+        setInterval(fetchData, 30000);
     </script>
-
+    <script src="/js/config.js"></script>
 </body>
 </html>
