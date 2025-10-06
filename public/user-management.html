@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --neon-cyan: #00f3ff;
@@ -16,14 +17,7 @@
             --dark-bg: #0a0a1a;
             --card-bg: rgba(16, 16, 32, 0.7);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --hologram-gradient: linear-gradient(
-                45deg,
-                var(--neon-cyan) 0%,
-                var(--neon-magenta) 25%,
-                var(--neon-lime) 50%,
-                var(--neon-blue) 75%,
-                var(--neon-cyan) 100%
-            );
+            --hologram-gradient: linear-gradient(45deg, var(--neon-cyan) 0%, var(--neon-magenta) 25%, var(--neon-lime) 50%, var(--neon-blue) 75%, var(--neon-cyan) 100%);
         }
 
         body {
@@ -37,21 +31,15 @@
             padding: 30px;
         }
 
-        /* 3D Header Card with Holographic Effect */
         .header-card {
-            background: linear-gradient(135deg, 
-                rgba(0, 102, 255, 0.2) 0%, 
-                rgba(255, 0, 255, 0.2) 50%, 
-                rgba(0, 255, 157, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2) 0%, rgba(255, 0, 255, 0.2) 50%, rgba(0, 255, 157, 0.2) 100%);
             border-radius: 20px;
             padding: 40px;
             color: white;
             margin-bottom: 30px;
             position: relative;
             transform: perspective(1000px) rotateX(2deg);
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.4),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
             transition: all 0.3s;
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
@@ -65,15 +53,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                conic-gradient(
-                    from 0deg at 50% 50%,
-                    rgba(0, 255, 255, 0.1) 0%,
-                    rgba(255, 0, 255, 0.1) 25%,
-                    rgba(0, 255, 0, 0.1) 50%,
-                    rgba(0, 102, 255, 0.1) 75%,
-                    rgba(0, 255, 255, 0.1) 100%
-                );
+            background: conic-gradient(from 0deg at 50% 50%, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 25%, rgba(0, 255, 0, 0.1) 50%, rgba(0, 102, 255, 0.1) 75%, rgba(0, 255, 255, 0.1) 100%);
             animation: aurora 20s linear infinite;
             z-index: 0;
             border-radius: 20px;
@@ -81,10 +61,7 @@
 
         .header-card:hover {
             transform: perspective(1000px) rotateX(0deg) translateY(-5px);
-            box-shadow: 
-                0 25px 50px rgba(0,0,0,0.5),
-                0 0 20px rgba(0, 255, 255, 0.3),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
         }
 
         .header-title {
@@ -99,7 +76,6 @@
             background-clip: text;
         }
 
-        /* Stats Cards with 3D Holographic Effect */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -113,9 +89,7 @@
             padding: 25px;
             position: relative;
             transform: perspective(500px) rotateX(0deg);
-            box-shadow: 
-                0 10px 25px rgba(0,0,0,0.3),
-                inset 0 0 0 1px var(--glass-border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 0 0 1px var(--glass-border);
             transition: all 0.3s;
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
@@ -135,10 +109,7 @@
 
         .stat-card:hover {
             transform: perspective(500px) rotateX(-5deg) translateY(-5px);
-            box-shadow: 
-                0 15px 35px rgba(0,0,0,0.4),
-                0 0 15px rgba(0, 255, 255, 0.2),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
         }
 
         .stat-card.users { border-left: 4px solid var(--neon-blue); }
@@ -160,22 +131,10 @@
             overflow: hidden;
         }
 
-        .stat-card.users .stat-icon { 
-            background: linear-gradient(135deg, var(--neon-blue), #3182ce);
-            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
-        }
-        .stat-card.active .stat-icon { 
-            background: linear-gradient(135deg, var(--neon-lime), #38a169);
-            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.4);
-        }
-        .stat-card.admins .stat-icon { 
-            background: linear-gradient(135deg, var(--neon-magenta), #dd6b20);
-            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
-        }
-        .stat-card.new .stat-icon { 
-            background: linear-gradient(135deg, var(--neon-cyan), #805ad5);
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
-        }
+        .stat-card.users .stat-icon { background: linear-gradient(135deg, var(--neon-blue), #3182ce); box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4); }
+        .stat-card.active .stat-icon { background: linear-gradient(135deg, var(--neon-lime), #38a169); box-shadow: 0 5px 15px rgba(0, 255, 157, 0.4); }
+        .stat-card.admins .stat-icon { background: linear-gradient(135deg, var(--neon-magenta), #dd6b20); box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4); }
+        .stat-card.new .stat-icon { background: linear-gradient(135deg, var(--neon-cyan), #805ad5); box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4); }
 
         .stat-icon::before {
             content: '';
@@ -184,12 +143,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transform: rotate(45deg);
             animation: shine 3s infinite;
         }
@@ -203,14 +157,11 @@
             background-clip: text;
         }
 
-        /* User Table with Holographic Design */
         .table-card {
             background: var(--card-bg);
             border-radius: 20px;
             padding: 25px;
-            box-shadow: 
-                0 10px 30px rgba(0,0,0,0.3),
-                inset 0 0 0 1px var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 0 1px var(--glass-border);
             transform: perspective(2000px) rotateX(1deg);
             transition: all 0.3s;
             backdrop-filter: blur(10px);
@@ -232,10 +183,7 @@
 
         .table-card:hover {
             transform: perspective(2000px) rotateX(0deg);
-            box-shadow: 
-                0 15px 40px rgba(0,0,0,0.4),
-                0 0 15px rgba(0, 255, 255, 0.2),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4), 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
         }
 
         .table-header {
@@ -247,9 +195,16 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
 
+        .filters-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
         .search-box {
             position: relative;
-            width: 300px;
+            width: 250px;
         }
 
         .search-box input {
@@ -267,6 +222,7 @@
             border-color: var(--neon-cyan);
             box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
             color: white;
+            outline: none;
         }
 
         .search-box i {
@@ -277,7 +233,22 @@
             color: var(--neon-cyan);
         }
 
-        /* Modern Table */
+        .filter-select {
+            padding: 10px 15px;
+            background: rgba(10, 10, 20, 0.5);
+            border: 2px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            background: rgba(10, 10, 20, 0.7);
+            border-color: var(--neon-cyan);
+            outline: none;
+        }
+
         .user-table {
             width: 100%;
             color: white;
@@ -324,23 +295,6 @@
             overflow: hidden;
         }
 
-        .user-avatar::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            transform: rotate(45deg);
-            animation: shine 3s infinite;
-        }
-
         .user-info {
             display: flex;
             align-items: center;
@@ -358,7 +312,6 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* Status Badges */
         .badge-status {
             padding: 6px 12px;
             border-radius: 20px;
@@ -378,13 +331,6 @@
             border: 1px solid rgba(255, 0, 0, 0.3);
         }
 
-        .badge-pending {
-            background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
-            border: 1px solid rgba(255, 193, 7, 0.3);
-        }
-
-        /* Role Badges */
         .badge-role {
             padding: 6px 12px;
             border-radius: 8px;
@@ -404,13 +350,6 @@
             box-shadow: 0 3px 10px rgba(0, 102, 255, 0.3);
         }
 
-        .badge-moderator {
-            background: linear-gradient(135deg, var(--neon-lime), #38f9d7);
-            color: var(--dark-bg);
-            box-shadow: 0 3px 10px rgba(0, 255, 157, 0.3);
-        }
-
-        /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -428,29 +367,6 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-        }
-
-        .btn-action::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            transform: rotate(45deg);
-            transition: all 0.5s;
-            opacity: 0;
-        }
-
-        .btn-action:hover::before {
-            opacity: 1;
-            animation: shine 0.5s;
         }
 
         .btn-edit {
@@ -479,20 +395,6 @@
             box-shadow: 0 5px 15px rgba(252,92,101,0.4);
         }
 
-        .btn-view {
-            background: rgba(49, 130, 206, 0.2);
-            color: var(--neon-blue);
-            border: 1px solid rgba(49, 130, 206, 0.3);
-        }
-
-        .btn-view:hover {
-            background: rgba(49, 130, 206, 0.4);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(49,130,206,0.4);
-        }
-
-        /* Add User Button */
         .btn-add-user {
             background: var(--hologram-gradient);
             color: var(--dark-bg);
@@ -507,56 +409,22 @@
             box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
             position: relative;
             overflow: hidden;
-        }
-
-        .btn-add-user::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.4),
-                transparent
-            );
-            transition: 0.5s;
+            cursor: pointer;
         }
 
         .btn-add-user:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 243, 255, 0.6);
-            color: var(--dark-bg);
         }
 
-        .btn-add-user:hover::before {
-            left: 100%;
-        }
-
-        /* Modal with Holographic Effect */
         .modal-content {
             border: none;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            transform: perspective(1000px) rotateX(0deg);
-            animation: modalSlideIn 0.3s ease-out;
             background: var(--card-bg);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             color: white;
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                transform: perspective(1000px) rotateX(-15deg) translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: perspective(1000px) rotateX(0deg) translateY(0);
-                opacity: 1;
-            }
         }
 
         .modal-header {
@@ -566,25 +434,6 @@
             padding: 25px;
             position: relative;
             overflow: hidden;
-        }
-
-        .modal-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                conic-gradient(
-                    from 0deg at 50% 50%,
-                    rgba(255, 255, 255, 0.2) 0%,
-                    rgba(255, 255, 255, 0.1) 25%,
-                    rgba(255, 255, 255, 0.2) 50%,
-                    rgba(255, 255, 255, 0.1) 75%,
-                    rgba(255, 255, 255, 0.2) 100%
-                );
-            animation: aurora 10s linear infinite;
         }
 
         .modal-title {
@@ -621,9 +470,9 @@
             border-color: var(--neon-cyan);
             box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
             color: white;
+            outline: none;
         }
 
-        /* Pagination */
         .pagination-wrapper {
             display: flex;
             justify-content: space-between;
@@ -648,19 +497,22 @@
             transition: all 0.2s;
         }
 
-        .page-btn:hover {
+        .page-btn:hover:not(:disabled) {
             background: var(--neon-cyan);
             color: var(--dark-bg);
             border-color: var(--neon-cyan);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
         }
 
         .page-btn.active {
             background: var(--hologram-gradient);
             color: var(--dark-bg);
             border-color: transparent;
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
         .page-info {
@@ -668,34 +520,26 @@
             font-size: 14px;
         }
 
-        /* Animations */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--neon-cyan);
+        }
+
         @keyframes aurora {
-            0% {
-                transform: rotate(0deg) scale(1);
-            }
-            50% {
-                transform: rotate(180deg) scale(1.2);
-            }
-            100% {
-                transform: rotate(360deg) scale(1);
-            }
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
         }
 
         @keyframes shine {
-            0% {
-                transform: rotate(45deg) translateX(-100%);
-            }
-            100% {
-                transform: rotate(45deg) translateX(200%);
-            }
+            0% { transform: rotate(45deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(200%); }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar will be injected here -->
-    
     <div class="main-content">
-        <!-- Header -->
         <div class="header-card">
             <h1 class="header-title">
                 <i class="fas fa-users me-3"></i>
@@ -704,53 +548,53 @@
             <p class="mb-0" style="position: relative; z-index: 1;">Kelola user, role, dan permission dengan mudah</p>
         </div>
 
-        <!-- Statistics -->
         <div class="stats-container">
             <div class="stat-card users">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3 class="h2 mb-1">1,248</h3>
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <h3 class="h2 mb-1" id="totalUsers">0</h3>
                 <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">Total Users</p>
             </div>
             
             <div class="stat-card active">
-                <div class="stat-icon">
-                    <i class="fas fa-user-check"></i>
-                </div>
-                <h3 class="h2 mb-1">892</h3>
+                <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+                <h3 class="h2 mb-1" id="activeUsers">0</h3>
                 <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">Active Users</p>
             </div>
             
             <div class="stat-card admins">
-                <div class="stat-icon">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <h3 class="h2 mb-1">12</h3>
+                <div class="stat-icon"><i class="fas fa-user-shield"></i></div>
+                <h3 class="h2 mb-1" id="adminUsers">0</h3>
                 <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">Admins</p>
             </div>
             
             <div class="stat-card new">
-                <div class="stat-icon">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <h3 class="h2 mb-1">48</h3>
+                <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
+                <h3 class="h2 mb-1" id="newUsers">0</h3>
                 <p class="mb-0" style="color: rgba(255, 255, 255, 0.7);">New This Month</p>
             </div>
         </div>
 
-        <!-- User Table -->
         <div class="table-card">
             <div class="table-header">
                 <h5 class="mb-0" style="color: var(--neon-cyan);">
                     <i class="fas fa-list me-2"></i>
                     Daftar User
                 </h5>
-                <div class="d-flex gap-3">
+                <div class="filters-row">
                     <div class="search-box">
-                        <input type="text" placeholder="Cari user...">
+                        <input type="text" id="searchInput" placeholder="Cari user...">
                         <i class="fas fa-search"></i>
                     </div>
+                    <select class="filter-select" id="roleFilter">
+                        <option value="">Semua Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Semua Status</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
                     <button class="btn-add-user" onclick="showAddUserModal()">
                         <i class="fas fa-plus"></i>
                         Tambah User
@@ -758,189 +602,96 @@
                 </div>
             </div>
 
-            <table class="user-table">
-                <thead>
-                    <tr>
-                        <th width="5%">ID</th>
-                        <th width="30%">User</th>
-                        <th width="15%">Role</th>
-                        <th width="15%">Status</th>
-                        <th width="15%">Joined</th>
-                        <th width="10%">Entries</th>
-                        <th width="10%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody">
-                    <!-- Sample data -->
-                    <tr>
-                        <td>#001</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">JD</div>
-                                <div>
-                                    <div class="user-name">John Doe</div>
-                                    <div class="user-email">john.doe@example.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge-role badge-admin">Admin</span></td>
-                        <td><span class="badge-status badge-active">Active</span></td>
-                        <td>Jan 15, 2024</td>
-                        <td>245</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-action btn-edit" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-action btn-delete" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#002</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">AS</div>
-                                <div>
-                                    <div class="user-name">Alice Smith</div>
-                                    <div class="user-email">alice.smith@example.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge-role badge-user">User</span></td>
-                        <td><span class="badge-status badge-active">Active</span></td>
-                        <td>Feb 20, 2024</td>
-                        <td>128</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-action btn-edit" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-action btn-delete" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#003</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">RJ</div>
-                                <div>
-                                    <div class="user-name">Robert Johnson</div>
-                                    <div class="user-email">robert.j@example.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge-role badge-moderator">Moderator</span></td>
-                        <td><span class="badge-status badge-pending">Pending</span></td>
-                        <td>Mar 5, 2024</td>
-                        <td>0</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-action btn-edit" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-action btn-delete" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div id="loadingState" class="loading">
+                <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                <div>Loading users...</div>
+            </div>
 
-            <div class="pagination-wrapper">
-                <div class="page-info">
-                    Showing 1-10 of 1,248 users
-                </div>
-                <div class="pagination">
-                    <button class="page-btn">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <button class="page-btn">...</button>
-                    <button class="page-btn">125</button>
-                    <button class="page-btn">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+            <div id="tableContent" style="display: none;">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th width="5%">ID</th>
+                            <th width="30%">User</th>
+                            <th width="15%">Role</th>
+                            <th width="15%">Status</th>
+                            <th width="15%">Joined</th>
+                            <th width="10%">Entries</th>
+                            <th width="10%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody"></tbody>
+                </table>
+
+                <div class="pagination-wrapper">
+                    <div class="page-info" id="pageInfo">Showing 0-0 of 0 users</div>
+                    <div class="pagination" id="pagination"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add User Modal -->
-    <div class="modal fade" id="addUserModal" tabindex="-1">
+    <!-- Add/Edit User Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="modalTitle">
                         <i class="fas fa-user-plus me-2"></i>
                         Tambah User Baru
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="userForm">
+                        <input type="hidden" id="userId">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Username</label>
-                                    <input type="text" class="form-control" placeholder="Enter username">
+                                    <label class="form-label">Username *</label>
+                                    <input type="text" class="form-control" id="username" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" placeholder="Enter email">
+                                    <input type="email" class="form-control" id="email">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" placeholder="Enter full name">
+                                    <input type="text" class="form-control" id="fullName">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Role</label>
-                                    <select class="form-control">
-                                        <option>User</option>
-                                        <option>Admin</option>
-                                        <option>Moderator</option>
+                                    <label class="form-label">Role *</label>
+                                    <select class="form-control" id="role" required>
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="passwordGroup">
                                 <div class="form-group">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" class="form-control" placeholder="Enter password">
+                                    <label class="form-label">Password *</label>
+                                    <input type="password" class="form-control" id="password">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Confirm Password</label>
-                                    <input type="password" class="form-control" placeholder="Confirm password">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-control" id="isActive">
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary" style="background: var(--hologram-gradient); border: none; color: var(--dark-bg); font-weight: 600;">Add User</button>
+                            <button type="submit" class="btn btn-primary" style="background: var(--hologram-gradient); border: none; color: var(--dark-bg); font-weight: 600;">Save User</button>
                         </div>
                     </form>
                 </div>
@@ -949,12 +700,293 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/sidebar.js"></script>
     <script>
+        // SUPABASE CONFIG
+        const SUPABASE_URL = 'https://rwxgpbikdxlialoegghq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3eGdwYmlrZHhsaWFsb2VnZ2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1OTQwNDUsImV4cCI6MjA3NTE3MDA0NX0.qxOwPHR9XSzSwaDUyo5a11Ok2Irs7I4N45uJPiyi4Ug';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Check admin access
+        const userRole = localStorage.getItem('userRole');
+        if (userRole !== 'admin') {
+            alert('Access denied. Admin only!');
+            window.location.href = '/dashboard.html';
+        }
+
+        let allUsers = [];
+        let filteredUsers = [];
+        let currentPage = 1;
+        const usersPerPage = 10;
+        let editingUserId = null;
+
+        // Fetch all users
+        async function fetchUsers() {
+            try {
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('tableContent').style.display = 'none';
+
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allUsers = data || [];
+                filteredUsers = [...allUsers];
+                
+                updateStats();
+                renderTable();
+                
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                alert('Error loading users: ' + error.message);
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = allUsers.length;
+            const active = allUsers.filter(u => u.is_active).length;
+            const admins = allUsers.filter(u => u.role === 'admin').length;
+            
+            const now = new Date();
+            const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const newThisMonth = allUsers.filter(u => new Date(u.created_at) >= firstDayOfMonth).length;
+
+            document.getElementById('totalUsers').textContent = total;
+            document.getElementById('activeUsers').textContent = active;
+            document.getElementById('adminUsers').textContent = admins;
+            document.getElementById('newUsers').textContent = newThisMonth;
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('userTableBody');
+            const startIndex = (currentPage - 1) * usersPerPage;
+            const endIndex = startIndex + usersPerPage;
+            const pageUsers = filteredUsers.slice(startIndex, endIndex);
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('tableContent').style.display = 'block';
+
+            tbody.innerHTML = pageUsers.map(user => {
+                const initials = (user.full_name || user.username).substring(0, 2).toUpperCase();
+                const joinDate = new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const statusClass = user.is_active ? 'badge-active' : 'badge-inactive';
+                const statusText = user.is_active ? 'Active' : 'Inactive';
+                const roleClass = user.role === 'admin' ? 'badge-admin' : 'badge-user';
+
+                return `
+                    <tr>
+                        <td>#${String(user.id).padStart(3, '0')}</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">${initials}</div>
+                                <div>
+                                    <div class="user-name">${user.full_name || user.username}</div>
+                                    <div class="user-email">${user.email || '-'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge-role ${roleClass}">${user.role}</span></td>
+                        <td><span class="badge-status ${statusClass}">${statusText}</span></td>
+                        <td>${joinDate}</td>
+                        <td>${user.total_entries || 0}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-edit" onclick="editUser(${user.id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action btn-delete" onclick="deleteUser(${user.id}, '${user.username}')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderPagination();
+        }
+
+        // Render pagination
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+            const startIndex = (currentPage - 1) * usersPerPage + 1;
+            const endIndex = Math.min(startIndex + usersPerPage - 1, filteredUsers.length);
+
+            document.getElementById('pageInfo').textContent = `Showing ${startIndex}-${endIndex} of ${filteredUsers.length} users`;
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += '<span style="color: rgba(255,255,255,0.5);">...</span>';
+                }
+            }
+
+            html += `
+                <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            pagination.innerHTML = html;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const role = document.getElementById('roleFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            filteredUsers = allUsers.filter(user => {
+                const matchSearch = !search || 
+                    user.username.toLowerCase().includes(search) ||
+                    (user.email && user.email.toLowerCase().includes(search)) ||
+                    (user.full_name && user.full_name.toLowerCase().includes(search));
+                
+                const matchRole = !role || user.role === role;
+                const matchStatus = !status || user.is_active.toString() === status;
+
+                return matchSearch && matchRole && matchStatus;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Show add user modal
         function showAddUserModal() {
-            const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+            editingUserId = null;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus me-2"></i>Tambah User Baru';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('password').required = true;
+            document.getElementById('passwordGroup').style.display = 'block';
+            
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
             modal.show();
         }
+
+        // Edit user
+        async function editUser(id) {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+
+            editingUserId = id;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-edit me-2"></i>Edit User';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('fullName').value = user.full_name || '';
+            document.getElementById('role').value = user.role;
+            document.getElementById('isActive').value = user.is_active.toString();
+            document.getElementById('password').required = false;
+            document.getElementById('passwordGroup').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
+        }
+
+        // Save user (add or update)
+        document.getElementById('userForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const userData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value || null,
+                full_name: document.getElementById('fullName').value || null,
+                role: document.getElementById('role').value,
+                is_active: document.getElementById('isActive').value === 'true'
+            };
+
+            try {
+                if (editingUserId) {
+                    // Update existing user
+                    const { error } = await supabase
+                        .from('users')
+                        .update(userData)
+                        .eq('id', editingUserId);
+
+                    if (error) throw error;
+                    alert('User berhasil diupdate!');
+                } else {
+                    // Add new user
+                    const password = document.getElementById('password').value;
+                    if (!password) {
+                        alert('Password required for new user!');
+                        return;
+                    }
+
+                    // WARNING: In production, hash password on backend!
+                    userData.password = password; // Should be hashed!
+
+                    const { error } = await supabase
+                        .from('users')
+                        .insert([userData]);
+
+                    if (error) throw error;
+                    alert('User berhasil ditambahkan!');
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
+                fetchUsers();
+            } catch (error) {
+                console.error('Error saving user:', error);
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Delete user
+        async function deleteUser(id, username) {
+            if (!confirm(`Hapus user "${username}"?`)) return;
+
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('User berhasil dihapus!');
+                fetchUsers();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('roleFilter').addEventListener('change', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+        // Initialize
+        fetchUsers();
+        setInterval(fetchUsers, 60000); // Refresh every minute
     </script>
+    <script src="/js/sidebar.js"></script>
 </body>
 </html>
