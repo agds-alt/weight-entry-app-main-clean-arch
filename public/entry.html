@@ -585,6 +585,14 @@
             <i class="fas fa-exclamation-circle"></i> <span id="errorMsg"></span>
         </div>
 
+        <div id="alertSuccess" class="alert alert-success" style="display: none;">
+            <i class="fas fa-check-circle"></i> <span id="successMsg"></span>
+        </div>
+
+        <div id="alertError" class="alert alert-error" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i> <span id="errorMsg"></span>
+        </div>
+
         <form id="entryForm">
             <div class="card">
                 <div class="user-field">
@@ -877,7 +885,7 @@
             } else {
                 userLocation.city = 'Indonesia';
                 userLocation.country = 'Indonesia';
-                showAlert('error', 'Browser tidak support GPS');
+                showToast('error', 'GPS', 'Browser tidak support GPS', 3000);
             }
         }
 
@@ -919,12 +927,13 @@
 
         async function handleFile(file) {
             if (!file.type.startsWith('image/')) {
-                showAlert('error', 'File harus berupa gambar');
+                showToast('error', 'Format Salah', 'File harus berupa gambar (JPG/PNG)', 4000);
                 return;
             }
 
             if (file.size > 5 * 1024 * 1024) {
-                showAlert('error', 'Ukuran file maksimal 5MB');
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                showToast('error', 'File Terlalu Besar', `Ukuran ${sizeMB}MB melebihi batas 5MB`, 5000);
                 return;
             }
 
@@ -936,9 +945,10 @@
                 const watermarkedFile = await addWatermark(file);
                 photos[currentSlot] = watermarkedFile;
                 displayPhoto(watermarkedFile, currentSlot);
+                showToast('success', 'Upload Berhasil', 'Foto berhasil diproses dengan watermark', 3000);
             } catch (error) {
                 console.error('Watermark error:', error);
-                showAlert('error', 'Gagal memproses foto: ' + error.message);
+                showToast('error', 'Gagal Memproses', error.message, 4000);
                 // Reset slot
                 slot.innerHTML = `<i class="fas fa-plus"></i><span>Foto ${currentSlot === 'slot1' ? '1' : '2'}</span>`;
             }
@@ -1201,7 +1211,7 @@
             }, function(err) {
                 if (err) {
                     console.error('Quagga init error:', err);
-                    showAlert('error', 'Gagal membuka kamera');
+                    showToast('error', 'Kamera Error', 'Gagal membuka kamera', 3000);
                     stopScanner();
                     return;
                 }
@@ -1220,15 +1230,54 @@
                         return;
                     }
                     
-                    // Filter 2: Minimum length untuk nomor resi
-                    if (code.length < 8) {
-                        console.log(`Too short: ${code}`);
+                    // Filter 2: REJECT pure numeric (barcode produk EAN/UPC)
+                    if (/^\d+$/.test(code)) {
+                        console.log(`Rejected: Pure numeric barcode (product barcode): ${code}`);
+                        scanStatus.textContent = `❌ Bukan nomor resi (barcode produk)`;
+                        scanStatus.style.color = '#ef4444';
+                        showToast('error', 'Barcode Salah', 'Ini barcode produk, bukan nomor resi pengiriman', 4000);
                         return;
                     }
                     
-                    // Filter 3: Pattern validation - nomor resi biasanya alphanumeric
-                    if (!/^[A-Z0-9]{8,}$/i.test(code)) {
-                        console.log(`Invalid pattern: ${code}`);
+                    // Filter 3: Whitelist prefix ekspedisi yang valid
+                    const validPrefixes = [
+                        'JX', 'JP', 'JT', 'JN',  // J&T Express
+                        'JNE', 'JNT',             // JNE, JNT
+                        'SIC', 'SI',              // SiCepat
+                        'NIN', 'NJ',              // Ninja Express
+                        'ANT', 'AN',              // Anteraja
+                        'ID', 'IDP',              // ID Express
+                        'LIO', 'LE',              // Lion Parcel
+                        'POS', 'PS',              // Pos Indonesia
+                        'TIK', 'TK',              // TikTok/Tokopedia
+                        'SPX', 'SP',              // Shopee Express
+                        'SAP'                     // SAP Express
+                    ];
+                    
+                    // Extract prefix (2-3 huruf di awal)
+                    const prefixMatch = code.match(/^([A-Z]{2,3})/i);
+                    if (!prefixMatch) {
+                        console.log(`Rejected: No valid prefix found in ${code}`);
+                        scanStatus.textContent = `❌ Format salah (harus ada kode ekspedisi)`;
+                        scanStatus.style.color = '#ef4444';
+                        return;
+                    }
+                    
+                    const prefix = prefixMatch[1].toUpperCase();
+                    if (!validPrefixes.includes(prefix)) {
+                        console.log(`Rejected: Invalid prefix "${prefix}" in ${code}`);
+                        scanStatus.textContent = `❌ Kode ekspedisi tidak valid: ${prefix}`;
+                        scanStatus.style.color = '#ef4444';
+                        showToast('warning', 'Prefix Tidak Dikenal', `Kode "${prefix}" bukan ekspedisi yang dikenal`, 4000);
+                        return;
+                    }
+                    
+                    // Filter 4: Format resi - Prefix (2-3 huruf) + minimal 10 digit angka
+                    if (!/^[A-Z]{2,3}\d{10,}$/i.test(code)) {
+                        console.log(`Rejected: Invalid format ${code}`);
+                        scanStatus.textContent = `❌ Format salah: ${code}`;
+                        scanStatus.style.color = '#f59e0b';
+                        showToast('warning', 'Format Resi Salah', 'Format harus: XX1234567890 (2-3 huruf + minimal 10 angka)', 5000);
                         return;
                     }
                     
@@ -1256,14 +1305,14 @@
                         }
                     }
                     
-                    // Filter 4: Need at least 3 consistent detections
+                    // Filter 5: Need at least 3 consistent detections
                     if (maxCount >= 3 && mostCommon !== lastDetectedCode) {
                         lastDetectedCode = mostCommon;
                         document.getElementById('noResi').value = mostCommon.toUpperCase();
                         scanStatus.textContent = `✓ Terdeteksi: ${mostCommon}`;
                         scanStatus.style.color = '#22c55e';
                         
-                        showAlert('success', `Barcode berhasil di-scan: ${mostCommon}`);
+                        showToast('success', 'Scan Berhasil', `Nomor resi: ${mostCommon}`, 3000);
                         
                         // Auto close setelah 1.5 detik
                         setTimeout(() => {
@@ -1389,20 +1438,19 @@
             e.target.value = e.target.value.toUpperCase();
         });
 
+        // Legacy showAlert wrapper for compatibility
         function showAlert(type, message) {
-            const alertEl = document.getElementById(type === 'success' ? 'alertSuccess' : 'alertError');
-            const msgEl = document.getElementById(type === 'success' ? 'successMsg' : 'errorMsg');
-            
-            msgEl.textContent = message;
-            alertEl.style.display = 'block';
-            
-            setTimeout(() => {
-                alertEl.style.display = 'none';
-            }, 5000);
+            const titles = {
+                success: 'Berhasil',
+                error: 'Error',
+                warning: 'Peringatan'
+            };
+            showToast(type, titles[type] || 'Info', message, 4000);
         }
     });
     </script>
-     <script src="/js/sidebar.js"></script>
-                <script src="/js/data-management.js"></script>
+      <script src="/js/sidebar.js"></script>
+                <script src="/js/entry-form-resi.js"></script>
+    
 </body>
 </html>
