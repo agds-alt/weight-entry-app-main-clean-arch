@@ -11,17 +11,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --bg-dark: #0a0e27;
-            --surface: #1e2139;
-            --surface-light: #262945;
-            --accent-cyan: #00d4ff;
-            --accent-magenta: #ff00ff;
-            --accent-lime: #00ff88;
-            --accent-orange: #ffaa00;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a9d1;
-            --gradient-holographic: linear-gradient(45deg, var(--accent-cyan), var(--accent-magenta), var(--accent-lime), var(--accent-orange), var(--accent-cyan));
-            --shadow-holographic: 0 10px 30px rgba(0, 212, 255, 0.3), 0 0 20px rgba(255, 0, 255, 0.2), 0 0 10px rgba(0, 255, 136, 0.1);
+            --primary-red: #ff3b3b;
+            --primary-red-dark: #e63535;
+            --primary-red-light: #ff6b6b;
+            --bg-white: #ffffff;
+            --bg-gray: #f5f7fa;
+            --surface: #ffffff;
+            --surface-light: #f9fafb;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
+            --border-radius: 16px;
         }
 
         * {
@@ -32,36 +33,11 @@
 
         body {
             font-family: 'Space Grotesk', sans-serif;
-            background: var(--bg-dark);
+            background: var(--bg-gray);
             color: var(--text-primary);
             overflow-x: hidden;
             min-height: 100vh;
-            padding: 40px;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%), 
-                        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
-            animation: holographicFloat 20s ease infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        @keyframes holographicFloat {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            33% { transform: rotate(3deg) scale(1.05); }
-            66% { transform: rotate(-2deg) scale(1.02); }
-        }
-
-        @keyframes holographicWave {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
+            padding: 20px;
         }
 
         .container-fluid {
@@ -69,168 +45,191 @@
             margin: 0 auto;
         }
 
+        /* Header */
         .header {
             background: var(--surface);
-            border-radius: 30px;
-            padding: 40px;
-            margin-bottom: 40px;
-            box-shadow: var(--shadow-holographic);
-            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-3d);
+            border-top: 4px solid var(--primary-red);
+            transition: all 0.3s;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: var(--gradient-holographic);
-            background-size: 400% 400%;
-            border-radius: 30px;
-            opacity: 0.5;
-            z-index: -1;
-            animation: holographicWave 10s linear infinite;
+        .header:hover {
+            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
         }
 
         .header-title {
-            font-size: 42px;
+            font-size: 26px;
             font-weight: 700;
-            background: var(--gradient-holographic);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: holographicWave 8s linear infinite;
+            color: var(--text-primary);
         }
 
+        .header-title i {
+            color: var(--primary-red);
+        }
+
+        /* Stats */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
             background: var(--surface);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: var(--shadow-holographic);
-            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow-3d);
+            border: 1px solid var(--border-color);
             text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
         }
 
         .stat-value {
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--accent-cyan);
+            color: var(--primary-red);
         }
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 14px;
-            margin-top: 5px;
+            font-size: 13px;
+            margin-top: 4px;
         }
 
+        /* Filter Card */
         .filter-card {
-            background: rgba(30, 33, 57, 0.7);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            box-shadow: var(--shadow-holographic);
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-3d);
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-card h5 {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .filter-card h5 i {
+            color: var(--primary-red);
         }
 
         .filter-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .filter-label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            color: var(--accent-cyan);
-            margin-bottom: 8px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
         }
 
         .holographic-input {
-            background: rgba(38, 41, 69, 0.8);
-            border: 1px solid rgba(0, 212, 255, 0.3);
+            background: var(--surface);
+            border: 1px solid var(--border-color);
             color: var(--text-primary);
-            border-radius: 12px;
-            padding: 12px 15px;
+            border-radius: 10px;
+            padding: 10px 14px;
             font-size: 14px;
             width: 100%;
+            transition: all 0.3s;
         }
 
         .holographic-input:focus {
-            background: rgba(38, 41, 69, 0.9);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
             outline: none;
         }
 
+        /* Buttons */
         .btn-holographic {
-            background: var(--gradient-holographic);
-            background-size: 400% 400%;
+            background: var(--primary-red);
             border: none;
             color: white;
-            padding: 12px 25px;
+            padding: 10px 20px;
             font-weight: 600;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
-            animation: holographicWave 8s linear infinite;
-            box-shadow: var(--shadow-holographic);
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
 
         .btn-holographic:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.5);
+            background: var(--primary-red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
         }
 
         .btn-danger {
-            background: linear-gradient(45deg, var(--accent-magenta), #cc00cc);
+            background: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
         }
 
         .btn-success {
-            background: linear-gradient(45deg, var(--accent-lime), #00cc7a);
+            background: #22c55e;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
         }
 
         .action-bar {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
+        /* Photo Gallery */
         .photo-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .photo-card {
             background: var(--surface);
-            border-radius: 20px;
+            border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: var(--shadow-holographic);
-            border: 1px solid rgba(0, 212, 255, 0.1);
+            box-shadow: var(--shadow-3d);
+            border: 1px solid var(--border-color);
             transition: all 0.3s;
             position: relative;
         }
 
         .photo-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
         }
 
         .photo-card.selected {
-            border: 2px solid var(--accent-cyan);
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+            border: 2px solid var(--primary-red);
+            box-shadow: 0 0 20px rgba(255, 59, 59, 0.3);
         }
 
         .photo-checkbox {
@@ -238,17 +237,17 @@
             top: 10px;
             left: 10px;
             z-index: 10;
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
         }
 
         .photo-img-container {
             width: 100%;
-            height: 250px;
+            height: 220px;
             overflow: hidden;
             position: relative;
-            background: var(--surface-light);
+            background: var(--bg-gray);
         }
 
         .photo-img {
@@ -259,31 +258,33 @@
         }
 
         .photo-card:hover .photo-img {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .photo-info {
-            padding: 15px;
+            padding: 14px;
         }
 
         .photo-name {
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-size: 14px;
         }
 
         .photo-date {
             font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .photo-size {
             font-size: 11px;
-            color: var(--accent-lime);
+            color: var(--primary-red);
+            font-weight: 500;
         }
 
         .photo-actions {
@@ -293,63 +294,82 @@
         }
 
         .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+            border-radius: 6px;
             border: none;
             cursor: pointer;
             transition: all 0.3s;
+            flex: 1;
         }
 
         .btn-view {
-            background: rgba(0, 212, 255, 0.2);
-            color: var(--accent-cyan);
-            border: 1px solid var(--accent-cyan);
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .btn-view:hover {
+            background: #3b82f6;
+            color: white;
         }
 
         .btn-download {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--accent-lime);
-            border: 1px solid var(--accent-lime);
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        .btn-download:hover {
+            background: #22c55e;
+            color: white;
         }
 
         .btn-delete {
-            background: rgba(255, 0, 255, 0.2);
-            color: var(--accent-magenta);
-            border: 1px solid var(--accent-magenta);
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid #ef4444;
         }
 
-        .loading {
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* States */
+        .loading, .no-photos {
             text-align: center;
             padding: 60px;
             color: var(--text-secondary);
         }
 
-        .no-photos {
-            text-align: center;
-            padding: 60px;
-            color: var(--text-secondary);
+        .loading i, .no-photos i {
+            color: var(--primary-red);
         }
 
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 30px;
+            gap: 8px;
+            margin-top: 24px;
         }
 
         .pagination button {
-            background: rgba(0, 212, 255, 0.2);
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 8px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 13px;
         }
 
         .pagination button:hover:not(:disabled) {
-            background: rgba(0, 212, 255, 0.4);
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
         }
 
         .pagination button:disabled {
@@ -358,19 +378,45 @@
         }
 
         .pagination button.active {
-            background: var(--accent-cyan);
-            color: var(--bg-dark);
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
             body {
+                padding: 15px;
+            }
+
+            .header {
                 padding: 20px;
             }
+
             .header-title {
-                font-size: 28px;
+                font-size: 22px;
             }
+
             .photo-gallery {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .photo-img-container {
+                height: 180px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 640px) {
+            body {
+                padding: 32px;
+            }
+
+            .header {
+                padding: 28px 32px;
             }
         }
     </style>
@@ -385,7 +431,7 @@
                         <i class="fas fa-images me-2"></i>
                         Photo Management
                     </h1>
-                    <p style="color: var(--text-secondary);">Kelola foto dari Cloudinary dengan mudah</p>
+                    <p style="color: var(--text-secondary); font-size: 14px;">Kelola foto dari Cloudinary dengan mudah</p>
                 </div>
                 <button class="btn-holographic" onclick="window.location.href='/data-management.html'">
                     <i class="fas fa-arrow-left me-2"></i> Back
@@ -415,7 +461,7 @@
 
         <!-- Filters -->
         <div class="filter-card">
-            <h5 class="mb-3" style="color: var(--accent-cyan);">
+            <h5 class="mb-3">
                 <i class="fas fa-filter me-2"></i> Filters
             </h5>
             <div class="filter-grid">
