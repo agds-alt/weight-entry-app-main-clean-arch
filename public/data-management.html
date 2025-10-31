@@ -927,11 +927,12 @@
         }
 
         let currentPage = 1;
-        const itemsPerPage = 20;
+        const itemsPerPage = 100;
         let allData = [];
         let filteredData = [];
         let sortColumn = 'created_at';
         let sortDirection = 'desc';
+        let totalCount = 0;  // Total records in database
 
         // Update DateTime
         function updateDateTime() {
@@ -954,27 +955,64 @@
             document.getElementById('userRole').textContent = userRole.toUpperCase();
         }
 
-        // Fetch Data
-        async function fetchData() {
-            console.log('📡 fetchData() called...');
+        // Fetch Data with Server-Side Pagination - Using Backend API
+        async function fetchData(page = 1) {
+            console.log(`📡 fetchData() called for page ${page}...`);
             try {
                 console.log('🔄 Setting loading state...');
                 document.getElementById('loadingState').style.display = 'block';
                 document.getElementById('tableContent').style.display = 'none';
                 document.getElementById('noDataState').style.display = 'none';
 
-                console.log('🔍 Fetching data from Supabase...');
-                const { data, error } = await supabase
-                    .from('entries')
-                    .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, status, foto_url_1, foto_url_2, created_by, created_at, updated_at, notes')
-                    .order('created_at', { ascending: false });
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
+                }
 
-                console.log('📦 Response received:', { dataCount: data?.length, error });
+                console.log(`🔍 Fetching page ${page} from API...`);
 
-                if (error) throw error;
+                // Fetch data from backend API
+                const response = await fetch(`/api/data-management/entries?page=${page}&limit=${itemsPerPage}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                allData = data || [];
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                console.log('📦 API Response:', result);
+
+                if (!result.success) {
+                    throw new Error(result.message || 'API request failed');
+                }
+
+                const data = result.data || [];
+                const pagination = result.pagination || {};
+
+                // Update total count
+                totalCount = pagination.total || 0;
+                console.log('✅ Total records in database:', totalCount);
+
+                if (data.length === 0) {
+                    console.log('⚠️ No data returned from API');
+                    allData = [];
+                    filteredData = [];
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('tableContent').style.display = 'none';
+                    document.getElementById('noDataState').style.display = 'block';
+                    return;
+                }
+
+                allData = data;
                 filteredData = [...allData];
+                currentPage = page;
 
                 console.log('✅ Data loaded:', allData.length, 'entries');
                 console.log('📊 Sample data:', allData[0]);
@@ -984,7 +1022,6 @@
 
             } catch (error) {
                 console.error('❌ fetchData ERROR:', error);
-                console.error('❌ Error details:', error.message, error.code, error.details);
                 document.getElementById('loadingState').innerHTML =
                     '<i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: #ff9500;"></i><div>Error loading data: ' + error.message + '</div>';
             }
@@ -992,9 +1029,11 @@
 
         // Update Stats
         function updateStats() {
-            document.getElementById('totalEntries').textContent = allData.length.toLocaleString();
+            // Show total count from database, not just current page
+            document.getElementById('totalEntries').textContent = totalCount.toLocaleString();
 
-            const avgSelisih = allData.length > 0 
+            // Average selisih for current page
+            const avgSelisih = allData.length > 0
                 ? (allData.reduce((sum, item) => sum + parseFloat(item.selisih || 0), 0) / allData.length).toFixed(2)
                 : 0;
             document.getElementById('avgSelisih').textContent = `${avgSelisih} kg`;
@@ -1011,8 +1050,9 @@
                 trendEl.style.color = '#22c55e';
             }
 
+            // Today count (only from current page - not accurate but fast)
             const today = new Date().toISOString().split('T')[0];
-            const todayCount = allData.filter(item => 
+            const todayCount = allData.filter(item =>
                 item.created_at && item.created_at.startsWith(today)
             ).length;
             document.getElementById('todayEntries').textContent = todayCount;
@@ -1049,7 +1089,7 @@
             renderTable();
         }
 
-        // Render Table
+        // Render Table (Server-Side Pagination - No Slicing Needed)
         function renderTable() {
             console.log('📊 renderTable() called');
             console.log('📊 filteredData.length:', filteredData.length);
@@ -1058,9 +1098,8 @@
             const tbody = document.getElementById('dataTableBody');
             console.log('📊 tbody element:', !!tbody);
 
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = filteredData.slice(startIndex, endIndex);
+            // No need to slice - data already paginated from server
+            const pageData = filteredData;
             console.log('📊 pageData.length:', pageData.length);
 
             if (filteredData.length === 0) {
@@ -1130,10 +1169,12 @@
             renderPagination();
         }
 
-        // Pagination
+        // Pagination (Server-Side)
         function renderPagination() {
             const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+            console.log('📄 Pagination:', { totalCount, itemsPerPage, totalPages, currentPage });
 
             if (totalPages <= 1) {
                 pagination.innerHTML = '';
@@ -1168,10 +1209,10 @@
         }
 
         function changePage(page) {
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const totalPages = Math.ceil(totalCount / itemsPerPage);
             if (page < 1 || page > totalPages) return;
-            currentPage = page;
-            renderTable();
+            console.log(`📄 Changing to page ${page}...`);
+            fetchData(page);  // Fetch new page from server
         }
 
         // Apply Filters
@@ -1338,25 +1379,41 @@
 
                 console.log(`💾 Updating entry ID ${id}...`);
 
-                // Update Supabase
-                const { data, error } = await supabase
-                    .from('entries')
-                    .update({
-                        nama: nama,
-                        no_resi: no_resi,
-                        berat_resi: berat_resi,
-                        berat_aktual: berat_aktual,
-                        selisih: selisih,
-                        status: status,
-                        notes: notes || null,
-                        updated_at: new Date().toISOString()
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
+                }
+
+                // Update via API
+                const response = await fetch(`/api/data-management/entries/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nama,
+                        no_resi,
+                        berat_resi,
+                        berat_aktual,
+                        selisih,
+                        status,
+                        notes: notes || null
                     })
-                    .eq('id', id)
-                    .select();
+                });
 
-                if (error) throw error;
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
 
-                console.log('✅ Entry updated successfully:', data);
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Update failed');
+                }
+
+                console.log('✅ Entry updated successfully:', result.data);
 
                 // Success feedback
                 saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
@@ -1364,7 +1421,7 @@
                 // Close modal and refresh data
                 setTimeout(() => {
                     closeEditModal();
-                    fetchData(); // Refresh table
+                    fetchData(currentPage); // Refresh current page
                     alert('✅ Data berhasil diupdate!');
 
                     // Reset button
@@ -1412,30 +1469,47 @@
             if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
 
             try {
-                const { error } = await supabase
-                    .from('entries')
-                    .delete()
-                    .eq('id', id);
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
+                }
 
-                if (error) throw error;
+                console.log(`🗑️ Deleting entry ID ${id}...`);
 
-                alert('Data berhasil dihapus!');
-                fetchData();
+                // Delete via API
+                const response = await fetch(`/api/data-management/entries/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Delete failed');
+                }
+
+                console.log('✅ Entry deleted successfully');
+
+                alert('✅ Data berhasil dihapus!');
+                fetchData(currentPage); // Refresh current page
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error menghapus data: ' + error.message);
+                console.error('❌ Error deleting entry:', error);
+                alert('❌ Error menghapus data: ' + error.message);
             }
         }
 
         // Initialize Everything
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Initializing Data Management...');
-            console.log('🔍 Checking Supabase library:', typeof window.supabase);
-            console.log('🔍 Checking supabase client:', typeof supabase);
-
-            // Test Supabase connection first
-            const connected = await testConnection();
-            console.log('🔌 Supabase connection test:', connected ? '✅ SUCCESS' : '❌ FAILED');
+            console.log('🔍 Using Backend API for data operations');
 
             // Setup event listeners for filter buttons
             const applyBtn = document.getElementById('applyFilter');
