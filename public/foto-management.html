@@ -435,6 +435,62 @@
             margin-bottom: 10px;
         }
 
+        /* View Mode Toggle */
+        .view-mode-toggle {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .view-mode-btn {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-mode-btn:hover {
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
+        }
+
+        .view-mode-btn.active {
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+        }
+
+        /* Virtual Scroll Container */
+        .virtual-scroll-container {
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .virtual-scroll-spacer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            pointer-events: none;
+        }
+
+        .virtual-scroll-content {
+            position: relative;
+            will-change: transform;
+        }
+
         /* Pagination */
         .pagination {
             display: flex;
@@ -576,8 +632,21 @@
                 <div style="flex: 1; min-width: 150px; text-align: right; padding: 10px 0; color: var(--text-secondary); font-size: 13px;">
                     <i class="fas fa-info-circle me-1"></i>
                     Showing <strong id="filteredCount">0</strong> of <strong id="totalCount">0</strong> photos
+                    <span id="virtualScrollInfo" style="display: none; color: var(--primary-red); margin-left: 10px;">
+                        <i class="fas fa-bolt"></i> <strong id="renderedCount">0</strong> rendered
+                    </span>
                 </div>
             </div>
+        </div>
+
+        <!-- View Mode Toggle -->
+        <div class="view-mode-toggle">
+            <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
+                <i class="fas fa-th"></i> Pagination Mode
+            </button>
+            <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
+                <i class="fas fa-infinity"></i> Infinite Scroll (Virtual)
+            </button>
         </div>
 
         <!-- Action Bar -->
@@ -646,6 +715,20 @@
         let selectedPhotos = new Set();
         let currentPage = 1;
         const photosPerPage = 12;
+
+        // View Mode State
+        let viewMode = 'pagination'; // 'pagination' or 'infinite'
+
+        // Virtual Scroll State
+        let virtualScrollState = {
+            scrollTop: 0,
+            visibleStart: 0,
+            visibleEnd: 0,
+            itemHeight: 340, // approx height of photo card (220px img + 120px info)
+            itemsPerRow: 4, // will be calculated dynamically
+            buffer: 2, // extra rows to render above/below viewport
+            containerHeight: 0
+        };
 
         // ==========================================
         // FETCH PHOTOS FROM SUPABASE
@@ -765,6 +848,11 @@
             document.getElementById('photoGallery').style.display = 'grid';
             document.getElementById('noPhotosState').style.display = 'none';
 
+            // Reset styles for pagination mode (undo virtual scroll styles)
+            gallery.style.minHeight = '';
+            gallery.style.position = '';
+            gallery.style.width = '';
+
             gallery.innerHTML = pagePhotos.map(photo => {
                 const date = new Date(photo.created_at);
                 const dateStr = date.toLocaleDateString('id-ID');
@@ -823,6 +911,9 @@
             initLazyLoading();
             renderPagination();
             updateStats();
+
+            // Hide virtual scroll info in pagination mode
+            document.getElementById('virtualScrollInfo').style.display = 'none';
         }
 
         // ==========================================
@@ -931,25 +1022,44 @@
         }
 
         function selectAll() {
-            // Select only photos on current page
-            const startIndex = (currentPage - 1) * photosPerPage;
-            const endIndex = startIndex + photosPerPage;
-            const pagePhotos = filteredPhotos.slice(startIndex, endIndex);
+            if (viewMode === 'pagination') {
+                // Select only photos on current page
+                const startIndex = (currentPage - 1) * photosPerPage;
+                const endIndex = startIndex + photosPerPage;
+                const pagePhotos = filteredPhotos.slice(startIndex, endIndex);
 
-            pagePhotos.forEach(photo => selectedPhotos.add(photo.id));
+                pagePhotos.forEach(photo => selectedPhotos.add(photo.id));
+                console.log(`✅ Selected ${pagePhotos.length} photos on current page`);
 
-            console.log(`✅ Selected ${pagePhotos.length} photos on current page`);
+                // Update UI
+                pagePhotos.forEach(photo => {
+                    const card = document.getElementById(`card-${photo.id}`);
+                    if (card) {
+                        card.classList.add('selected');
+                        const checkbox = card.querySelector('.photo-checkbox');
+                        if (checkbox) checkbox.checked = true;
+                    }
+                });
+            } else {
+                // Infinite scroll mode - select visible photos
+                const { visibleStart, visibleEnd } = virtualScrollState;
+                const visiblePhotos = filteredPhotos.slice(visibleStart, visibleEnd);
+
+                visiblePhotos.forEach(photo => selectedPhotos.add(photo.id));
+                console.log(`✅ Selected ${visiblePhotos.length} visible photos`);
+
+                // Update UI
+                visiblePhotos.forEach(photo => {
+                    const card = document.getElementById(`card-${photo.id}`);
+                    if (card) {
+                        card.classList.add('selected');
+                        const checkbox = card.querySelector('.photo-checkbox');
+                        if (checkbox) checkbox.checked = true;
+                    }
+                });
+            }
+
             updateStats();
-
-            // Update UI
-            pagePhotos.forEach(photo => {
-                const card = document.getElementById(`card-${photo.id}`);
-                if (card) {
-                    card.classList.add('selected');
-                    const checkbox = card.querySelector('.photo-checkbox');
-                    if (checkbox) checkbox.checked = true;
-                }
-            });
         }
 
         function unselectAll() {
@@ -1196,6 +1306,204 @@
         document.getElementById('searchInput').addEventListener('input', function() {
             if (this.value.length > 2 || this.value.length === 0) {
                 applyFilters();
+            }
+        });
+
+        // ==========================================
+        // VIEW MODE SWITCHING
+        // ==========================================
+        function switchViewMode(mode) {
+            console.log(`🔄 Switching to ${mode} mode...`);
+            viewMode = mode;
+
+            // Update button states
+            document.getElementById('paginationModeBtn').classList.toggle('active', mode === 'pagination');
+            document.getElementById('infiniteModeBtn').classList.toggle('active', mode === 'infinite');
+
+            // Re-render with new mode
+            if (mode === 'pagination') {
+                currentPage = 1;
+                renderGallery();
+            } else {
+                renderVirtualScroll();
+            }
+        }
+
+        // ==========================================
+        // VIRTUAL SCROLL CALCULATIONS
+        // ==========================================
+        function calculateItemsPerRow() {
+            const gallery = document.getElementById('photoGallery');
+            const galleryWidth = gallery.offsetWidth;
+
+            // Photo card min-width is 220px from CSS: minmax(220px, 1fr)
+            const minCardWidth = 220;
+            const gap = 20; // gap from CSS
+
+            const itemsPerRow = Math.floor((galleryWidth + gap) / (minCardWidth + gap));
+            return Math.max(1, itemsPerRow); // at least 1 item per row
+        }
+
+        function calculateVisibleRange() {
+            const gallery = document.getElementById('photoGallery');
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const viewportHeight = window.innerHeight;
+            const galleryTop = gallery.offsetTop || 0;
+
+            // Calculate relative scroll position within gallery
+            const relativeScroll = Math.max(0, scrollTop - galleryTop);
+
+            const state = virtualScrollState;
+            const itemsPerRow = state.itemsPerRow;
+            const totalRows = Math.ceil(filteredPhotos.length / itemsPerRow);
+
+            // Calculate visible row range
+            const startRow = Math.max(0, Math.floor(relativeScroll / state.itemHeight) - state.buffer);
+            const endRow = Math.min(totalRows, Math.ceil((relativeScroll + viewportHeight) / state.itemHeight) + state.buffer);
+
+            // Convert to item indices
+            const visibleStart = startRow * itemsPerRow;
+            const visibleEnd = Math.min(filteredPhotos.length, endRow * itemsPerRow);
+
+            return { visibleStart, visibleEnd, startRow };
+        }
+
+        // ==========================================
+        // VIRTUAL SCROLL RENDERING
+        // ==========================================
+        function renderVirtualScroll() {
+            const gallery = document.getElementById('photoGallery');
+
+            // Calculate items per row dynamically
+            virtualScrollState.itemsPerRow = calculateItemsPerRow();
+
+            // Calculate visible range
+            const { visibleStart, visibleEnd, startRow } = calculateVisibleRange();
+            virtualScrollState.visibleStart = visibleStart;
+            virtualScrollState.visibleEnd = visibleEnd;
+
+            // Get visible photos
+            const visiblePhotos = filteredPhotos.slice(visibleStart, visibleEnd);
+
+            if (filteredPhotos.length === 0) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('photoGallery').style.display = 'none';
+                document.getElementById('noPhotosState').style.display = 'block';
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('photoGallery').style.display = 'block'; // Change to block for absolute positioning
+            document.getElementById('noPhotosState').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none'; // Hide pagination in infinite mode
+
+            // Calculate total height
+            const totalRows = Math.ceil(filteredPhotos.length / virtualScrollState.itemsPerRow);
+            const totalHeight = totalRows * virtualScrollState.itemHeight;
+
+            // Set min-height to maintain scroll space and container for absolute positioning
+            gallery.style.minHeight = `${totalHeight}px`;
+            gallery.style.position = 'relative';
+            gallery.style.width = '100%';
+
+            // Render visible items with offset
+            const offsetTop = startRow * virtualScrollState.itemHeight;
+
+            const photosHtml = visiblePhotos.map((photo, index) => {
+                const actualIndex = visibleStart + index;
+                const date = new Date(photo.created_at);
+                const dateStr = date.toLocaleDateString('id-ID');
+                const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const isSelected = selectedPhotos.has(photo.id);
+
+                const thumbnailUrl = createThumbnailUrl(photo.url);
+                const fullSizeUrl = photo.url;
+                const urlParts = photo.url.split('/');
+                const filename = urlParts[urlParts.length - 1];
+                const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect fill='%23f5f7fa'/%3E%3C/svg%3E";
+
+                // Calculate position for absolute positioning
+                const row = Math.floor(actualIndex / virtualScrollState.itemsPerRow);
+                const col = actualIndex % virtualScrollState.itemsPerRow;
+                const galleryWidth = gallery.offsetWidth;
+                const gap = 20;
+                const itemWidth = (galleryWidth - (gap * (virtualScrollState.itemsPerRow - 1))) / virtualScrollState.itemsPerRow;
+                const left = col * (itemWidth + gap);
+                const top = row * virtualScrollState.itemHeight;
+
+                return `
+                    <div class="photo-card ${isSelected ? 'selected' : ''}" id="card-${photo.id}" style="position: absolute; top: ${top}px; left: ${left}px; width: ${itemWidth}px;">
+                        <input type="checkbox"
+                            class="photo-checkbox"
+                            ${isSelected ? 'checked' : ''}
+                            onchange="toggleSelect('${photo.id}')"
+                        >
+                        <div class="photo-img-container">
+                            <img src="${placeholderSvg}"
+                                data-src="${thumbnailUrl}"
+                                data-full="${fullSizeUrl}"
+                                alt="${photo.nama}"
+                                class="photo-img lazy-loading"
+                                onerror="this.src='https://via.placeholder.com/250?text=Error+Loading'"
+                            >
+                        </div>
+                        <div class="photo-info">
+                            <div class="photo-name" title="${photo.nama}">${photo.nama}</div>
+                            <div class="photo-date">${dateStr} ${timeStr}</div>
+                            <div class="photo-size">${photo.type} • Thumbnail</div>
+                            <div class="photo-actions">
+                                <button class="btn-small btn-view" onclick="viewPhotoLightbox('${fullSizeUrl}')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn-small btn-download" onclick="downloadPhoto('${fullSizeUrl}', '${filename}')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn-small btn-delete" onclick="deletePhoto('${photo.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            gallery.innerHTML = photosHtml;
+
+            // Re-initialize lazy loading
+            initLazyLoading();
+            updateStats();
+
+            // Update virtual scroll performance info
+            const renderedCount = visibleEnd - visibleStart;
+            document.getElementById('renderedCount').textContent = renderedCount;
+            document.getElementById('virtualScrollInfo').style.display = 'inline';
+
+            console.log(`📊 Virtual Scroll: Rendering ${renderedCount} items (${visibleStart}-${visibleEnd}) of ${filteredPhotos.length} total`);
+        }
+
+        // ==========================================
+        // SCROLL EVENT HANDLER (THROTTLED)
+        // ==========================================
+        let scrollTimeout = null;
+        function handleVirtualScroll() {
+            if (viewMode !== 'infinite') return;
+
+            // Throttle scroll events
+            if (scrollTimeout) return;
+
+            scrollTimeout = setTimeout(() => {
+                renderVirtualScroll();
+                scrollTimeout = null;
+            }, 100); // Update every 100ms
+        }
+
+        // Attach scroll listener
+        window.addEventListener('scroll', handleVirtualScroll);
+        window.addEventListener('resize', () => {
+            if (viewMode === 'infinite') {
+                virtualScrollState.itemsPerRow = calculateItemsPerRow();
+                renderVirtualScroll();
             }
         });
 
