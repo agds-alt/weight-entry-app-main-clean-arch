@@ -10,31 +10,29 @@
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --neon-cyan: #00f3ff;
-            --neon-magenta: #ff00ff;
-            --neon-lime: #00ff9d;
-            --neon-blue: #0066ff;
-            --dark-bg: #0a0a0f;
-            --dark-surface: rgba(15, 15, 25, 0.95);
-            --dark-text: #e0e0ff;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --hologram-gradient: linear-gradient(45deg, var(--neon-cyan) 0%, var(--neon-magenta) 25%, var(--neon-lime) 50%, var(--neon-blue) 75%, var(--neon-cyan) 100%);
-            --shadow-holographic: 0 10px 30px rgba(0, 243, 255, 0.3), 0 0 20px rgba(255, 0, 255, 0.2), 0 0 10px rgba(0, 255, 136, 0.1);
+            --primary-red: #ff3b3b;
+            --primary-red-dark: #e63535;
+            --primary-red-light: #ff6b6b;
+            --bg-white: #ffffff;
+            --bg-gray: #f5f7fa;
+            --surface: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
+            --border-radius: 16px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: var(--dark-bg);
-            color: var(--dark-text);
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow-x: hidden;
             position: relative;
         }
 
@@ -42,181 +40,134 @@
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 20%, rgba(0, 255, 136, 0.15) 0%, transparent 50%);
-            animation: holographicFloat 20s ease infinite;
+            background:
+                linear-gradient(90deg, rgba(255, 59, 59, 0.02) 1px, transparent 1px),
+                linear-gradient(rgba(255, 59, 59, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
             pointer-events: none;
             z-index: 0;
         }
 
-        @keyframes holographicFloat {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            33% { transform: rotate(3deg) scale(1.05); }
-            66% { transform: rotate(-2deg) scale(1.02); }
-        }
-
         .signup-container {
             width: 100%;
-            max-width: 550px;
+            max-width: 480px;
             position: relative;
             z-index: 1;
-            animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px) perspective(1000px) rotateX(20deg); }
-            to { opacity: 1; transform: translateY(0) perspective(1000px) rotateX(0deg); }
         }
 
         .signup-card {
-            background: var(--dark-surface);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 30px;
+            background: var(--surface);
+            border-radius: var(--border-radius);
             overflow: hidden;
-            transform-style: preserve-3d;
-            transform: perspective(1000px) rotateX(2deg);
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: var(--shadow-holographic);
-            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-3d);
+            border: none;
             position: relative;
-        }
-
-        .signup-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--hologram-gradient);
-            opacity: 0.03;
-            animation: hologramShift 15s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        @keyframes hologramShift {
-            0%, 100% { filter: hue-rotate(0deg) blur(20px); transform: scale(1.2) rotate(0deg); }
-            50% { filter: hue-rotate(180deg) blur(30px); transform: scale(1.3) rotate(180deg); }
         }
 
         .signup-card:hover {
-            transform: perspective(1000px) rotateX(0deg) translateY(-10px);
-            box-shadow: 0 25px 50px rgba(0, 243, 255, 0.4), 0 0 35px rgba(255, 0, 255, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
         }
 
         .signup-header {
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            animation: holographicWave 8s linear infinite;
-            padding: 40px 35px;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+            padding: 32px 28px;
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes holographicWave {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
-        }
-
-        .signup-header::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            0% { left: -100%; }
-            100% { left: 200%; }
+            border-bottom: 3px solid var(--primary-red);
         }
 
         .signup-icon {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 38px;
+            margin: 0 auto 16px;
+            font-size: 32px;
             color: white;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transform: perspective(500px) rotateY(-10deg);
-            transition: all 0.4s;
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+            transition: all 0.3s;
         }
 
         .signup-icon:hover {
-            transform: perspective(500px) rotateY(0deg) scale(1.1);
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
         }
 
         .signup-header h3 {
-            color: white;
+            color: var(--text-primary);
             font-weight: 700;
-            font-size: 28px;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-size: 24px;
+            margin-bottom: 6px;
         }
 
         .signup-header p {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-secondary);
             margin: 0;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .signup-body {
-            padding: 35px;
+            padding: 28px;
+        }
+
+        @media (min-width: 640px) {
+            .signup-body {
+                padding: 32px;
+            }
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             position: relative;
         }
 
         .form-label {
-            color: var(--neon-lime);
-            font-weight: 500;
-            margin-bottom: 8px;
-            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .form-label i {
-            font-size: 16px;
+            font-size: 14px;
+            color: var(--primary-red);
         }
 
         .form-control {
-            background: rgba(38, 41, 69, 0.6);
-            border: 2px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 14px 50px 14px 18px;
-            font-size: 15px;
-            color: var(--dark-text);
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            backdrop-filter: blur(10px);
+            background: var(--bg-white);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 12px 44px 12px 14px;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.3s;
             font-family: 'Space Grotesk', sans-serif;
         }
 
         .form-control:focus {
-            background: rgba(38, 41, 69, 0.8);
-            border-color: var(--neon-cyan);
-            color: var(--dark-text);
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            background: var(--bg-white);
+            border-color: var(--primary-red);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
             outline: none;
-            transform: translateY(-2px);
         }
 
         .form-control.is-valid {
-            border-color: var(--neon-lime);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
 
         .form-control.is-invalid {
-            border-color: #ff6b6b;
-            box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
         }
 
         .password-wrapper {
@@ -225,47 +176,44 @@
 
         .password-toggle {
             position: absolute;
-            right: 15px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--neon-cyan);
+            color: var(--text-secondary);
             cursor: pointer;
             padding: 8px;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.3s;
         }
 
         .password-toggle:hover {
-            color: var(--neon-magenta);
-            background: rgba(255, 0, 255, 0.1);
-            transform: translateY(-50%) scale(1.15);
+            color: var(--primary-red);
+            background: rgba(255, 59, 59, 0.05);
         }
 
         .strength-bar {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
+            height: 5px;
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             overflow: hidden;
-            margin-top: 8px;
-            border: 1px solid var(--glass-border);
+            margin-top: 6px;
         }
 
         .strength-fill {
             height: 100%;
             width: 0%;
             border-radius: 10px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            animation: holographicWave 3s linear infinite;
+            transition: all 0.4s;
+            background: var(--primary-red);
         }
 
         .feedback-text {
             font-size: 12px;
             margin-top: 6px;
             display: block;
+            color: var(--text-secondary);
         }
 
         .invalid-feedback, .valid-feedback {
@@ -275,37 +223,23 @@
 
         .btn-signup {
             width: 100%;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
+            background: var(--primary-red);
             border: none;
             color: white;
-            padding: 16px;
+            padding: 13px;
             font-weight: 600;
-            font-size: 16px;
-            border-radius: 15px;
-            margin-top: 10px;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            animation: holographicWave 8s linear infinite;
-            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.3);
-            position: relative;
-            overflow: hidden;
+            font-size: 14px;
+            border-radius: 10px;
+            margin-top: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
             font-family: 'Space Grotesk', sans-serif;
         }
 
-        .btn-signup::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.6s;
-        }
-
-        .btn-signup:hover::before { left: 100%; }
-
         .btn-signup:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.5), 0 0 30px rgba(255, 0, 255, 0.4);
-            animation: holographicWave 4s linear infinite;
+            transform: translateY(-2px);
+            background: var(--primary-red-dark);
+            box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
         }
 
         .btn-signup:disabled {
@@ -316,67 +250,59 @@
 
         .btn-back {
             width: 100%;
-            border: 2px solid var(--neon-cyan);
-            background: rgba(0, 243, 255, 0.05);
-            backdrop-filter: blur(10px);
-            color: var(--neon-cyan);
-            padding: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.15);
+            background: transparent;
+            color: var(--text-primary);
+            padding: 12px;
             font-weight: 600;
-            border-radius: 15px;
-            margin-top: 15px;
+            border-radius: 10px;
+            margin-top: 12px;
             transition: all 0.3s;
             font-family: 'Space Grotesk', sans-serif;
         }
 
         .btn-back:hover {
-            background: rgba(0, 243, 255, 0.1);
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 243, 255, 0.2);
-            color: var(--neon-cyan);
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
 
         .alert-holographic {
-            background: var(--dark-surface);
-            backdrop-filter: blur(20px);
+            background: var(--surface);
             border: 1px solid;
-            border-radius: 15px;
-            padding: 15px 18px;
-            margin-top: 20px;
-            font-size: 14px;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 16px;
+            font-size: 13px;
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideDown 0.5s;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
 
         .alert-success {
-            border-color: var(--neon-lime);
-            color: var(--neon-lime);
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
+            border-color: #10b981;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #f0fdf4, var(--surface));
         }
 
         .alert-danger {
-            border-color: #ff6b6b;
-            color: #ff6b6b;
-            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.2);
+            border-color: #ef4444;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #fef2f2, var(--surface));
         }
 
         .alert-info {
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
-            box-shadow: 0 5px 20px rgba(0, 243, 255, 0.2);
+            border-color: var(--primary-red);
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #fff5f5, var(--surface));
         }
 
         .spinner-border {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-width: 2px;
-            border-color: white transparent white transparent;
         }
 
         @media (max-width: 768px) {
