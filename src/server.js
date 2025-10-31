@@ -49,10 +49,12 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 const authRoutes = require('./routes/auth.routes');
 const entryRoutes = require('./routes/entry.routes');
 const dataManagementRoutes = require('./routes/data-management.routes');
+const fotoManagementRoutes = require('./routes/foto-management.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/entries', entryRoutes);
 app.use('/api/data-management', dataManagementRoutes);
+app.use('/api/foto-management', fotoManagementRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
