@@ -6,22 +6,38 @@ class DashboardRepository {
      */
     async getGlobalStats() {
         try {
-            console.log('🔍 Fetching ALL entries with limit 100000...');
+            console.log('🔍 Fetching global stats using COUNT query...');
 
-            // Fetch ALL entries from database (override default 1000 limit)
-            const { data: entries, error } = await supabase
+            // SOLUTION: Use COUNT query instead of fetching all rows
+            // This is MUCH faster and doesn't hit 1000 row limit
+            const { count: totalCount, error: countError } = await supabase
                 .from('entries')
-                .select('selisih, status, created_at')
-                .limit(100000); // Set high limit to get all entries
+                .select('*', { count: 'exact', head: true });
 
-            if (error) {
-                throw error;
+            if (countError) {
+                throw countError;
             }
 
-            console.log(`✅ Fetched ${entries.length} entries from database`);
-            console.log('📊 Expected: 18149, Got:', entries.length);
+            console.log(`✅ Total entries from COUNT: ${totalCount}`);
 
-            // Calculate statistics
+            // Fetch sample data for calculations (today, week, month, avg)
+            // We need recent data for accurate today/week/month calculations
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            const { data: recentEntries, error: entriesError } = await supabase
+                .from('entries')
+                .select('selisih, status, created_at')
+                .gte('created_at', thirtyDaysAgo.toISOString())
+                .order('created_at', { ascending: false });
+
+            if (entriesError) {
+                throw entriesError;
+            }
+
+            console.log(`✅ Fetched ${recentEntries.length} recent entries for calculations`);
+
+            // Calculate statistics using COUNT + recent entries
             const now = new Date();
             const today = now.toDateString();
             const startOfWeek = new Date(now);
@@ -31,7 +47,7 @@ class DashboardRepository {
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
             const stats = {
-                total_entries: entries.length,
+                total_entries: totalCount, // ✅ Use COUNT query result!
                 today_entries: 0,
                 week_entries: 0,
                 month_entries: 0,
@@ -40,8 +56,10 @@ class DashboardRepository {
             };
 
             let totalSelisih = 0;
+            let selisihCount = 0;
 
-            entries.forEach(entry => {
+            // Calculate from recent entries (last 30 days)
+            recentEntries.forEach(entry => {
                 const entryDate = new Date(entry.created_at);
 
                 // Today's entries
@@ -59,8 +77,12 @@ class DashboardRepository {
                     stats.month_entries++;
                 }
 
-                // Sum selisih for average
-                totalSelisih += parseFloat(entry.selisih || 0);
+                // Sum selisih for average (from recent data)
+                const selisih = parseFloat(entry.selisih || 0);
+                if (!isNaN(selisih)) {
+                    totalSelisih += selisih;
+                    selisihCount++;
+                }
 
                 // Verified count
                 if (entry.status === 'verified') {
@@ -68,8 +90,16 @@ class DashboardRepository {
                 }
             });
 
-            // Calculate average selisih
-            stats.avg_selisih = entries.length > 0 ? totalSelisih / entries.length : 0;
+            // Calculate average selisih from recent data
+            stats.avg_selisih = selisihCount > 0 ? totalSelisih / selisihCount : 0;
+
+            console.log('📊 Final global stats:', {
+                total: stats.total_entries,
+                today: stats.today_entries,
+                week: stats.week_entries,
+                month: stats.month_entries,
+                recent_sample: recentEntries.length
+            });
 
             return stats;
         } catch (error) {
