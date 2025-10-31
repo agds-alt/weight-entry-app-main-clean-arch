@@ -733,30 +733,36 @@
             </div>
         </div>
 
-        <!-- View Mode Toggle -->
-        <div class="view-mode-toggle">
-            <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
-                <i class="fas fa-th"></i> Mode 500 Foto
-            </button>
-            <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
-                <i class="fas fa-infinity"></i> Tampilkan 2000 Foto (Virtual)
-            </button>
-        </div>
+        <!-- Controls Bar: Pagination/View Mode (Left) + Export/Delete (Right) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 20px; flex-wrap: wrap;">
+            <!-- Left Side: View Mode Toggle + Pagination -->
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="view-mode-toggle" style="margin: 0;">
+                    <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
+                        <i class="fas fa-th"></i> Mode 500 Foto
+                    </button>
+                    <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
+                        <i class="fas fa-infinity"></i> Tampilkan 2000 Foto (Virtual)
+                    </button>
+                </div>
+                <div class="pagination" id="paginationTop" style="margin: 0;"></div>
+            </div>
 
-        <!-- Action Bar -->
-        <div class="action-bar">
-            <button class="btn-holographic" onclick="selectAll()">
-                <i class="fas fa-check-square me-2"></i> Pilih All
-            </button>
-            <button class="btn-holographic" onclick="unselectAll()">
-                <i class="fas fa-square me-2"></i> Gak Pilih All
-            </button>
-            <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
-                <i class="fas fa-download me-2"></i> Unduh Mang!
-            </button>
-            <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
-                <i class="fas fa-trash me-2"></i> Hapus Mang?
-            </button>
+            <!-- Right Side: Select All/Unselect + Download/Delete Buttons -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn-holographic" onclick="selectAll()">
+                    <i class="fas fa-check-square me-2"></i> Pilih All
+                </button>
+                <button class="btn-holographic" onclick="unselectAll()">
+                    <i class="fas fa-square me-2"></i> Gak Pilih All
+                </button>
+                <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
+                    <i class="fas fa-download me-2"></i> Unduh Mang!
+                </button>
+                <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
+                    <i class="fas fa-trash me-2"></i> Hapus Mang?
+                </button>
+            </div>
         </div>
 
         <!-- Loading State -->
