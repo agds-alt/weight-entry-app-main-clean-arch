@@ -724,10 +724,11 @@
             scrollTop: 0,
             visibleStart: 0,
             visibleEnd: 0,
-            itemHeight: 340, // approx height of photo card (220px img + 120px info)
+            itemHeight: 360, // approx height of photo card (220px img + 140px info + margins)
             itemsPerRow: 4, // will be calculated dynamically
             buffer: 2, // extra rows to render above/below viewport
-            containerHeight: 0
+            containerHeight: 0,
+            gap: 20 // match CSS grid gap
         };
 
         // ==========================================
@@ -1338,10 +1339,29 @@
 
             // Photo card min-width is 220px from CSS: minmax(220px, 1fr)
             const minCardWidth = 220;
-            const gap = 20; // gap from CSS
+            const gap = virtualScrollState.gap; // use gap from state
 
+            // Calculate how many items can fit with proper gaps
+            // Formula: (galleryWidth - gap*(n-1)) / n >= minCardWidth
+            // Solve for n: galleryWidth / (minCardWidth + gap) gives approximate n
             const itemsPerRow = Math.floor((galleryWidth + gap) / (minCardWidth + gap));
-            return Math.max(1, itemsPerRow); // at least 1 item per row
+            const result = Math.max(1, itemsPerRow); // at least 1 item per row
+
+            console.log(`📐 Calculate items per row: gallery=${galleryWidth}px, items=${result}`);
+            return result;
+        }
+
+        // Dynamic height calculation based on actual card
+        function updateItemHeight() {
+            // Try to measure actual card height from pagination mode
+            const cards = document.querySelectorAll('.photo-card');
+            if (cards.length > 0) {
+                const actualHeight = cards[0].offsetHeight;
+                if (actualHeight > 0) {
+                    virtualScrollState.itemHeight = actualHeight + virtualScrollState.gap; // add gap between rows
+                    console.log(`📏 Updated item height to ${virtualScrollState.itemHeight}px (card=${actualHeight}px + gap=${virtualScrollState.gap}px)`);
+                }
+            }
         }
 
         function calculateVisibleRange() {
@@ -1373,6 +1393,11 @@
         // ==========================================
         function renderVirtualScroll() {
             const gallery = document.getElementById('photoGallery');
+
+            // Update item height based on actual card dimensions (first time only)
+            if (virtualScrollState.itemHeight === 360) {
+                updateItemHeight();
+            }
 
             // Calculate items per row dynamically
             virtualScrollState.itemsPerRow = calculateItemsPerRow();
@@ -1406,9 +1431,22 @@
             gallery.style.minHeight = `${totalHeight}px`;
             gallery.style.position = 'relative';
             gallery.style.width = '100%';
+            gallery.style.overflow = 'visible'; // Ensure no clipping
+
+            console.log(`📊 Virtual Scroll Layout: ${totalRows} rows × ${virtualScrollState.itemHeight}px = ${totalHeight}px total height`);
 
             // Render visible items with offset
             const offsetTop = startRow * virtualScrollState.itemHeight;
+
+            // Pre-calculate dimensions once for all items
+            const galleryWidth = gallery.offsetWidth;
+            const gap = virtualScrollState.gap;
+            const itemsPerRow = virtualScrollState.itemsPerRow;
+
+            // Calculate item width to match CSS grid behavior
+            // CSS: grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))
+            const totalGaps = gap * (itemsPerRow - 1);
+            const itemWidth = (galleryWidth - totalGaps) / itemsPerRow;
 
             const photosHtml = visiblePhotos.map((photo, index) => {
                 const actualIndex = visibleStart + index;
@@ -1424,16 +1462,22 @@
                 const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect fill='%23f5f7fa'/%3E%3C/svg%3E";
 
                 // Calculate position for absolute positioning
-                const row = Math.floor(actualIndex / virtualScrollState.itemsPerRow);
-                const col = actualIndex % virtualScrollState.itemsPerRow;
-                const galleryWidth = gallery.offsetWidth;
-                const gap = 20;
-                const itemWidth = (galleryWidth - (gap * (virtualScrollState.itemsPerRow - 1))) / virtualScrollState.itemsPerRow;
+                const row = Math.floor(actualIndex / itemsPerRow);
+                const col = actualIndex % itemsPerRow;
+
+                // Position with proper gaps
                 const left = col * (itemWidth + gap);
                 const top = row * virtualScrollState.itemHeight;
 
                 return `
-                    <div class="photo-card ${isSelected ? 'selected' : ''}" id="card-${photo.id}" style="position: absolute; top: ${top}px; left: ${left}px; width: ${itemWidth}px;">
+                    <div class="photo-card ${isSelected ? 'selected' : ''}"
+                         id="card-${photo.id}"
+                         style="position: absolute;
+                                top: ${top}px;
+                                left: ${left}px;
+                                width: ${itemWidth}px;
+                                box-sizing: border-box;
+                                margin: 0;">
                         <input type="checkbox"
                             class="photo-checkbox"
                             ${isSelected ? 'checked' : ''}
@@ -1479,7 +1523,13 @@
             document.getElementById('renderedCount').textContent = renderedCount;
             document.getElementById('virtualScrollInfo').style.display = 'inline';
 
-            console.log(`📊 Virtual Scroll: Rendering ${renderedCount} items (${visibleStart}-${visibleEnd}) of ${filteredPhotos.length} total`);
+            console.log(`📊 Virtual Scroll Summary:`);
+            console.log(`   - Total photos: ${filteredPhotos.length}`);
+            console.log(`   - Items per row: ${itemsPerRow}`);
+            console.log(`   - Item dimensions: ${itemWidth.toFixed(2)}px × ${virtualScrollState.itemHeight}px`);
+            console.log(`   - Gap: ${gap}px`);
+            console.log(`   - Rendered: ${renderedCount} items (${visibleStart}-${visibleEnd})`);
+            console.log(`   - Gallery size: ${galleryWidth}px × ${totalHeight}px`);
         }
 
         // ==========================================
