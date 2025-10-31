@@ -624,7 +624,7 @@
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn-holographic" onclick="applyFilters()">
-                    <i class="fas fa-search me-2"></i> Apply Filters
+                    <i class="fas fa-search me-2"></i> Terapkan Filter
                 </button>
                 <button class="btn-holographic" onclick="resetFilters()">
                     <i class="fas fa-redo me-2"></i> Reset
@@ -642,26 +642,26 @@
         <!-- View Mode Toggle -->
         <div class="view-mode-toggle">
             <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
-                <i class="fas fa-th"></i> Pagination Mode
+                <i class="fas fa-th"></i> Mode 500 Foto
             </button>
             <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
-                <i class="fas fa-infinity"></i> Infinite Scroll (Virtual)
+                <i class="fas fa-infinity"></i> Tampilkan 2000 Foto (Virtual)
             </button>
         </div>
 
         <!-- Action Bar -->
         <div class="action-bar">
             <button class="btn-holographic" onclick="selectAll()">
-                <i class="fas fa-check-square me-2"></i> Select All
+                <i class="fas fa-check-square me-2"></i> Pilih All
             </button>
             <button class="btn-holographic" onclick="unselectAll()">
-                <i class="fas fa-square me-2"></i> Unselect All
+                <i class="fas fa-square me-2"></i> Gak Pilih All
             </button>
             <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
-                <i class="fas fa-download me-2"></i> Download Selected
+                <i class="fas fa-download me-2"></i> Unduh
             </button>
             <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
-                <i class="fas fa-trash me-2"></i> Delete Selected
+                <i class="fas fa-trash me-2"></i> Hapus
             </button>
         </div>
 
@@ -714,7 +714,7 @@
         let filteredPhotos = [];
         let selectedPhotos = new Set();
         let currentPage = 1;
-        const photosPerPage = 12;
+        const photosPerPage = 50;
 
         // View Mode State
         let viewMode = 'pagination'; // 'pagination' or 'infinite'
