@@ -927,11 +927,12 @@
         }
 
         let currentPage = 1;
-        const itemsPerPage = 20;
+        const itemsPerPage = 100;
         let allData = [];
         let filteredData = [];
         let sortColumn = 'created_at';
         let sortDirection = 'desc';
+        let totalCount = 0;  // Total records in database
 
         // Update DateTime
         function updateDateTime() {
@@ -954,39 +955,60 @@
             document.getElementById('userRole').textContent = userRole.toUpperCase();
         }
 
-        // Fetch Data
-        async function fetchData() {
-            console.log('📡 fetchData() called...');
+        // Fetch Data with Server-Side Pagination
+        async function fetchData(page = 1) {
+            console.log(`📡 fetchData() called for page ${page}...`);
             try {
                 console.log('🔄 Setting loading state...');
                 document.getElementById('loadingState').style.display = 'block';
                 document.getElementById('tableContent').style.display = 'none';
                 document.getElementById('noDataState').style.display = 'none';
 
-                console.log('🔍 Fetching data from Supabase...');
+                // Get total count (only if first page)
+                if (page === 1) {
+                    console.log('📊 Getting total count...');
+                    const { count, error: countError } = await supabase
+                        .from('entries')
+                        .select('*', { count: 'exact', head: true });
 
-                // First try to get count
-                const { count, error: countError } = await supabase
-                    .from('entries')
-                    .select('*', { count: 'exact', head: true });
+                    if (countError) {
+                        console.error('❌ Count error:', countError);
+                    } else {
+                        totalCount = count || 0;
+                        console.log('✅ Total records in database:', totalCount);
+                    }
+                }
 
-                console.log('📊 Total count in database:', count, 'Error:', countError);
+                // Calculate range for pagination
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage - 1;
 
-                // Then fetch actual data with limit (for performance with large datasets)
+                console.log(`🔍 Fetching records ${start} to ${end}...`);
+
+                // Fetch data for current page
                 const { data, error } = await supabase
                     .from('entries')
                     .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, status, foto_url_1, foto_url_2, created_by, created_at, updated_at, notes')
                     .order('created_at', { ascending: false })
-                    .limit(5000);
+                    .range(start, end);
 
                 console.log('📦 Response received:', { dataCount: data?.length, error });
-                console.log('📦 Raw data:', data);
-                console.log('📦 Error object:', error);
 
                 if (error) throw error;
 
-                allData = data || [];
+                if (!data || data.length === 0) {
+                    console.log('⚠️ No data returned from query');
+                    allData = [];
+                    filteredData = [];
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('tableContent').style.display = 'none';
+                    document.getElementById('noDataState').style.display = 'block';
+                    return;
+                }
+
+                allData = data;
                 filteredData = [...allData];
+                currentPage = page;
 
                 console.log('✅ Data loaded:', allData.length, 'entries');
                 console.log('📊 Sample data:', allData[0]);
@@ -1004,9 +1026,11 @@
 
         // Update Stats
         function updateStats() {
-            document.getElementById('totalEntries').textContent = allData.length.toLocaleString();
+            // Show total count from database, not just current page
+            document.getElementById('totalEntries').textContent = totalCount.toLocaleString();
 
-            const avgSelisih = allData.length > 0 
+            // Average selisih for current page
+            const avgSelisih = allData.length > 0
                 ? (allData.reduce((sum, item) => sum + parseFloat(item.selisih || 0), 0) / allData.length).toFixed(2)
                 : 0;
             document.getElementById('avgSelisih').textContent = `${avgSelisih} kg`;
@@ -1023,8 +1047,9 @@
                 trendEl.style.color = '#22c55e';
             }
 
+            // Today count (only from current page - not accurate but fast)
             const today = new Date().toISOString().split('T')[0];
-            const todayCount = allData.filter(item => 
+            const todayCount = allData.filter(item =>
                 item.created_at && item.created_at.startsWith(today)
             ).length;
             document.getElementById('todayEntries').textContent = todayCount;
@@ -1061,7 +1086,7 @@
             renderTable();
         }
 
-        // Render Table
+        // Render Table (Server-Side Pagination - No Slicing Needed)
         function renderTable() {
             console.log('📊 renderTable() called');
             console.log('📊 filteredData.length:', filteredData.length);
@@ -1070,9 +1095,8 @@
             const tbody = document.getElementById('dataTableBody');
             console.log('📊 tbody element:', !!tbody);
 
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = filteredData.slice(startIndex, endIndex);
+            // No need to slice - data already paginated from server
+            const pageData = filteredData;
             console.log('📊 pageData.length:', pageData.length);
 
             if (filteredData.length === 0) {
@@ -1142,10 +1166,12 @@
             renderPagination();
         }
 
-        // Pagination
+        // Pagination (Server-Side)
         function renderPagination() {
             const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+            console.log('📄 Pagination:', { totalCount, itemsPerPage, totalPages, currentPage });
 
             if (totalPages <= 1) {
                 pagination.innerHTML = '';
@@ -1180,10 +1206,10 @@
         }
 
         function changePage(page) {
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const totalPages = Math.ceil(totalCount / itemsPerPage);
             if (page < 1 || page > totalPages) return;
-            currentPage = page;
-            renderTable();
+            console.log(`📄 Changing to page ${page}...`);
+            fetchData(page);  // Fetch new page from server
         }
 
         // Apply Filters
