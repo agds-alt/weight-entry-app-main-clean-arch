@@ -40,10 +40,10 @@ router.get('/entries', authenticateToken, async (req, res) => {
         const start = (page - 1) * limit;
         const end = start + limit - 1;
 
-        // Build query
+        // Build query (OPTIMIZED: Exclude foto_url_1, foto_url_2 for performance)
         let query = supabase
             .from('entries')
-            .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, status, foto_url_1, foto_url_2, created_by, created_at, updated_at, notes', { count: 'exact' });
+            .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, status, created_by, created_at, updated_at, notes', { count: 'exact' });
 
         // Apply filters
         if (status) {
