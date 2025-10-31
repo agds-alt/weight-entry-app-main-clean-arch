@@ -216,16 +216,23 @@ class RealtimeDashboard {
 
         const leaderboardHtml = leaderboard.map(user => {
             const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
-            const userEarnings = (user.total_entries || user.entries_count || 0) * 500;
+
+            // Use total_earnings from user_statistics table if available
+            const totalEarnings = user.total_earnings || ((user.total_entries || 0) * 500);
+            const dailyEntries = user.daily_entries || 0;
+            const totalEntries = user.total_entries || user.entries_count || 0;
 
             return `
                 <div class="leaderboard-item">
                     <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
                     <div class="leaderboard-user">
                         <div class="leaderboard-name">${user.username}</div>
-                        <div class="leaderboard-entries">${user.total_entries || user.entries_count || 0} entries</div>
+                        <div class="leaderboard-entries">
+                            <span style="font-weight: 600;">${totalEntries} total</span>
+                            ${dailyEntries > 0 ? `<span style="color: var(--primary-red); margin-left: 8px;">+${dailyEntries} hari ini</span>` : ''}
+                        </div>
                     </div>
-                    <div class="leaderboard-earnings">${this.formatCurrency(userEarnings)}</div>
+                    <div class="leaderboard-earnings">${this.formatCurrency(totalEarnings)}</div>
                 </div>
             `;
         }).join('');
