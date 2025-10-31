@@ -11,9 +11,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
         :root {
+            /* 🇮🇩 MERAH PUTIH - Indonesian Flag Theme */
             --primary-red: #ff3b3b;
-            --primary-red-dark: #e63535;
-            --primary-red-light: #ff6b6b;
+            --primary-red-dark: #ce1126;  /* Official Indonesian Red */
+            --primary-red-light: #ff8a8a;
             --bg-white: #ffffff;
             --bg-gray: #f5f7fa;
             --surface: #ffffff;
@@ -23,6 +24,7 @@
             --border-color: rgba(0, 0, 0, 0.1);
             --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
             --border-radius: 16px;
+            --red-success: #ff6b6b;  /* Light red for success */
         }
 
         * {
@@ -214,13 +216,14 @@
         }
 
         .btn-export {
-            background: #22c55e;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            /* 🇮🇩 Red for Export */
+            background: var(--primary-red);
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
 
         .btn-export:hover {
-            background: #16a34a;
-            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+            background: var(--primary-red-dark);
+            box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
         }
 
         .btn-reset {
@@ -249,7 +252,7 @@
             border-collapse: separate;
             border-spacing: 0;
             color: var(--text-primary);
-            min-width: 1400px;
+            min-width: 1000px;  /* Reduced from 1400px */
             font-size: 13px;
         }
 
@@ -310,21 +313,24 @@
         }
 
         .badge-submitted {
-            background: rgba(255, 170, 0, 0.1);
-            color: #ff9500;
-            border: 1px solid #ff9500;
+            /* 🇮🇩 Light Red - Pending/Submitted */
+            background: rgba(255, 138, 138, 0.15);
+            color: var(--primary-red-light);
+            border: 1px solid var(--primary-red-light);
         }
 
         .badge-approved {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-            border: 1px solid #22c55e;
+            /* 🇮🇩 White - Approved/Success */
+            background: var(--bg-white);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
         }
 
         .badge-rejected {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid #ef4444;
+            /* 🇮🇩 Dark Red - Rejected/Error */
+            background: rgba(206, 17, 38, 0.1);
+            color: var(--primary-red-dark);
+            border: 1px solid var(--primary-red-dark);
         }
 
         .action-buttons {
@@ -342,24 +348,26 @@
         }
 
         .btn-edit {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border: 1px solid #3b82f6;
+            /* 🇮🇩 Light Red for Edit */
+            background: rgba(255, 59, 59, 0.1);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
         }
 
         .btn-edit:hover {
-            background: #3b82f6;
+            background: var(--primary-red);
             color: white;
         }
 
         .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid #ef4444;
+            /* 🇮🇩 Dark Red for Delete */
+            background: rgba(206, 17, 38, 0.1);
+            color: var(--primary-red-dark);
+            border: 1px solid var(--primary-red-dark);
         }
 
         .btn-delete:hover {
-            background: #ef4444;
+            background: var(--primary-red-dark);
             color: white;
         }
 
@@ -786,7 +794,6 @@
                             <th onclick="sortTable('status')">Status <i class="fas fa-sort"></i></th>
                             <th>Created By</th>
                             <th onclick="sortTable('created_at')">Tanggal/Waktu <i class="fas fa-sort"></i></th>
-                            <th>Notes</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1035,7 +1042,7 @@
             } catch (error) {
                 console.error('❌ fetchData ERROR:', error);
                 document.getElementById('loadingState').innerHTML =
-                    '<i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: #ff9500;"></i><div>Error loading data: ' + error.message + '</div>';
+                    '<i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--primary-red);"></i><div>Error loading data: ' + error.message + '</div>';
             }
         }
 
@@ -1053,13 +1060,15 @@
             const avgFloat = parseFloat(avgSelisih);
             const trendEl = document.getElementById('selisihTrend');
             if (avgFloat > 0) {
+                // 🇮🇩 Red for Positive (loss)
                 trendEl.innerHTML = '<i class="fas fa-arrow-up"></i> Positif';
-                trendEl.style.background = 'rgba(239, 68, 68, 0.1)';
-                trendEl.style.color = '#ef4444';
+                trendEl.style.background = 'rgba(206, 17, 38, 0.1)';
+                trendEl.style.color = 'var(--primary-red-dark)';
             } else if (avgFloat < 0) {
+                // 🇮🇩 Light Red for Negative (gain)
                 trendEl.innerHTML = '<i class="fas fa-arrow-down"></i> Negatif';
-                trendEl.style.background = 'rgba(34, 197, 94, 0.1)';
-                trendEl.style.color = '#22c55e';
+                trendEl.style.background = 'rgba(255, 138, 138, 0.1)';
+                trendEl.style.color = 'var(--red-success)';
             }
 
             // Today count (only from current page - not accurate but fast)
@@ -1144,7 +1153,7 @@
                         <td><strong style="color: var(--primary-red);">${item.no_resi}</strong></td>
                         <td>${item.berat_resi} kg</td>
                         <td>${item.berat_aktual} kg</td>
-                        <td style="color: ${item.selisih > 0 ? '#ef4444' : item.selisih < 0 ? '#22c55e' : 'var(--text-primary)'}; font-weight: 600;">
+                        <td style="color: ${item.selisih > 0 ? 'var(--primary-red)' : item.selisih < 0 ? 'var(--red-success)' : 'var(--text-primary)'}; font-weight: 600;">
                             ${item.selisih > 0 ? '+' : ''}${item.selisih} kg
                         </td>
                         <td><span class="badge-holographic ${statusClass}">${item.status}</span></td>
@@ -1153,7 +1162,6 @@
                             <div>${dateStr}</div>
                             <small style="color: var(--text-secondary);">${timeStr}</small>
                         </td>
-                        <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.notes || ''}">${item.notes || '-'}</td>
                         <td>
                             <div class="action-buttons">
                                 <button class="btn-action btn-edit" onclick="editEntry(${item.id})" title="Edit">
