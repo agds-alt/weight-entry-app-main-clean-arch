@@ -240,3 +240,19 @@ module.exports.deleteFolder = deleteFolder;
 module.exports.uploadFromUrl = uploadFromUrl;
 module.exports.isConfigured = isConfigured;
 module.exports.testConnection = testConnection;
+
+/**
+ * Get unsigned upload configuration for frontend
+ * This allows frontend to upload directly to Cloudinary without API credentials
+ * @returns {Object} Unsigned upload config
+ */
+function getUnsignedConfig() {
+    return {
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
+        folder: process.env.CLOUDINARY_FOLDER || 'selisih_berat',
+        uploadUrl: `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`
+    };
+}
+
+module.exports.getUnsignedConfig = getUnsignedConfig;

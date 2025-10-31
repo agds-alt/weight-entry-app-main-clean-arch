@@ -1,13 +1,16 @@
 ﻿// entry-form-resi.js - Upload saat submit
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Check authentication
     const token = localStorage.getItem('accessToken');
     const userName = localStorage.getItem('userName');
-    
+
     if (!token) {
         window.location.href = '/login.html';
         return;
     }
+
+    // Load Cloudinary configuration from backend
+    await loadCloudinaryConfig();
 
     // Form elements
     const form = document.getElementById('entryForm');
@@ -35,29 +38,51 @@ document.addEventListener('DOMContentLoaded', function() {
         foto2: null
     };
 
-  // Ganti bagian Cloudinary configuration dengan ini:
-const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // Upload preset default Cloudinary
-const CLOUDINARY_CLOUD_NAME = 'ddzzlusek'; // Pastikan ini benar
-const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+  // ==================== CLOUDINARY CONFIGURATION ====================
+// Konfigurasi Cloudinary akan dimuat dari backend API
+let CLOUDINARY_CONFIG = null;
+
+// Fungsi untuk memuat konfigurasi Cloudinary dari backend
+async function loadCloudinaryConfig() {
+    try {
+        const response = await fetch('/api/config/cloudinary');
+        const result = await response.json();
+
+        if (result.success) {
+            CLOUDINARY_CONFIG = result.data;
+            console.log('✅ Cloudinary config loaded:', CLOUDINARY_CONFIG.cloudName);
+            return true;
+        } else {
+            console.error('❌ Failed to load Cloudinary config:', result);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error loading Cloudinary config:', error);
+        return false;
+    }
+}
 
 // Upload image to Cloudinary - dengan error handling yang lebih baik
 async function uploadToCloudinary(file) {
+    if (!CLOUDINARY_CONFIG) {
+        throw new Error('Cloudinary configuration not loaded');
+    }
+
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    
-    // Hapus folder dulu untuk testing, atau gunakan folder yang lebih simple
-    // formData.append('folder', `weight-entries/${userName}`);
-    formData.append('folder', 'weight-entries'); // Folder yang lebih simple
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    formData.append('folder', CLOUDINARY_CONFIG.folder)
 
     try {
         console.log('📤 Uploading file to Cloudinary...', {
             file: file.name,
             size: file.size,
-            type: file.type
+            type: file.type,
+            preset: CLOUDINARY_CONFIG.uploadPreset,
+            folder: CLOUDINARY_CONFIG.folder
         });
 
-        const response = await fetch(CLOUDINARY_UPLOAD_URL, {
+        const response = await fetch(CLOUDINARY_CONFIG.uploadUrl, {
             method: 'POST',
             body: formData
         });

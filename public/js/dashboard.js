@@ -44,14 +44,14 @@ class RealtimeDashboard {
             console.log('🔄 Loading dashboard data...');
 
             const [statsResponse, leaderboardResponse] = await Promise.all([
-                fetch('/api/dashboard/user-stats', {
-                    headers: { 
+                fetch('/api/dashboard/global-stats', {
+                    headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 }),
                 fetch('/api/dashboard/leaderboard', {
-                    headers: { 
+                    headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
@@ -60,9 +60,10 @@ class RealtimeDashboard {
 
             // Handle stats response
             if (statsResponse.ok) {
-                const statsData = await statsResponse.json();
-                console.log('📊 Stats data from API:', statsData);
-                this.stats = statsData;
+                const response = await statsResponse.json();
+                console.log('📊 Global stats response from API:', response);
+                // Extract data from {success: true, data: {...}} format
+                this.stats = response.data || response;
                 this.updateDashboardUI();
             } else {
                 console.error('Stats API error:', statsResponse.status);
@@ -115,15 +116,20 @@ class RealtimeDashboard {
         // Update earnings card
         this.updateElement('totalEarnings', 'innerHTML', `${this.formatCurrency(totalEarnings)}<sup>,-</sup>`);
         this.updateElement('totalEntriesCount', 'textContent', this.stats.total_entries || 0);
-        
+
+        // 🔥 Update NEW Global Total Entries Card (prominent display with animation)
+        const globalTotal = this.stats.total_entries || 0;
+        this.updateElement('globalTotalEntries', 'textContent', globalTotal.toLocaleString('id-ID'));
+        console.log('📊 Global Total Entries displayed:', globalTotal);
+
         // Update period earnings
         this.updateElement('todayEarnings', 'textContent', this.formatCurrency(todayEarnings));
         this.updateElement('weekEarnings', 'textContent', this.formatCurrency(weekEarnings));
         this.updateElement('monthEarnings', 'textContent', this.formatCurrency(monthEarnings));
 
-        // Update stats cards
-        this.updateElement('todayEntries', 'textContent', this.stats.entries_today || 0);
-        this.updateElement('weekEntries', 'textContent', this.stats.entries_this_week || 0);
+        // Update stats cards (handle both old and new field names)
+        this.updateElement('todayEntries', 'textContent', this.stats.today_entries || this.stats.entries_today || 0);
+        this.updateElement('weekEntries', 'textContent', this.stats.week_entries || this.stats.entries_this_week || 0);
         
         // FIX: Handle string/number for avg_selisih
         const avgSelisih = parseFloat(this.stats.avg_selisih || 0);

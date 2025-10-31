@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const { supabase } = require('../config/database');
+const dashboardController = require('../controllers/dashboard.controller');
 
 // Get user statistics and earnings
 router.get('/user-stats', authenticateToken, async (req, res) => {
@@ -72,6 +73,9 @@ router.get('/user-stats', authenticateToken, async (req, res) => {
         });
     }
 });
+
+// Get global statistics (all entries from all users)
+router.get('/global-stats', authenticateToken, dashboardController.getGlobalStats);
 
 // Get leaderboard
 router.get('/leaderboard', authenticateToken, async (req, res) => {

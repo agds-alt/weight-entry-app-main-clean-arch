@@ -2,6 +2,111 @@ const { supabase } = require('../config/database');
 
 class DashboardRepository {
     /**
+     * Get global statistics (all entries from all users)
+     */
+    async getGlobalStats() {
+        try {
+            console.log('🔍 Fetching global stats using COUNT queries...');
+
+            // Calculate date boundaries
+            const now = new Date();
+            const today = new Date(now);
+            today.setHours(0, 0, 0, 0);
+
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+
+            // Run all COUNT queries in parallel for better performance
+            const [
+                totalResult,
+                todayResult,
+                weekResult,
+                monthResult,
+                recentResult
+            ] = await Promise.all([
+                // Total count (all time)
+                supabase.from('entries').select('*', { count: 'exact', head: true }),
+
+                // Today count
+                supabase.from('entries').select('*', { count: 'exact', head: true })
+                    .gte('created_at', today.toISOString()),
+
+                // This week count
+                supabase.from('entries').select('*', { count: 'exact', head: true })
+                    .gte('created_at', startOfWeek.toISOString()),
+
+                // This month count
+                supabase.from('entries').select('*', { count: 'exact', head: true })
+                    .gte('created_at', startOfMonth.toISOString()),
+
+                // Fetch recent entries for avg_selisih and verified_count
+                supabase.from('entries').select('selisih, status')
+                    .gte('created_at', startOfMonth.toISOString())
+                    .limit(1000)
+            ]);
+
+            if (totalResult.error) throw totalResult.error;
+            if (todayResult.error) throw todayResult.error;
+            if (weekResult.error) throw weekResult.error;
+            if (monthResult.error) throw monthResult.error;
+            if (recentResult.error) throw recentResult.error;
+
+            console.log(`✅ Total entries: ${totalResult.count}`);
+            console.log(`✅ Today entries: ${todayResult.count}`);
+            console.log(`✅ Week entries: ${weekResult.count}`);
+            console.log(`✅ Month entries: ${monthResult.count}`);
+
+            // Calculate avg_selisih and verified_count from recent data
+            const recentEntries = recentResult.data || [];
+            let totalSelisih = 0;
+            let selisihCount = 0;
+            let verifiedCount = 0;
+
+            recentEntries.forEach(entry => {
+                // Sum selisih for average
+                const selisih = parseFloat(entry.selisih || 0);
+                if (!isNaN(selisih)) {
+                    totalSelisih += selisih;
+                    selisihCount++;
+                }
+
+                // Count verified entries
+                if (entry.status === 'verified') {
+                    verifiedCount++;
+                }
+            });
+
+            const avgSelisih = selisihCount > 0 ? totalSelisih / selisihCount : 0;
+
+            const stats = {
+                total_entries: totalResult.count,
+                today_entries: todayResult.count,
+                week_entries: weekResult.count,
+                month_entries: monthResult.count,
+                avg_selisih: avgSelisih,
+                verified_count: verifiedCount
+            };
+
+            console.log('📊 Final global stats:', {
+                total: stats.total_entries,
+                today: stats.today_entries,
+                week: stats.week_entries,
+                month: stats.month_entries,
+                avg_selisih: avgSelisih.toFixed(2)
+            });
+
+            return stats;
+        } catch (error) {
+            console.error('Dashboard repository getGlobalStats error:', error);
+            throw new Error('Gagal mengambil statistik global');
+        }
+    }
+
+    /**
      * Get user statistics
      * Note: This implementation fetches data and calculates in-memory.
      * For better performance with large datasets, consider creating a Supabase RPC function.

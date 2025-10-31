@@ -82,14 +82,19 @@
             color: var(--neon-cyan);
         }
         :root {
-            --neon-cyan: #00f3ff;
-            --neon-magenta: #ff00ff;
-            --neon-lime: #00ff9d;
-            --neon-blue: #0066ff;
-            --dark-bg: #0a0a1a;
-            --card-bg: rgba(16, 16, 32, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --hologram-gradient: linear-gradient( 45deg, var(--neon-cyan) 0%, var(--neon-magenta) 25%, var(--neon-lime) 50%, var(--neon-blue) 75%, var(--neon-cyan) 100% );
+            /* 🎨 NEW LIGHT THEME - Red Accent + 3D Backshadow */
+            --primary-red: #ff3b3b;
+            --primary-red-dark: #e63535;
+            --primary-red-light: #ff6b6b;
+            --bg-white: #ffffff;
+            --bg-gray: #f5f7fa;
+            --text-dark: #2d3748;
+            --text-gray: #718096;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
+            --border-radius: 16px;
         }
 
         * {
@@ -99,15 +104,15 @@
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: var(--dark-bg);
-            color: #fff;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-dark);
             overflow-x: hidden;
             position: relative;
             min-height: 100vh;
         }
 
-            /* Animated Background */
+            /* Clean subtle pattern background */
             body::before {
                 content: '';
                 position: fixed;
@@ -115,10 +120,12 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(0, 255, 157, 0.1) 0%, transparent 50%);
-                animation: floatingGradient 20s ease infinite;
+                background:
+                    linear-gradient(90deg, rgba(255, 59, 59, 0.02) 1px, transparent 1px),
+                    linear-gradient(rgba(255, 59, 59, 0.02) 1px, transparent 1px);
+                background-size: 50px 50px;
                 pointer-events: none;
-                z-index: -1;
+                z-index: 0;
             }
 
         @keyframes floatingGradient {
@@ -137,18 +144,16 @@
             z-index: 1;
         }
 
-        /* 3D Header Card with Holographic Effect */
+        /* 3D Header Card with Light Theme */
         .header-card {
-            background: var(--card-bg);
-            border-radius: 30px;
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
             padding: 40px;
             margin-bottom: 40px;
             position: relative;
-            transform: perspective(1000px) rotateX(5deg);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 243, 255, 0.1), inset 0 0 0 1px var(--glass-border);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-3d);
+            border: none;
             overflow: hidden;
         }
 
@@ -158,46 +163,36 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                bottom: 0;
-                background: conic-gradient( from 0deg at 50% 50%, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 25%, rgba(0, 255, 0, 0.1) 50%, rgba(0, 102, 255, 0.1) 75%, rgba(0, 255, 255, 0.1) 100% );
-                animation: aurora 20s linear infinite;
-                z-index: 0;
-                border-radius: 30px;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+                z-index: 1;
             }
 
             .header-card:hover {
-                transform: perspective(1000px) rotateX(0deg) translateY(-10px);
-                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(0, 243, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+                transform: translateY(-4px);
+                box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
             }
 
         .header-title {
             font-size: 42px;
             font-weight: 700;
-            background: var(--hologram-gradient);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicWave 5s linear infinite;
+            color: var(--text-dark);
             margin-bottom: 10px;
             position: relative;
             z-index: 1;
         }
 
-        /* Earnings Card - Holographic Design */
+        /* Earnings Card - Light Theme with 3D Shadow */
         .earnings-card {
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.3) 0%, rgba(255, 0, 255, 0.3) 50%, rgba(0, 255, 157, 0.3) 100%);
-            border-radius: 25px;
-            padding: 30px;
-            color: white;
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 32px;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            transform: perspective(1000px) rotateX(5deg);
-            box-shadow: 0 20px 60px rgba(0, 102, 255, 0.4), inset 0 0 0 1px var(--glass-border);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-3d);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
         }
 
             .earnings-card::before {
@@ -206,37 +201,14 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 3px;
-                background: var(--hologram-gradient);
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
                 z-index: 1;
             }
 
-            .earnings-card::after {
-                content: '';
-                position: absolute;
-                top: -50%;
-                right: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-                animation: pulse 4s ease-in-out infinite;
-            }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.5;
-            }
-
-            50% {
-                transform: scale(1.2);
-                opacity: 0.8;
-            }
-        }
-
         .earnings-card:hover {
-            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
-            box-shadow: 0 30px 80px rgba(0, 102, 255, 0.5), 0 0 100px rgba(0, 243, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
         }
 
         .earnings-header {
@@ -250,7 +222,7 @@
 
         .earnings-title {
             font-size: 18px;
-            opacity: 0.9;
+            color: var(--text-gray);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -260,7 +232,7 @@
             font-size: 48px;
             font-weight: 800;
             margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            color: var(--text-dark);
             position: relative;
             z-index: 1;
         }
@@ -272,7 +244,7 @@
 
         .earnings-subtitle {
             font-size: 16px;
-            opacity: 0.85;
+            color: var(--text-gray);
             margin-bottom: 25px;
             position: relative;
             z-index: 1;
@@ -283,7 +255,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
             position: relative;
             z-index: 1;
         }
@@ -296,11 +268,12 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
+            color: var(--primary-red);
         }
 
         .earning-stat-label {
             font-size: 13px;
-            opacity: 0.8;
+            color: var(--text-gray);
         }
 
         /* Stats Grid with Holographic Effects */
@@ -312,15 +285,15 @@
         }
 
         .stat-card {
-            background: var(--card-bg);
-            border-radius: 25px;
-            padding: 30px;
+            /* 🎨 Light theme card with 3D backshadow */
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 28px;
             position: relative;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 25px 25px 50px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(30, 33, 57, 0.3), inset 0 0 0 1px var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-3d);
             cursor: pointer;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
+            border: none;
             overflow: hidden;
         }
 
@@ -330,14 +303,46 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 3px;
-                background: var(--hologram-gradient);
-                z-index: 1;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
             }
 
             .stat-card:hover {
-                transform: scale(1.05);
-                box-shadow: 0 20px 40px rgba(0, 243, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+                transform: translateY(-4px);
+                box-shadow:
+                    12px 12px 24px rgba(0, 0, 0, 0.12),
+                    -6px -6px 12px rgba(255, 255, 255, 1);
+            }
+
+            /* 🔥 Highlighted card for Total Global Entries */
+            .stat-card-highlight {
+                background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+                border: 2px solid var(--primary-red) !important;
+                box-shadow:
+                    0 0 0 4px rgba(255, 59, 59, 0.1),
+                    12px 12px 24px rgba(255, 59, 59, 0.15),
+                    -6px -6px 12px rgba(255, 255, 255, 1);
+            }
+
+            .stat-card-highlight .stat-value {
+                font-size: 3.2rem !important;
+                color: var(--primary-red);
+                font-weight: 800;
+                text-shadow: 2px 2px 4px rgba(255, 59, 59, 0.1);
+            }
+
+            .stat-card-highlight::before {
+                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+                height: 5px;
+            }
+
+            .stat-card-highlight:hover {
+                transform: translateY(-6px);
+                box-shadow:
+                    0 0 0 4px rgba(255, 59, 59, 0.15),
+                    16px 16px 32px rgba(255, 59, 59, 0.2),
+                    -8px -8px 16px rgba(255, 255, 255, 1);
             }
 
             /* Floating animation */
@@ -368,32 +373,23 @@
         }
 
         .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            margin-bottom: 20px;
-            background: var(--hologram-gradient);
-            background-size: 200% 200%;
-            animation: gradientShift 5s ease infinite;
-            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.3);
-            position: relative;
-            overflow: hidden;
+            font-size: 24px;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+            color: white;
+            box-shadow: 4px 4px 8px rgba(255, 59, 59, 0.2), -2px -2px 4px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
         }
 
-            .stat-icon::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: linear-gradient( 45deg, transparent, rgba(255, 255, 255, 0.3), transparent );
-                transform: rotate(45deg);
-                animation: shine 3s infinite;
+            .stat-card:hover .stat-icon {
+                transform: scale(1.05) rotate(5deg);
+                box-shadow: 6px 6px 12px rgba(255, 59, 59, 0.3), -3px -3px 6px rgba(255, 255, 255, 0.7);
             }
 
         @keyframes gradientShift {
@@ -447,36 +443,42 @@
         .stat-value {
             font-size: 32px;
             font-weight: 700;
-            color: #fff;
-            margin-bottom: 5px;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            line-height: 1.2;
         }
 
         .stat-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            margin-bottom: 10px;
+            color: var(--text-gray);
+            font-size: 13px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .stat-change {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
             .stat-change.positive {
-                background: rgba(0, 255, 157, 0.1);
-                border: 1px solid rgba(0, 255, 157, 0.3);
-                color: var(--neon-lime);
+                background: rgba(255, 59, 59, 0.08);
+                border: 1px solid rgba(255, 59, 59, 0.2);
+                color: var(--primary-red);
             }
 
             .stat-change.negative {
-                background: rgba(255, 0, 255, 0.1);
-                border: 1px solid rgba(255, 0, 255, 0.3);
-                color: var(--neon-magenta);
+                background: rgba(255, 107, 107, 0.08);
+                border: 1px solid rgba(255, 107, 107, 0.2);
+                color: var(--primary-red-light);
             }
 
         /* User Level Badge */
@@ -486,35 +488,39 @@
             border-radius: 20px;
             font-weight: 600;
             font-size: 14px;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: var(--bg-gray);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .level-diamond {
-            background: var(--hologram-gradient);
-            color: var(--dark-bg);
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+            color: white;
+            border-color: var(--primary-red);
         }
 
         .level-gold {
             background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
             color: #713f12;
+            border-color: #facc15;
         }
 
         .level-silver {
             background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
             color: #1f2937;
+            border-color: #9ca3af;
         }
 
         .level-bronze {
             background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
             color: #7c2d12;
+            border-color: #fb923c;
         }
 
         .level-beginner {
-            background: linear-gradient(135deg, rgba(0, 243, 255, 0.3) 0%, rgba(0, 102, 255, 0.3) 100%);
-            color: white;
-            border: 1px solid rgba(0, 243, 255, 0.3);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: #075985;
+            border-color: #0ea5e9;
         }
 
         /* 3D Chart Container */
@@ -560,14 +566,14 @@
 
         /* Leaderboard Card */
         .leaderboard-card {
-            background: var(--card-bg);
-            border-radius: 25px;
-            padding: 30px;
+            /* 🎨 Light theme with 3D backshadow */
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 32px;
             position: relative;
             overflow: hidden;
-            box-shadow: 25px 25px 50px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(30, 33, 57, 0.3), inset 0 0 0 1px var(--glass-border);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-3d);
+            border: none;
         }
 
             .leaderboard-card::before {
@@ -576,67 +582,61 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 3px;
-                background: var(--hologram-gradient);
-                z-index: 1;
-            }
-
-            .leaderboard-card::after {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: var(--hologram-gradient);
-                background-size: 400% 400%;
-                opacity: 0.03;
-                animation: holographicWave 20s linear infinite;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
             }
 
         .leaderboard-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-            background: rgba(30, 33, 57, 0.5);
-            position: relative;
-            z-index: 1;
+            gap: 16px;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            background: var(--bg-gray);
+            border: 1px solid transparent;
         }
 
             .leaderboard-item:hover {
-                background: rgba(0, 243, 255, 0.1);
-                transform: translateX(10px);
+                background: rgba(255, 59, 59, 0.04);
+                border-color: rgba(255, 59, 59, 0.15);
+                transform: translateX(6px);
+                box-shadow: 4px 4px 8px rgba(255, 59, 59, 0.08);
             }
 
         .leaderboard-rank {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
+            font-size: 16px;
             color: white;
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-magenta));
+            background: linear-gradient(135deg, var(--primary-red), var(--primary-red-light));
+            box-shadow: 3px 3px 6px rgba(255, 59, 59, 0.25);
         }
 
         .rank-1 {
-            background: var(--hologram-gradient);
-            color: var(--dark-bg);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #fff;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2), 4px 4px 8px rgba(255, 215, 0, 0.3);
+            font-size: 18px;
         }
 
         .rank-2 {
-            background: linear-gradient(135deg, #c0c0c0, #e5e5e5);
-            color: #000;
+            background: linear-gradient(135deg, #C0C0C0, #E8E8E8);
+            color: #2d3748;
+            box-shadow: 3px 3px 6px rgba(192, 192, 192, 0.3);
         }
 
         .rank-3 {
-            background: linear-gradient(135deg, #cd7f32, #e6a968);
+            background: linear-gradient(135deg, #CD7F32, #E6A968);
             color: #fff;
+            box-shadow: 3px 3px 6px rgba(205, 127, 50, 0.3);
         }
 
         .leaderboard-user {
@@ -645,17 +645,21 @@
 
         .leaderboard-name {
             font-weight: 600;
-            color: #fff;
+            color: var(--text-dark);
+            font-size: 15px;
+            margin-bottom: 2px;
         }
 
         .leaderboard-entries {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            color: var(--text-gray);
+            font-weight: 500;
         }
 
         .leaderboard-earnings {
             font-weight: 700;
-            color: var(--neon-cyan);
+            color: var(--primary-red);
+            font-size: 15px;
         }
 
         /* Progress Bar */
@@ -779,11 +783,11 @@
                     <h1 id="welcomeMessage" class="header-title">
                         Welcome back, User! 👋
                     </h1>
-                    <p style="color: rgba(255, 255, 255, 0.7); position: relative; z-index: 1;">Dashboard penghasilan dan performa Anda</p>
+                    <p style="color: var(--text-gray); position: relative; z-index: 1;">Dashboard penghasilan dan performa Anda</p>
                 </div>
                 <div class="text-end">
-                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px; position: relative; z-index: 1;">Current Time</div>
-                    <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--neon-cyan); position: relative; z-index: 1;">Loading...</div>
+                    <div style="color: var(--text-gray); font-size: 14px; position: relative; z-index: 1;">Current Time</div>
+                    <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--primary-red); position: relative; z-index: 1;">Loading...</div>
                 </div>
             </div>
         </div>
@@ -834,6 +838,18 @@
 
         <!-- Stats Cards -->
         <div class="stats-grid">
+            <!-- NEW: Total Global Entries Card -->
+            <div class="stat-card stat-card-highlight">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="stat-value" id="globalTotalEntries">0</div>
+                <div class="stat-label">Total Entries (Global)</div>
+                <span class="stat-change positive">
+                    <i class="fas fa-globe"></i> Semua User
+                </span>
+            </div>
+
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-box"></i>
@@ -867,37 +883,16 @@
                 </span>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="stat-value" id="verifiedCount">0</div>
-                <div class="stat-label">Data Verified</div>
-                <span class="stat-change positive">
-                    <i class="fas fa-check"></i> 95% accuracy
-                </span>
-            </div>
         </div>
 
-        <!-- Charts Row -->
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="chart-3d">
-                    <h3 style="color: var(--neon-cyan); margin-bottom: 20px; position: relative; z-index: 1;">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        Performa Harian (7 Hari Terakhir)
-                    </h3>
-                    <canvas id="performanceChart" height="135"></canvas>
-                </div>
-            </div>
 
 
 
-            <div class="col-lg-4">
+            <div class="col-lg-12">
                 <div class="leaderboard-card">
-                    <h3 style="color: var(--neon-cyan); margin-bottom: 20px; position: relative; z-index: 1;">
-                        <i class="fas fa-trophy me-2"></i>
-                        Top Performers
+                    <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-trophy" style="color: var(--primary-red); font-size: 22px;"></i>
+                        <span>Top Performers</span>
                     </h3>
                     <div id="leaderboardList">
                         <!-- Will be populated by JavaScript -->
@@ -1183,8 +1178,8 @@ async function fetchUserStats() {
             return;
         }
 
-        const response = await fetch('/api/dashboard/user-stats', {
-            headers: { 
+        const response = await fetch('/api/dashboard/global-stats', {
+            headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
@@ -1194,7 +1189,10 @@ async function fetchUserStats() {
             throw new Error('Network response was not ok');
         }
 
-        const stats = await response.json();
+        const result = await response.json();
+        // Extract data from {success: true, data: {...}} format
+        const stats = result.data || result;
+        console.log('📊 Global stats from inline script:', stats);
         // Update UI dengan stats
         updateDashboardUI(stats);
     } catch (error) {
@@ -1231,4 +1229,5 @@ async function fetchLeaderboard() {
     </script>
     <script src="/js/dashboard.js"></script>
 </body>
+
 </html>
