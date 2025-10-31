@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/config.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
@@ -885,6 +887,7 @@
 
         </div>
 
+<<<<<<< HEAD
         <!-- Leaderboards Section -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; margin-bottom: 30px;">
 
@@ -903,6 +906,65 @@
                             <div class="leaderboard-entries">0 entries today</div>
                         </div>
                         <div class="leaderboard-earnings">Rp 0</div>
+=======
+<<<<<<< HEAD
+        <!-- Top Performers Leaderboard -->
+        <div class="leaderboard-card">
+            <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-trophy" style="color: var(--primary-red); font-size: 22px;"></i>
+                <span>Top Performers</span>
+            </h3>
+            <div id="leaderboardList">
+                <!-- Will be populated by JavaScript -->
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank rank-1">1</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-name">Loading...</div>
+                        <div class="leaderboard-entries">0 entries</div>
+=======
+
+
+
+            <!-- Top Performers Harian -->
+            <div class="col-lg-6">
+                <div class="leaderboard-card">
+                    <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-calendar-day" style="color: var(--primary-red); font-size: 22px;"></i>
+                        <span>Top Performers Hari Ini</span>
+                    </h3>
+                    <div id="dailyLeaderboardList">
+                        <!-- Will be populated by JavaScript -->
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank rank-1">1</div>
+                            <div class="leaderboard-user">
+                                <div class="leaderboard-name">Loading...</div>
+                                <div class="leaderboard-entries">0 entries</div>
+                            </div>
+                            <div class="leaderboard-earnings">Rp 0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Performers Total -->
+            <div class="col-lg-6">
+                <div class="leaderboard-card">
+                    <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-trophy" style="color: #FFD700; font-size: 22px;"></i>
+                        <span>Top Performers Total</span>
+                    </h3>
+                    <div id="totalLeaderboardList">
+                        <!-- Will be populated by JavaScript -->
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank rank-1">1</div>
+                            <div class="leaderboard-user">
+                                <div class="leaderboard-name">Loading...</div>
+                                <div class="leaderboard-entries">0 entries</div>
+                            </div>
+                            <div class="leaderboard-earnings">Rp 0</div>
+                        </div>
+>>>>>>> c48299b (Add Top Performer system with daily and total leaderboards)
+>>>>>>> e091905 (Add Top Performer system with daily and total leaderboards)
                     </div>
                 </div>
             </div>
@@ -958,8 +1020,377 @@
 
         // User stats and leaderboard are now handled by RealtimeDashboard class in dashboard.js
 
+<<<<<<< HEAD
         // Dashboard initialization is handled by dashboard.js
         // All chart and data loading logic moved to external JS file
+=======
+                    // Update earnings
+                    const totalEarnings = stats.total_entries * 500;
+                    document.getElementById('totalEarnings').innerHTML = `${formatCurrency(totalEarnings)}<sup>,-</sup>`;
+                    document.getElementById('totalEntriesCount').textContent = stats.total_entries;
+
+                    // Update period earnings
+                    document.getElementById('todayEarnings').textContent = formatCurrency(stats.entries_today * 500);
+                    document.getElementById('weekEarnings').textContent = formatCurrency(stats.entries_this_week * 500);
+                    document.getElementById('monthEarnings').textContent = formatCurrency(stats.entries_this_month * 500);
+
+                    // Update stats cards
+                    document.getElementById('todayEntries').textContent = stats.entries_today;
+                    document.getElementById('weekEntries').textContent = stats.entries_this_week;
+                    document.getElementById('avgSelisih').textContent = `${(stats.avg_selisih || 0).toFixed(2)} kg`;
+                    document.getElementById('verifiedCount').textContent = stats.verified_count || 0;
+
+                    // Update level
+                    const level = getUserLevel(stats.total_entries);
+                    const levelElement = document.getElementById('userLevel');
+                    levelElement.className = `user-level ${level.class}`;
+                    levelElement.innerHTML = `<i class="fas fa-medal me-1"></i> ${level.name}`;
+
+                    // Update progress bar
+                    if (level.next) {
+                        const progress = ((stats.total_entries % level.next) / level.next) * 100;
+                        document.getElementById('levelProgress').style.width = `${progress}%`;
+                        document.getElementById('progressText').textContent = `${stats.total_entries}/${level.next} entries`;
+                    } else {
+                        document.getElementById('levelProgress').style.width = '100%';
+                        document.getElementById('progressText').textContent = 'Max Level Reached!';
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+                // Use dummy data for demo
+                const dummyEntries = 245;
+                const totalEarnings = dummyEntries * 500;
+
+                document.getElementById('totalEarnings').innerHTML = `${formatCurrency(totalEarnings)}<sup>,-</sup>`;
+                document.getElementById('totalEntriesCount').textContent = dummyEntries;
+                document.getElementById('todayEarnings').textContent = formatCurrency(12 * 500);
+                document.getElementById('weekEarnings').textContent = formatCurrency(67 * 500);
+                document.getElementById('monthEarnings').textContent = formatCurrency(245 * 500);
+
+                document.getElementById('todayEntries').textContent = '12';
+                document.getElementById('weekEntries').textContent = '67';
+                document.getElementById('avgSelisih').textContent = '2.3 kg';
+                document.getElementById('verifiedCount').textContent = '232';
+
+                // Set level to Silver for demo
+                const levelElement = document.getElementById('userLevel');
+                levelElement.className = 'user-level level-silver';
+                levelElement.innerHTML = '<i class="fas fa-medal me-1"></i> Silver';
+                document.getElementById('levelProgress').style.width = '45%';
+                document.getElementById('progressText').textContent = '245/500 entries';
+            }
+        }
+
+        // Initialize Supabase
+        const supabase = initSupabase();
+
+        // Fetch Daily Top Performers
+        async function fetchDailyTopPerformers() {
+            try {
+                if (!supabase) {
+                    console.error('Supabase not initialized');
+                    displayDailyLeaderboard([]);
+                    return;
+                }
+
+                // Query dari view daily_top_performers
+                const { data, error } = await supabase
+                    .from('daily_top_performers')
+                    .select('*')
+                    .limit(5);
+
+                if (error) {
+                    console.error('Error fetching daily top performers:', error);
+                    // Fallback: Calculate dari entries langsung
+                    const today = new Date().toISOString().split('T')[0];
+                    const { data: entries, error: entriesError } = await supabase
+                        .from('entries')
+                        .select('created_by')
+                        .gte('created_at', today + 'T00:00:00')
+                        .lte('created_at', today + 'T23:59:59');
+
+                    if (!entriesError && entries) {
+                        const grouped = entries.reduce((acc, entry) => {
+                            if (entry.created_by) {
+                                acc[entry.created_by] = (acc[entry.created_by] || 0) + 1;
+                            }
+                            return acc;
+                        }, {});
+
+                        const leaderboard = Object.entries(grouped)
+                            .map(([username, count]) => ({
+                                rank: 0,
+                                username,
+                                daily_entries: count,
+                                daily_earnings: count * 500
+                            }))
+                            .sort((a, b) => b.daily_entries - a.daily_entries)
+                            .slice(0, 5)
+                            .map((item, index) => ({ ...item, rank: index + 1 }));
+
+                        displayDailyLeaderboard(leaderboard);
+                    } else {
+                        displayDailyLeaderboard([]);
+                    }
+                } else {
+                    displayDailyLeaderboard(data || []);
+                }
+            } catch (error) {
+                console.error('Error fetching daily top performers:', error);
+                displayDailyLeaderboard([]);
+            }
+        }
+
+        // Fetch Total Top Performers
+        async function fetchTotalTopPerformers() {
+            try {
+                if (!supabase) {
+                    console.error('Supabase not initialized');
+                    displayTotalLeaderboard([]);
+                    return;
+                }
+
+                // Query dari view total_top_performers
+                const { data, error } = await supabase
+                    .from('total_top_performers')
+                    .select('*')
+                    .limit(5);
+
+                if (error) {
+                    console.error('Error fetching total top performers:', error);
+                    // Fallback: Calculate dari entries langsung
+                    const { data: entries, error: entriesError } = await supabase
+                        .from('entries')
+                        .select('created_by');
+
+                    if (!entriesError && entries) {
+                        const grouped = entries.reduce((acc, entry) => {
+                            if (entry.created_by) {
+                                acc[entry.created_by] = (acc[entry.created_by] || 0) + 1;
+                            }
+                            return acc;
+                        }, {});
+
+                        const leaderboard = Object.entries(grouped)
+                            .map(([username, count]) => ({
+                                rank: 0,
+                                username,
+                                total_entries: count,
+                                total_earnings: count * 500
+                            }))
+                            .sort((a, b) => b.total_entries - a.total_entries)
+                            .slice(0, 5)
+                            .map((item, index) => ({ ...item, rank: index + 1 }));
+
+                        displayTotalLeaderboard(leaderboard);
+                    } else {
+                        displayTotalLeaderboard([]);
+                    }
+                } else {
+                    displayTotalLeaderboard(data || []);
+                }
+            } catch (error) {
+                console.error('Error fetching total top performers:', error);
+                displayTotalLeaderboard([]);
+            }
+        }
+
+        // Display Daily Leaderboard
+        function displayDailyLeaderboard(data) {
+            if (!data || data.length === 0) {
+                document.getElementById('dailyLeaderboardList').innerHTML = `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-user" style="text-align: center; color: var(--text-gray);">
+                            <div class="leaderboard-name">Belum ada data hari ini</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const leaderboardHtml = data.map(user => {
+                const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
+                const entries = user.daily_entries || 0;
+                const earnings = user.daily_earnings || (entries * 500);
+
+                return `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-name">${user.username}</div>
+                            <div class="leaderboard-entries">${entries} entries hari ini</div>
+                        </div>
+                        <div class="leaderboard-earnings">${formatCurrency(earnings)}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('dailyLeaderboardList').innerHTML = leaderboardHtml;
+        }
+
+        // Display Total Leaderboard
+        function displayTotalLeaderboard(data) {
+            if (!data || data.length === 0) {
+                document.getElementById('totalLeaderboardList').innerHTML = `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-user" style="text-align: center; color: var(--text-gray);">
+                            <div class="leaderboard-name">Belum ada data</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const leaderboardHtml = data.map(user => {
+                const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
+                const entries = user.total_entries || 0;
+                const earnings = user.total_earnings || (entries * 500);
+
+                return `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-name">${user.username}</div>
+                            <div class="leaderboard-entries">${entries} total entries</div>
+                        </div>
+                        <div class="leaderboard-earnings">${formatCurrency(earnings)}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('totalLeaderboardList').innerHTML = leaderboardHtml;
+        }
+
+        // Fetch both leaderboards
+        async function fetchLeaderboards() {
+            await Promise.all([
+                fetchDailyTopPerformers(),
+                fetchTotalTopPerformers()
+            ]);
+        }
+
+        // Initialize Performance Chart
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(0, 243, 255, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(255, 0, 255, 0.5)');
+        gradient.addColorStop(1, 'rgba(0, 255, 157, 0.2)');
+
+        const performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                datasets: [{
+                    label: 'Entries',
+                    data: [45, 52, 38, 65, 48, 55, 42],
+                    borderColor: '#00f3ff',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    pointBackgroundColor: '#00f3ff',
+                    pointBorderColor: '#0a0a1a',
+                    pointBorderWidth: 3,
+                    pointStyle: 'rectRounded'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(10, 10, 26, 0.9)',
+                        titleColor: '#00f3ff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#00f3ff',
+                        borderWidth: 1,
+                        padding: 15,
+                        bodyFont: {
+                            size: 14
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.parsed.y} entries = ${formatCurrency(context.parsed.y * 500)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 243, 255, 0.1)',
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            callback: function(value) {
+                                return value + ' entries';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 243, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+       
+async function fetchUserStats() {
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            console.error('No access token found');
+            return;
+        }
+
+        const response = await fetch('/api/dashboard/global-stats', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const result = await response.json();
+        // Extract data from {success: true, data: {...}} format
+        const stats = result.data || result;
+        console.log('📊 Global stats from inline script:', stats);
+        // Update UI dengan stats
+        updateDashboardUI(stats);
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+    }
+}
+
+        // Initialize dashboard - fetch leaderboards on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loaded, fetching top performers...');
+            fetchLeaderboards();
+
+            // Refresh leaderboards every 5 minutes
+            setInterval(fetchLeaderboards, 5 * 60 * 1000);
+        });
+>>>>>>> c48299b (Add Top Performer system with daily and total leaderboards)
     </script>
     <script src="/js/dashboard.js?v=3.1"></script>
 </body>
