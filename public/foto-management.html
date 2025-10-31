@@ -12,9 +12,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
         :root {
+            /* 🇮🇩 MERAH PUTIH - Indonesian Flag Theme */
             --primary-red: #ff3b3b;
-            --primary-red-dark: #e63535;
-            --primary-red-light: #ff6b6b;
+            --primary-red-dark: #ce1126;  /* Official Indonesian Red */
+            --primary-red-light: #ff8a8a;
             --bg-white: #ffffff;
             --bg-gray: #f5f7fa;
             --surface: #ffffff;
@@ -24,6 +25,7 @@
             --border-color: rgba(0, 0, 0, 0.1);
             --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
             --border-radius: 16px;
+            --red-success: #ff6b6b;  /* Light red for success */
         }
 
         * {
@@ -179,23 +181,25 @@
         }
 
         .btn-danger {
-            background: #ef4444;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            /* 🇮🇩 Dark Red for Delete */
+            background: var(--primary-red-dark);
+            box-shadow: 0 4px 12px rgba(206, 17, 38, 0.3);
         }
 
         .btn-danger:hover {
-            background: #dc2626;
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+            background: #a00f1f;
+            box-shadow: 0 6px 16px rgba(206, 17, 38, 0.4);
         }
 
         .btn-success {
-            background: #22c55e;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            /* 🇮🇩 Light Red for Download */
+            background: var(--primary-red);
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
 
         .btn-success:hover {
-            background: #16a34a;
-            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+            background: var(--primary-red-dark);
+            box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
         }
 
         .action-bar {
@@ -305,35 +309,38 @@
         }
 
         .btn-view {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border: 1px solid #3b82f6;
+            /* 🇮🇩 Red for View */
+            background: rgba(255, 59, 59, 0.1);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
         }
 
         .btn-view:hover {
-            background: #3b82f6;
+            background: var(--primary-red);
             color: white;
         }
 
         .btn-download {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-            border: 1px solid #22c55e;
+            /* 🇮🇩 Light Red for Download */
+            background: rgba(255, 138, 138, 0.1);
+            color: var(--red-success);
+            border: 1px solid var(--red-success);
         }
 
         .btn-download:hover {
-            background: #22c55e;
+            background: var(--red-success);
             color: white;
         }
 
         .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid #ef4444;
+            /* 🇮🇩 Dark Red for Delete */
+            background: rgba(206, 17, 38, 0.1);
+            color: var(--primary-red-dark);
+            border: 1px solid var(--primary-red-dark);
         }
 
         .btn-delete:hover {
-            background: #ef4444;
+            background: var(--primary-red-dark);
             color: white;
         }
 
@@ -1089,10 +1096,12 @@
         // ==========================================
         function renderPagination() {
             const pagination = document.getElementById('pagination');
+            const paginationTop = document.getElementById('paginationTop');
             const totalPages = Math.ceil(filteredPhotos.length / photosPerPage);
 
             if (totalPages <= 1) {
-                pagination.innerHTML = '';
+                if (pagination) pagination.innerHTML = '';
+                if (paginationTop) paginationTop.innerHTML = '';
                 return;
             }
 
@@ -1120,7 +1129,9 @@
                 </button>
             `;
 
-            pagination.innerHTML = html;
+            // Update both pagination elements
+            if (pagination) pagination.innerHTML = html;
+            if (paginationTop) paginationTop.innerHTML = html;
         }
 
         function changePage(page) {
