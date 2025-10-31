@@ -200,15 +200,24 @@ class RealtimeDashboard {
     }
 
     updateLeaderboard(leaderboard) {
+        console.log('🎯 updateLeaderboard called with:', leaderboard);
+
         if (!leaderboard || !Array.isArray(leaderboard)) {
-            console.error('Invalid leaderboard data:', leaderboard);
+            console.error('❌ Invalid leaderboard data:', leaderboard);
             return;
         }
+
+        if (leaderboard.length === 0) {
+            console.warn('⚠️ Leaderboard is empty');
+            return;
+        }
+
+        console.log(`✅ Processing ${leaderboard.length} leaderboard entries`);
 
         const leaderboardHtml = leaderboard.map(user => {
             const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
             const userEarnings = (user.total_entries || user.entries_count || 0) * 500;
-            
+
             return `
                 <div class="leaderboard-item">
                     <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
@@ -223,7 +232,11 @@ class RealtimeDashboard {
 
         const leaderboardList = document.getElementById('leaderboardList');
         if (leaderboardList) {
+            console.log('📝 Updating leaderboard HTML...');
             leaderboardList.innerHTML = leaderboardHtml;
+            console.log('✅ Leaderboard updated successfully!');
+        } else {
+            console.error('❌ Element #leaderboardList not found!');
         }
     }
 
