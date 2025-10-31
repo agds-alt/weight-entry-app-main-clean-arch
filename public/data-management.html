@@ -450,6 +450,198 @@
                 padding: 32px;
             }
         }
+
+        /* Edit Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-container {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-gray);
+            color: var(--primary-red);
+        }
+
+        .modal-body {
+            padding: 24px 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-label .required {
+            color: var(--primary-red);
+            margin-left: 2px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--surface);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
+        }
+
+        .form-control:disabled {
+            background: var(--bg-gray);
+            cursor: not-allowed;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .modal-footer {
+            padding: 20px 28px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-modal {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-modal-cancel {
+            background: var(--bg-gray);
+            color: var(--text-primary);
+        }
+
+        .btn-modal-cancel:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-modal-save {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        .btn-modal-save:hover {
+            background: var(--primary-red-dark);
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+        }
+
+        .btn-modal-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-container {
+                max-height: 95vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -613,6 +805,99 @@
             </div>
         </div>
     </main>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal" onclick="if(event.target === this) closeEditModal()">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-edit" style="color: var(--primary-red); margin-right: 8px;"></i>
+                    Edit Data Entry
+                </h3>
+                <button class="modal-close" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editId">
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Nama <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="editNama" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            No Resi <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="editNoResi" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Berat Resi (kg) <span class="required">*</span>
+                            </label>
+                            <input type="number" step="0.01" class="form-control" id="editBeratResi" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Berat Aktual (kg) <span class="required">*</span>
+                            </label>
+                            <input type="number" step="0.01" class="form-control" id="editBeratAktual" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Selisih (kg)
+                        </label>
+                        <input type="number" step="0.01" class="form-control" id="editSelisih" readonly disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Status <span class="required">*</span>
+                        </label>
+                        <select class="form-control form-select" id="editStatus" required>
+                            <option value="">Pilih Status</option>
+                            <option value="submitted">Submitted</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Notes
+                        </label>
+                        <textarea class="form-control" id="editNotes" rows="3" placeholder="Optional notes..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Created By</label>
+                        <input type="text" class="form-control" id="editCreatedBy" readonly disabled>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn-modal btn-modal-save" id="saveEditBtn" onclick="saveEdit()">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ==========================================
@@ -960,10 +1245,142 @@
             link.click();
         }
 
-        // Edit Entry
+        // ==========================================
+        // EDIT MODAL FUNCTIONS
+        // ==========================================
+
+        // Open Edit Modal
         async function editEntry(id) {
-            alert(`Edit feature coming soon! ID: ${id}`);
+            try {
+                console.log(`📝 Opening edit modal for ID: ${id}`);
+
+                // Find entry in current data
+                const entry = allData.find(item => item.id === id);
+                if (!entry) {
+                    alert('❌ Data not found!');
+                    return;
+                }
+
+                // Populate form fields
+                document.getElementById('editId').value = entry.id;
+                document.getElementById('editNama').value = entry.nama || '';
+                document.getElementById('editNoResi').value = entry.no_resi || '';
+                document.getElementById('editBeratResi').value = entry.berat_resi || '';
+                document.getElementById('editBeratAktual').value = entry.berat_aktual || '';
+                document.getElementById('editSelisih').value = entry.selisih || '';
+                document.getElementById('editStatus').value = entry.status || '';
+                document.getElementById('editNotes').value = entry.notes || '';
+                document.getElementById('editCreatedBy').value = entry.created_by || '-';
+
+                // Show modal
+                document.getElementById('editModal').classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scroll
+
+                console.log('✅ Edit modal opened successfully');
+            } catch (error) {
+                console.error('❌ Error opening edit modal:', error);
+                alert('Error opening edit modal: ' + error.message);
+            }
         }
+
+        // Close Edit Modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            document.body.style.overflow = ''; // Restore scroll
+            document.getElementById('editForm').reset();
+            console.log('✅ Edit modal closed');
+        }
+
+        // Save Edit
+        async function saveEdit() {
+            try {
+                const saveBtn = document.getElementById('saveEditBtn');
+
+                // Get form data
+                const id = parseInt(document.getElementById('editId').value);
+                const nama = document.getElementById('editNama').value.trim();
+                const no_resi = document.getElementById('editNoResi').value.trim();
+                const berat_resi = parseFloat(document.getElementById('editBeratResi').value);
+                const berat_aktual = parseFloat(document.getElementById('editBeratAktual').value);
+                const status = document.getElementById('editStatus').value;
+                const notes = document.getElementById('editNotes').value.trim();
+
+                // Validation
+                if (!nama || !no_resi || isNaN(berat_resi) || isNaN(berat_aktual) || !status) {
+                    alert('⚠️ Please fill all required fields!');
+                    return;
+                }
+
+                // Calculate selisih
+                const selisih = berat_aktual - berat_resi;
+
+                // Disable button and show loading
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                console.log(`💾 Updating entry ID ${id}...`);
+
+                // Update Supabase
+                const { data, error } = await supabase
+                    .from('entries')
+                    .update({
+                        nama: nama,
+                        no_resi: no_resi,
+                        berat_resi: berat_resi,
+                        berat_aktual: berat_aktual,
+                        selisih: selisih,
+                        status: status,
+                        notes: notes || null,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', id)
+                    .select();
+
+                if (error) throw error;
+
+                console.log('✅ Entry updated successfully:', data);
+
+                // Success feedback
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+
+                // Close modal and refresh data
+                setTimeout(() => {
+                    closeEditModal();
+                    fetchData(); // Refresh table
+                    alert('✅ Data berhasil diupdate!');
+
+                    // Reset button
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                }, 500);
+
+            } catch (error) {
+                console.error('❌ Error saving edit:', error);
+                alert('❌ Error saving data: ' + error.message);
+
+                // Reset button
+                const saveBtn = document.getElementById('saveEditBtn');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+            }
+        }
+
+        // Auto-calculate selisih when weights change
+        document.addEventListener('DOMContentLoaded', function() {
+            const beratResiInput = document.getElementById('editBeratResi');
+            const beratAktualInput = document.getElementById('editBeratAktual');
+            const selisihInput = document.getElementById('editSelisih');
+
+            function calculateSelisih() {
+                const beratResi = parseFloat(beratResiInput.value) || 0;
+                const beratAktual = parseFloat(beratAktualInput.value) || 0;
+                const selisih = beratAktual - beratResi;
+                selisihInput.value = selisih.toFixed(2);
+            }
+
+            beratResiInput.addEventListener('input', calculateSelisih);
+            beratAktualInput.addEventListener('input', calculateSelisih);
+        });
 
         // Delete Entry
         async function deleteEntry(id) {
