@@ -1094,50 +1094,79 @@
                     return;
                 }
 
-                // Query dari view daily_top_performers
+                console.log('📊 Fetching daily top performers...');
+
+                // STRATEGY 1: Try user_statistics table (most reliable, data already there!)
+                const { data: statsData, error: statsError } = await supabase
+                    .from('user_statistics')
+                    .select('username, daily_entries, daily_earnings, avg_selisih')
+                    .gt('daily_entries', 0)
+                    .order('daily_entries', { ascending: false })
+                    .limit(5);
+
+                if (!statsError && statsData && statsData.length > 0) {
+                    const leaderboard = statsData.map((item, index) => ({
+                        rank: index + 1,
+                        username: item.username,
+                        daily_entries: item.daily_entries,
+                        daily_earnings: item.daily_earnings
+                    }));
+                    console.log('✅ Daily performers from user_statistics:', leaderboard);
+                    displayDailyLeaderboard(leaderboard);
+                    return;
+                }
+
+                console.log('⚠️ user_statistics empty, trying view...');
+
+                // STRATEGY 2: Try from view daily_top_performers
                 const { data, error } = await supabase
                     .from('daily_top_performers')
                     .select('*')
                     .limit(5);
 
-                if (error) {
-                    console.error('Error fetching daily top performers:', error);
-                    // Fallback: Calculate dari entries langsung
-                    const today = new Date().toISOString().split('T')[0];
-                    const { data: entries, error: entriesError } = await supabase
-                        .from('entries')
-                        .select('created_by')
-                        .gte('created_at', today + 'T00:00:00')
-                        .lte('created_at', today + 'T23:59:59');
+                if (!error && data && data.length > 0) {
+                    console.log('✅ Daily performers from VIEW:', data);
+                    displayDailyLeaderboard(data);
+                    return;
+                }
 
-                    if (!entriesError && entries) {
-                        const grouped = entries.reduce((acc, entry) => {
-                            if (entry.created_by) {
-                                acc[entry.created_by] = (acc[entry.created_by] || 0) + 1;
-                            }
-                            return acc;
-                        }, {});
+                console.log('⚠️ View failed, calculating from entries...');
 
-                        const leaderboard = Object.entries(grouped)
-                            .map(([username, count]) => ({
-                                rank: 0,
-                                username,
-                                daily_entries: count,
-                                daily_earnings: count * 500
-                            }))
-                            .sort((a, b) => b.daily_entries - a.daily_entries)
-                            .slice(0, 5)
-                            .map((item, index) => ({ ...item, rank: index + 1 }));
+                // STRATEGY 3: Fallback - Calculate from entries
+                const today = new Date().toISOString().split('T')[0];
+                const { data: entries, error: entriesError } = await supabase
+                    .from('entries')
+                    .select('created_by')
+                    .gte('created_at', today + 'T00:00:00')
+                    .lte('created_at', today + 'T23:59:59');
 
-                        displayDailyLeaderboard(leaderboard);
-                    } else {
-                        displayDailyLeaderboard([]);
-                    }
+                if (!entriesError && entries && entries.length > 0) {
+                    const grouped = entries.reduce((acc, entry) => {
+                        if (entry.created_by) {
+                            acc[entry.created_by] = (acc[entry.created_by] || 0) + 1;
+                        }
+                        return acc;
+                    }, {});
+
+                    const leaderboard = Object.entries(grouped)
+                        .map(([username, count]) => ({
+                            rank: 0,
+                            username,
+                            daily_entries: count,
+                            daily_earnings: count * 500
+                        }))
+                        .sort((a, b) => b.daily_entries - a.daily_entries)
+                        .slice(0, 5)
+                        .map((item, index) => ({ ...item, rank: index + 1 }));
+
+                    console.log('✅ Daily performers calculated:', leaderboard);
+                    displayDailyLeaderboard(leaderboard);
                 } else {
-                    displayDailyLeaderboard(data || []);
+                    console.log('❌ No daily data found');
+                    displayDailyLeaderboard([]);
                 }
             } catch (error) {
-                console.error('Error fetching daily top performers:', error);
+                console.error('❌ Error fetching daily top performers:', error);
                 displayDailyLeaderboard([]);
             }
         }
@@ -1151,47 +1180,75 @@
                     return;
                 }
 
-                // Query dari view total_top_performers
+                console.log('🏆 Fetching total top performers...');
+
+                // STRATEGY 1: Try user_statistics table (most reliable!)
+                const { data: statsData, error: statsError } = await supabase
+                    .from('user_statistics')
+                    .select('username, total_entries, total_earnings, avg_selisih')
+                    .order('total_entries', { ascending: false })
+                    .limit(5);
+
+                if (!statsError && statsData && statsData.length > 0) {
+                    const leaderboard = statsData.map((item, index) => ({
+                        rank: index + 1,
+                        username: item.username,
+                        total_entries: item.total_entries,
+                        total_earnings: item.total_earnings
+                    }));
+                    console.log('✅ Total performers from user_statistics:', leaderboard);
+                    displayTotalLeaderboard(leaderboard);
+                    return;
+                }
+
+                console.log('⚠️ user_statistics empty, trying view...');
+
+                // STRATEGY 2: Try from view total_top_performers
                 const { data, error } = await supabase
                     .from('total_top_performers')
                     .select('*')
                     .limit(5);
 
-                if (error) {
-                    console.error('Error fetching total top performers:', error);
-                    // Fallback: Calculate dari entries langsung
-                    const { data: entries, error: entriesError } = await supabase
-                        .from('entries')
-                        .select('created_by');
+                if (!error && data && data.length > 0) {
+                    console.log('✅ Total performers from VIEW:', data);
+                    displayTotalLeaderboard(data);
+                    return;
+                }
 
-                    if (!entriesError && entries) {
-                        const grouped = entries.reduce((acc, entry) => {
-                            if (entry.created_by) {
-                                acc[entry.created_by] = (acc[entry.created_by] || 0) + 1;
-                            }
-                            return acc;
-                        }, {});
+                console.log('⚠️ View failed, calculating from entries...');
 
-                        const leaderboard = Object.entries(grouped)
-                            .map(([username, count]) => ({
-                                rank: 0,
-                                username,
-                                total_entries: count,
-                                total_earnings: count * 500
-                            }))
-                            .sort((a, b) => b.total_entries - a.total_entries)
-                            .slice(0, 5)
-                            .map((item, index) => ({ ...item, rank: index + 1 }));
+                // STRATEGY 3: Fallback - Calculate from all entries
+                const { data: entries, error: entriesError } = await supabase
+                    .from('entries')
+                    .select('created_by');
 
-                        displayTotalLeaderboard(leaderboard);
-                    } else {
-                        displayTotalLeaderboard([]);
-                    }
+                if (!entriesError && entries && entries.length > 0) {
+                    const grouped = entries.reduce((acc, entry) => {
+                        if (entry.created_by) {
+                            acc[entry.created_by] = (acc[entry.created_by] || 0) + 1;
+                        }
+                        return acc;
+                    }, {});
+
+                    const leaderboard = Object.entries(grouped)
+                        .map(([username, count]) => ({
+                            rank: 0,
+                            username,
+                            total_entries: count,
+                            total_earnings: count * 500
+                        }))
+                        .sort((a, b) => b.total_entries - a.total_entries)
+                        .slice(0, 5)
+                        .map((item, index) => ({ ...item, rank: index + 1 }));
+
+                    console.log('✅ Total performers calculated:', leaderboard);
+                    displayTotalLeaderboard(leaderboard);
                 } else {
-                    displayTotalLeaderboard(data || []);
+                    console.log('❌ No total data found');
+                    displayTotalLeaderboard([]);
                 }
             } catch (error) {
-                console.error('Error fetching total top performers:', error);
+                console.error('❌ Error fetching total top performers:', error);
                 displayTotalLeaderboard([]);
             }
         }
