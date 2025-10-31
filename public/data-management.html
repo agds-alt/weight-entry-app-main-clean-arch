@@ -964,12 +964,24 @@
                 document.getElementById('noDataState').style.display = 'none';
 
                 console.log('🔍 Fetching data from Supabase...');
+
+                // First try to get count
+                const { count, error: countError } = await supabase
+                    .from('entries')
+                    .select('*', { count: 'exact', head: true });
+
+                console.log('📊 Total count in database:', count, 'Error:', countError);
+
+                // Then fetch actual data with limit (for performance with large datasets)
                 const { data, error } = await supabase
                     .from('entries')
                     .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, status, foto_url_1, foto_url_2, created_by, created_at, updated_at, notes')
-                    .order('created_at', { ascending: false });
+                    .order('created_at', { ascending: false })
+                    .limit(5000);
 
                 console.log('📦 Response received:', { dataCount: data?.length, error });
+                console.log('📦 Raw data:', data);
+                console.log('📦 Error object:', error);
 
                 if (error) throw error;
 
