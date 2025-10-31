@@ -1366,10 +1366,15 @@
         }
 
         // Auto-calculate selisih when weights change
-        document.addEventListener('DOMContentLoaded', function() {
+        function setupModalListeners() {
             const beratResiInput = document.getElementById('editBeratResi');
             const beratAktualInput = document.getElementById('editBeratAktual');
             const selisihInput = document.getElementById('editSelisih');
+
+            if (!beratResiInput || !beratAktualInput || !selisihInput) {
+                console.warn('⚠️ Modal form elements not found yet');
+                return;
+            }
 
             function calculateSelisih() {
                 const beratResi = parseFloat(beratResiInput.value) || 0;
@@ -1380,7 +1385,9 @@
 
             beratResiInput.addEventListener('input', calculateSelisih);
             beratAktualInput.addEventListener('input', calculateSelisih);
-        });
+
+            console.log('✅ Modal listeners setup complete');
+        }
 
         // Delete Entry
         async function deleteEntry(id) {
@@ -1402,26 +1409,43 @@
             }
         }
 
-        // Event Listeners
-        document.getElementById('applyFilter').addEventListener('click', applyFilters);
-        document.getElementById('resetFilter').addEventListener('click', resetFilters);
-        document.getElementById('exportData').addEventListener('click', exportToExcel);
+        // Initialize Everything
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing Data Management...');
 
-        // Real-time search
-        document.getElementById('filterSearch').addEventListener('input', function() {
-            if (this.value.length > 2 || this.value.length === 0) {
-                applyFilters();
+            // Setup event listeners for filter buttons
+            const applyBtn = document.getElementById('applyFilter');
+            const resetBtn = document.getElementById('resetFilter');
+            const exportBtn = document.getElementById('exportData');
+            const searchInput = document.getElementById('filterSearch');
+
+            if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+            if (resetBtn) resetBtn.addEventListener('click', resetFilters);
+            if (exportBtn) exportBtn.addEventListener('click', exportToExcel);
+
+            // Real-time search
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    if (this.value.length > 2 || this.value.length === 0) {
+                        applyFilters();
+                    }
+                });
             }
+
+            // Setup modal listeners
+            setupModalListeners();
+
+            // Initialize data
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            loadUserInfo();
+            fetchData();
+
+            // Refresh data every 30 seconds
+            setInterval(fetchData, 30000);
+
+            console.log('✅ Data Management initialized successfully!');
         });
-
-        // Initialize
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
-        loadUserInfo();
-        fetchData();
-
-        // Refresh data setiap 30 detik
-        setInterval(fetchData, 30000);
     </script>
     <script src="/js/config.js"></script>
      <script src="/js/sidebar.js"></script>
