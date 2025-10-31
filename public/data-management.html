@@ -966,7 +966,7 @@
                 console.log('🔍 Fetching data from Supabase...');
                 const { data, error } = await supabase
                     .from('entries')
-                    .select('*')
+                    .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, status, foto_url_1, foto_url_2, created_by, created_at, updated_at, notes')
                     .order('created_at', { ascending: false });
 
                 console.log('📦 Response received:', { dataCount: data?.length, error });
