@@ -200,30 +200,71 @@ class RealtimeDashboard {
     }
 
     updateLeaderboard(leaderboard) {
+        console.log('🎯 updateLeaderboard called with:', leaderboard);
+
         if (!leaderboard || !Array.isArray(leaderboard)) {
-            console.error('Invalid leaderboard data:', leaderboard);
+            console.error('❌ Invalid leaderboard data:', leaderboard);
             return;
         }
 
+        if (leaderboard.length === 0) {
+            console.warn('⚠️ Leaderboard is empty');
+            return;
+        }
+
+        console.log(`✅ Processing ${leaderboard.length} leaderboard entries`);
+
         const leaderboardHtml = leaderboard.map(user => {
             const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
-            const userEarnings = (user.total_entries || user.entries_count || 0) * 500;
-            
+
+            // Use total_earnings from user_statistics table if available
+            const totalEarnings = user.total_earnings || ((user.total_entries || 0) * 500);
+            const dailyEntries = user.daily_entries || 0;
+            const totalEntries = user.total_entries || user.entries_count || 0;
+
             return `
                 <div class="leaderboard-item">
                     <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
                     <div class="leaderboard-user">
                         <div class="leaderboard-name">${user.username}</div>
-                        <div class="leaderboard-entries">${user.total_entries || user.entries_count || 0} entries</div>
+                        <div class="leaderboard-entries">
+                            <span style="font-weight: 600;">${totalEntries} total</span>
+                            ${dailyEntries > 0 ? `<span style="color: var(--primary-red); margin-left: 8px;">+${dailyEntries} hari ini</span>` : ''}
+                        </div>
                     </div>
-                    <div class="leaderboard-earnings">${this.formatCurrency(userEarnings)}</div>
+                    <div class="leaderboard-earnings">${this.formatCurrency(totalEarnings)}</div>
                 </div>
             `;
         }).join('');
 
-        const leaderboardList = document.getElementById('leaderboardList');
-        if (leaderboardList) {
-            leaderboardList.innerHTML = leaderboardHtml;
+        // Safe DOM update with retry
+        this.safeUpdateElement('leaderboardList', leaderboardHtml);
+    }
+
+    safeUpdateElement(elementId, html, retryCount = 0, maxRetries = 5) {
+        const element = document.getElementById(elementId);
+
+        if (element) {
+            console.log(`📝 Updating #${elementId}...`);
+            element.innerHTML = html;
+            console.log(`✅ #${elementId} updated successfully!`);
+            return true;
+        } else {
+            console.warn(`⚠️ Element #${elementId} not found (attempt ${retryCount + 1}/${maxRetries})`);
+
+            if (retryCount < maxRetries) {
+                // Retry after delay
+                const delay = 100 * (retryCount + 1); // Increasing delay: 100ms, 200ms, 300ms...
+                console.log(`⏳ Retrying in ${delay}ms...`);
+
+                setTimeout(() => {
+                    this.safeUpdateElement(elementId, html, retryCount + 1, maxRetries);
+                }, delay);
+            } else {
+                console.error(`❌ Element #${elementId} not found after ${maxRetries} attempts!`);
+                console.error(`🔍 Available elements:`, document.querySelectorAll('[id]'));
+            }
+            return false;
         }
     }
 
@@ -280,6 +321,11 @@ class RealtimeDashboard {
 
 // Initialize dashboard when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Initializing RealtimeDashboard...');
-    new RealtimeDashboard();
+    console.log('🚀 DOM Loaded, waiting for sidebar...');
+
+    // Small delay to ensure sidebar.js has finished injecting
+    setTimeout(() => {
+        console.log('🚀 Initializing RealtimeDashboard...');
+        new RealtimeDashboard();
+    }, 100);
 });

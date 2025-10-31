@@ -77,50 +77,132 @@ router.get('/user-stats', authenticateToken, async (req, res) => {
 // Get global statistics (all entries from all users)
 router.get('/global-stats', authenticateToken, dashboardController.getGlobalStats);
 
-// Get leaderboard
-router.get('/leaderboard', authenticateToken, async (req, res) => {
-    try {
-        console.log('🏆 Fetching leaderboard');
+// ==========================================
+// LEADERBOARD ENDPOINTS - Using Views & user_statistics table
+// ==========================================
 
-        // Fetch all entries with created_by
-        const { data: entries, error } = await supabase
-            .from('entries')
-            .select('created_by')
-            .not('created_by', 'is', null);
+// 1. Daily Top Performers (from view)
+router.get('/leaderboard/daily', authenticateToken, async (req, res) => {
+    try {
+        console.log('🏆 Fetching daily top performers from view');
+
+        const { data, error } = await supabase
+            .from('daily_top_performers')
+            .select('*')
+            .limit(10);
 
         if (error) {
+            console.error('❌ Error fetching daily_top_performers:', error);
             throw error;
         }
 
-        // Count entries per user
-        const userCounts = {};
-        entries.forEach(entry => {
-            const username = entry.created_by;
-            userCounts[username] = (userCounts[username] || 0) + 1;
+        console.log('✅ Daily top performers:', data);
+        res.json(data || []);
+
+    } catch (error) {
+        console.error('❌ Error in daily leaderboard:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching daily leaderboard: ' + error.message,
+            data: []
         });
+    }
+});
 
-        // Convert to array, sort, and add rankings
-        const leaderboard = Object.entries(userCounts)
-            .map(([username, total_entries]) => ({
-                username,
-                total_entries
-            }))
-            .sort((a, b) => b.total_entries - a.total_entries)
-            .slice(0, 10) // Top 10
-            .map((item, index) => ({
-                rank: index + 1,
-                username: item.username,
-                total_entries: item.total_entries,
-                total_earnings: item.total_entries * 500
-            }));
+// 2. Total Top Performers (from view)
+router.get('/leaderboard/total', authenticateToken, async (req, res) => {
+    try {
+        console.log('🏆 Fetching total top performers from view');
 
-        console.log('🏆 Leaderboard result:', leaderboard);
+        const { data, error } = await supabase
+            .from('total_top_performers')
+            .select('*')
+            .limit(10);
+
+        if (error) {
+            console.error('❌ Error fetching total_top_performers:', error);
+            throw error;
+        }
+
+        console.log('✅ Total top performers:', data);
+        res.json(data || []);
+
+    } catch (error) {
+        console.error('❌ Error in total leaderboard:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching total leaderboard: ' + error.message,
+            data: []
+        });
+    }
+});
+
+// 3. User Statistics (from table - with cache)
+router.get('/leaderboard/statistics', authenticateToken, async (req, res) => {
+    try {
+        console.log('📊 Fetching user statistics from table');
+
+        const { data, error } = await supabase
+            .from('user_statistics')
+            .select('*')
+            .order('total_entries', { ascending: false })
+            .limit(10);
+
+        if (error) {
+            console.error('❌ Error fetching user_statistics:', error);
+            throw error;
+        }
+
+        console.log('✅ User statistics:', data);
+        res.json(data || []);
+
+    } catch (error) {
+        console.error('❌ Error in statistics:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user statistics: ' + error.message,
+            data: []
+        });
+    }
+});
+
+// 4. Legacy leaderboard endpoint (for backward compatibility)
+// Now uses user_statistics table for better performance
+router.get('/leaderboard', authenticateToken, async (req, res) => {
+    try {
+        console.log('🏆 Fetching leaderboard (using user_statistics table)');
+
+        const { data, error } = await supabase
+            .from('user_statistics')
+            .select('username, total_entries, total_earnings, avg_selisih, daily_entries, daily_earnings')
+            .order('total_entries', { ascending: false })
+            .limit(10);
+
+        if (error) {
+            console.error('❌ Error fetching from user_statistics:', error);
+            throw error;
+        }
+
+        // Transform to legacy format with rank
+        const leaderboard = (data || []).map((item, index) => ({
+            rank: index + 1,
+            username: item.username,
+            total_entries: parseInt(item.total_entries) || 0,
+            total_earnings: parseFloat(item.total_earnings) || 0,
+            avg_selisih: parseFloat(item.avg_selisih) || 0,
+            daily_entries: parseInt(item.daily_entries) || 0,
+            daily_earnings: parseFloat(item.daily_earnings) || 0
+        }));
+
+        console.log('✅ Leaderboard result:', leaderboard);
         res.json(leaderboard);
 
     } catch (error) {
         console.error('❌ Error in leaderboard:', error);
         res.status(500).json({
-            message: 'Error: ' + error.message
+            success: false,
+            message: 'Error fetching leaderboard: ' + error.message,
+            data: []
         });
     }
 });
