@@ -44,14 +44,14 @@ class RealtimeDashboard {
             console.log('🔄 Loading dashboard data...');
 
             const [statsResponse, leaderboardResponse] = await Promise.all([
-                fetch('/api/dashboard/user-stats', {
-                    headers: { 
+                fetch('/api/dashboard/global-stats', {
+                    headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 }),
                 fetch('/api/dashboard/leaderboard', {
-                    headers: { 
+                    headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
@@ -60,9 +60,10 @@ class RealtimeDashboard {
 
             // Handle stats response
             if (statsResponse.ok) {
-                const statsData = await statsResponse.json();
-                console.log('📊 Stats data from API:', statsData);
-                this.stats = statsData;
+                const response = await statsResponse.json();
+                console.log('📊 Global stats response from API:', response);
+                // Extract data from {success: true, data: {...}} format
+                this.stats = response.data || response;
                 this.updateDashboardUI();
             } else {
                 console.error('Stats API error:', statsResponse.status);

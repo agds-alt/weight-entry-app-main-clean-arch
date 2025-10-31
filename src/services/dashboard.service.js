@@ -2,6 +2,37 @@ const dashboardRepository = require('../repositories/dashboard.repository');
 
 class DashboardService {
     /**
+     * Get global statistics (all entries from all users)
+     */
+    async getGlobalStats() {
+        try {
+            const stats = await dashboardRepository.getGlobalStats();
+
+            // Calculate earnings (Rp 500 per entry)
+            const totalEarnings = stats.total_entries * 500;
+            const todayEarnings = stats.today_entries * 500;
+            const weekEarnings = stats.week_entries * 500;
+            const monthEarnings = stats.month_entries * 500;
+
+            return {
+                total_entries: stats.total_entries || 0,
+                today_entries: stats.today_entries || 0,
+                week_entries: stats.week_entries || 0,
+                month_entries: stats.month_entries || 0,
+                avg_selisih: parseFloat(stats.avg_selisih || 0).toFixed(2),
+                verified_count: stats.verified_count || 0,
+                total_earnings: totalEarnings,
+                today_earnings: todayEarnings,
+                week_earnings: weekEarnings,
+                month_earnings: monthEarnings
+            };
+        } catch (error) {
+            console.error('Get global stats service error:', error);
+            throw new Error('Failed to get global statistics');
+        }
+    }
+
+    /**
      * Get user statistics
      */
     async getUserStats(username) {

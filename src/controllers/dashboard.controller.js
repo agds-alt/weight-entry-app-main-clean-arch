@@ -2,6 +2,28 @@
 
 class DashboardController {
     /**
+     * Get global statistics (all entries from all users)
+     */
+    async getGlobalStats(req, res) {
+        try {
+            console.log('📊 Fetching global stats (all users)');
+
+            const stats = await dashboardService.getGlobalStats();
+
+            return res.json({
+                success: true,
+                data: stats
+            });
+        } catch (error) {
+            console.error('❌ Get global stats controller error:', error);
+            return res.status(500).json({
+                success: false,
+                message: error.message || 'Gagal mengambil statistik global'
+            });
+        }
+    }
+
+    /**
      * Get user statistics for dashboard
      */
     async getUserStats(req, res) {
