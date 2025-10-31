@@ -778,8 +778,6 @@
                     <thead>
                         <tr>
                             <th onclick="sortTable('id')">ID <i class="fas fa-sort"></i></th>
-                            <th>Foto 1</th>
-                            <th>Foto 2</th>
                             <th onclick="sortTable('nama')">Nama <i class="fas fa-sort"></i></th>
                             <th onclick="sortTable('no_resi')">No Resi <i class="fas fa-sort"></i></th>
                             <th onclick="sortTable('berat_resi')">Berat Resi <i class="fas fa-sort"></i></th>
@@ -795,8 +793,22 @@
                     <tbody id="dataTableBody">
                     </tbody>
                 </table>
-                
-                <div class="pagination" id="pagination"></div>
+
+                <!-- Pagination Controls -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="itemsPerPageSelector" style="color: var(--text-primary); font-weight: 500;">Rows per page:</label>
+                        <select id="itemsPerPageSelector" onchange="changeItemsPerPage()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface); color: var(--text-primary); font-size: 14px; cursor: pointer;">
+                            <option value="10">10</option>
+                            <option value="50">50</option>
+                            <option value="100" selected>100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                        <span id="paginationInfo" style="color: var(--text-secondary); font-size: 14px; margin-left: 10px;"></span>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
             </div>
 
             <div id="noDataState" class="no-data" style="display: none;">
@@ -927,7 +939,7 @@
         }
 
         let currentPage = 1;
-        const itemsPerPage = 100;
+        let itemsPerPage = 100;  // Changed from const to let for dynamic selection
         let allData = [];
         let filteredData = [];
         let sortColumn = 'created_at';
@@ -1115,29 +1127,19 @@
             document.getElementById('tableContent').style.display = 'block';
             document.getElementById('noDataState').style.display = 'none';
 
+            // OPTIMIZED: Use innerHTML (faster than DocumentFragment for this case)
+            // REMOVED: Foto columns for performance (no image loading lag)
             tbody.innerHTML = pageData.map(item => {
                 const createdAt = new Date(item.created_at);
                 const dateStr = createdAt.toLocaleDateString('id-ID');
                 const timeStr = createdAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                
-                const statusClass = item.status === 'approved' ? 'badge-approved' : 
+
+                const statusClass = item.status === 'approved' ? 'badge-approved' :
                                    item.status === 'rejected' ? 'badge-rejected' : 'badge-submitted';
 
                 return `
                     <tr>
                         <td><strong>#${item.id}</strong></td>
-                        <td>
-                            ${item.foto_url_1 ? 
-                                `<img src="${item.foto_url_1}" class="table-image" alt="Foto 1" onclick="window.open('${item.foto_url_1}', '_blank')">` : 
-                                '<span style="color: var(--text-secondary);">-</span>'
-                            }
-                        </td>
-                        <td>
-                            ${item.foto_url_2 ? 
-                                `<img src="${item.foto_url_2}" class="table-image" alt="Foto 2" onclick="window.open('${item.foto_url_2}', '_blank')">` : 
-                                '<span style="color: var(--text-secondary);">-</span>'
-                            }
-                        </td>
                         <td>${item.nama}</td>
                         <td><strong style="color: var(--primary-red);">${item.no_resi}</strong></td>
                         <td>${item.berat_resi} kg</td>
@@ -1166,6 +1168,7 @@
                 `;
             }).join('');
 
+            updatePaginationInfo();
             renderPagination();
         }
 
@@ -1213,6 +1216,28 @@
             if (page < 1 || page > totalPages) return;
             console.log(`📄 Changing to page ${page}...`);
             fetchData(page);  // Fetch new page from server
+        }
+
+        // Change Items Per Page
+        function changeItemsPerPage() {
+            const selector = document.getElementById('itemsPerPageSelector');
+            itemsPerPage = parseInt(selector.value);
+            console.log(`📄 Items per page changed to: ${itemsPerPage}`);
+
+            // Reset to page 1 and fetch data
+            currentPage = 1;
+            fetchData(1);
+        }
+
+        // Update Pagination Info Display
+        function updatePaginationInfo() {
+            const paginationInfo = document.getElementById('paginationInfo');
+            if (!paginationInfo) return;
+
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, totalCount);
+
+            paginationInfo.textContent = `Showing ${start}-${end} of ${totalCount.toLocaleString()} entries`;
         }
 
         // Apply Filters
