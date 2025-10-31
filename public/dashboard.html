@@ -885,26 +885,21 @@
 
         </div>
 
-
-
-
-            <div class="col-lg-12">
-                <div class="leaderboard-card">
-                    <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-trophy" style="color: var(--primary-red); font-size: 22px;"></i>
-                        <span>Top Performers</span>
-                    </h3>
-                    <div id="leaderboardList">
-                        <!-- Will be populated by JavaScript -->
-                        <div class="leaderboard-item">
-                            <div class="leaderboard-rank rank-1">1</div>
-                            <div class="leaderboard-user">
-                                <div class="leaderboard-name">Loading...</div>
-                                <div class="leaderboard-entries">0 entries</div>
-                            </div>
-                            <div class="leaderboard-earnings">Rp 0</div>
-                        </div>
+        <!-- Top Performers Leaderboard -->
+        <div class="leaderboard-card">
+            <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-trophy" style="color: var(--primary-red); font-size: 22px;"></i>
+                <span>Top Performers</span>
+            </h3>
+            <div id="leaderboardList">
+                <!-- Will be populated by JavaScript -->
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank rank-1">1</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-name">Loading...</div>
+                        <div class="leaderboard-entries">0 entries</div>
                     </div>
+                    <div class="leaderboard-earnings">Rp 0</div>
                 </div>
             </div>
         </div>
@@ -912,320 +907,35 @@
 
     <script>
 
-        // Update additional stats
-function updateAdditionalStats(stats) {
-    // Update ranking jika ada
-    const rankElement = document.getElementById('currentRank');
-    if (rankElement && stats.rank) {
-        rankElement.textContent = `#${stats.rank}`;
-    }
-
-    // Update completion rate
-    const completionElement = document.getElementById('completionRate');
-    if (completionElement) {
-        const target = 50; // target harian
-        const today = stats.entries_today || 0;
-        const rate = Math.min(100, Math.round((today / target) * 100));
-        completionElement.textContent = `${rate}%`;
-    }
-}
-
-          // Fungsi Logout
-    function logout() {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userRole');
-        window.location.href = '/index.html';
-    }
-
-    // Update date and time
-    function updateDateTime() {
-        const now = new Date();
-        const options = {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
-    }
-
-    updateDateTime();
-    setInterval(updateDateTime, 60000);
-
-        // Format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(amount).replace('IDR', 'Rp');
+        // Logout function
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            window.location.href = '/index.html';
         }
 
-        // Calculate user level
-        function getUserLevel(entries) {
-            if (entries >= 1000) return { name: 'Diamond', class: 'level-diamond', next: null };
-            if (entries >= 500) return { name: 'Gold', class: 'level-gold', next: 1000 };
-            if (entries >= 200) return { name: 'Silver', class: 'level-silver', next: 500 };
-            if (entries >= 100) return { name: 'Bronze', class: 'level-bronze', next: 200 };
-            return { name: 'Beginner', class: 'level-beginner', next: 100 };
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
         }
 
-        // Fetch user statistics
-        async function fetchUserStats() {
-            try {
-                const response = await fetch('/api/dashboard/user-stats', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
 
-                if (response.ok) {
-                    const stats = await response.json();
+        // User stats and leaderboard are now handled by RealtimeDashboard class in dashboard.js
 
-                    // Update earnings
-                    const totalEarnings = stats.total_entries * 500;
-                    document.getElementById('totalEarnings').innerHTML = `${formatCurrency(totalEarnings)}<sup>,-</sup>`;
-                    document.getElementById('totalEntriesCount').textContent = stats.total_entries;
-
-                    // Update period earnings
-                    document.getElementById('todayEarnings').textContent = formatCurrency(stats.entries_today * 500);
-                    document.getElementById('weekEarnings').textContent = formatCurrency(stats.entries_this_week * 500);
-                    document.getElementById('monthEarnings').textContent = formatCurrency(stats.entries_this_month * 500);
-
-                    // Update stats cards
-                    document.getElementById('todayEntries').textContent = stats.entries_today;
-                    document.getElementById('weekEntries').textContent = stats.entries_this_week;
-                    document.getElementById('avgSelisih').textContent = `${(stats.avg_selisih || 0).toFixed(2)} kg`;
-                    document.getElementById('verifiedCount').textContent = stats.verified_count || 0;
-
-                    // Update level
-                    const level = getUserLevel(stats.total_entries);
-                    const levelElement = document.getElementById('userLevel');
-                    levelElement.className = `user-level ${level.class}`;
-                    levelElement.innerHTML = `<i class="fas fa-medal me-1"></i> ${level.name}`;
-
-                    // Update progress bar
-                    if (level.next) {
-                        const progress = ((stats.total_entries % level.next) / level.next) * 100;
-                        document.getElementById('levelProgress').style.width = `${progress}%`;
-                        document.getElementById('progressText').textContent = `${stats.total_entries}/${level.next} entries`;
-                    } else {
-                        document.getElementById('levelProgress').style.width = '100%';
-                        document.getElementById('progressText').textContent = 'Max Level Reached!';
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching stats:', error);
-                // Use dummy data for demo
-                const dummyEntries = 245;
-                const totalEarnings = dummyEntries * 500;
-
-                document.getElementById('totalEarnings').innerHTML = `${formatCurrency(totalEarnings)}<sup>,-</sup>`;
-                document.getElementById('totalEntriesCount').textContent = dummyEntries;
-                document.getElementById('todayEarnings').textContent = formatCurrency(12 * 500);
-                document.getElementById('weekEarnings').textContent = formatCurrency(67 * 500);
-                document.getElementById('monthEarnings').textContent = formatCurrency(245 * 500);
-
-                document.getElementById('todayEntries').textContent = '12';
-                document.getElementById('weekEntries').textContent = '67';
-                document.getElementById('avgSelisih').textContent = '2.3 kg';
-                document.getElementById('verifiedCount').textContent = '232';
-
-                // Set level to Silver for demo
-                const levelElement = document.getElementById('userLevel');
-                levelElement.className = 'user-level level-silver';
-                levelElement.innerHTML = '<i class="fas fa-medal me-1"></i> Silver';
-                document.getElementById('levelProgress').style.width = '45%';
-                document.getElementById('progressText').textContent = '245/500 entries';
-            }
-        }
-
-        // Fetch leaderboard
-        async function fetchLeaderboard() {
-            try {
-                const response = await fetch('/api/dashboard/leaderboard', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const leaderboard = await response.json();
-                    displayLeaderboard(leaderboard);
-                }
-            } catch (error) {
-                console.error('Error fetching leaderboard:', error);
-                // Use dummy data
-                displayLeaderboard([
-                    { rank: 1, username: 'John Doe', total_entries: 892, total_earnings: 446000 },
-                    { rank: 2, username: 'Sarah Smith', total_entries: 756, total_earnings: 378000 },
-                    { rank: 3, username: 'Mike Johnson', total_entries: 623, total_earnings: 311500 },
-                    { rank: 4, username: 'Emma Wilson', total_entries: 512, total_earnings: 256000 },
-                    { rank: 5, username: 'David Brown', total_entries: 487, total_earnings: 243500 }
-                ]);
-            }
-        }
-
-        function displayLeaderboard(data) {
-            const leaderboardHtml = data.map(user => {
-                const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
-                return `
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
-                        <div class="leaderboard-user">
-                            <div class="leaderboard-name">${user.username}</div>
-                            <div class="leaderboard-entries">${user.total_entries} entries</div>
-                        </div>
-                        <div class="leaderboard-earnings">${formatCurrency(user.total_earnings)}</div>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('leaderboardList').innerHTML = leaderboardHtml;
-        }
-
-        // Initialize Performance Chart
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(0, 243, 255, 0.8)');
-        gradient.addColorStop(0.5, 'rgba(255, 0, 255, 0.5)');
-        gradient.addColorStop(1, 'rgba(0, 255, 157, 0.2)');
-
-        const performanceChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-                datasets: [{
-                    label: 'Entries',
-                    data: [45, 52, 38, 65, 48, 55, 42],
-                    borderColor: '#00f3ff',
-                    backgroundColor: gradient,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    pointBackgroundColor: '#00f3ff',
-                    pointBorderColor: '#0a0a1a',
-                    pointBorderWidth: 3,
-                    pointStyle: 'rectRounded'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(10, 10, 26, 0.9)',
-                        titleColor: '#00f3ff',
-                        bodyColor: '#ffffff',
-                        borderColor: '#00f3ff',
-                        borderWidth: 1,
-                        padding: 15,
-                        bodyFont: {
-                            size: 14
-                        },
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.parsed.y} entries = ${formatCurrency(context.parsed.y * 500)}`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 243, 255, 0.1)',
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            callback: function(value) {
-                                return value + ' entries';
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(0, 243, 255, 0.05)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.7)'
-                        }
-                    }
-                },
-                animation: {
-                    duration: 2000,
-                    easing: 'easeInOutQuart'
-                }
-            }
-        });
-
-       
-async function fetchUserStats() {
-    try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            console.error('No access token found');
-            return;
-        }
-
-        const response = await fetch('/api/dashboard/global-stats', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-        // Extract data from {success: true, data: {...}} format
-        const stats = result.data || result;
-        console.log('📊 Global stats from inline script:', stats);
-        // Update UI dengan stats
-        updateDashboardUI(stats);
-    } catch (error) {
-        console.error('Error fetching stats:', error);
-    }
-}
-
-async function fetchLeaderboard() {
-    try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            console.error('No access token found');
-            return;
-        }
-
-        const response = await fetch('/api/dashboard/leaderboard', {
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const leaderboard = await response.json();
-        // Update UI dengan leaderboard
-        updateLeaderboardUI(leaderboard);
-    } catch (error) {
-        console.error('Error fetching leaderboard:', error);
-    }
-}
+        // Dashboard initialization is handled by dashboard.js
+        // All chart and data loading logic moved to external JS file
     </script>
     <script src="/js/dashboard.js"></script>
 </body>
