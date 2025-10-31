@@ -1382,11 +1382,8 @@
                     const urlParts = photo.url.split('/');
                     const originalFilename = urlParts[urlParts.length - 1];
 
-                    // Clean filename and add index for organization
-                    const paddedIndex = String(i + 1).padStart(4, '0');
-                    const extension = originalFilename.split('.').pop();
-                    const cleanName = photo.nama.replace(/[^a-zA-Z0-9]/g, '_');
-                    const filename = `photo-${paddedIndex}-${cleanName}.${extension}`;
+                    // Use original filename (important: matches nomor resi!)
+                    const filename = originalFilename;
 
                     try {
                         // Update progress
@@ -1406,7 +1403,7 @@
 
                         const blob = await response.blob();
 
-                        // Add to ZIP
+                        // Add to ZIP with original filename
                         zip.file(filename, blob);
                         successCount++;
 
