@@ -85,7 +85,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a>
                     </li>
 
-                                        ${userRole === 'admin' ? `
+                    <!-- Hidden: User Management, Password, Settings - not needed -->
+                    <!--
+                    ${userRole === 'admin' ? `
                     <li class="nav-item">
                         <a href="/user-management.html" class="nav-link" data-page="user-management">
                             <i class="fas fa-users"></i>
@@ -93,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a>
                     </li>
                     ` : ''}
-
 
                     <li class="nav-item">
                         <a href="/password.html" class="nav-link" data-page="password">
@@ -108,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="nav-text">Settings</span>
                         </a>
                     </li>
+                    -->
                 </ul>
 
                 <div class="nav-footer">
