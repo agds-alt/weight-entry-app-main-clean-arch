@@ -955,7 +955,7 @@
             document.getElementById('userRole').textContent = userRole.toUpperCase();
         }
 
-        // Fetch Data with Server-Side Pagination
+        // Fetch Data with Server-Side Pagination - Using Backend API
         async function fetchData(page = 1) {
             console.log(`📡 fetchData() called for page ${page}...`);
             try {
@@ -964,40 +964,44 @@
                 document.getElementById('tableContent').style.display = 'none';
                 document.getElementById('noDataState').style.display = 'none';
 
-                // Get total count (only if first page)
-                if (page === 1) {
-                    console.log('📊 Getting total count...');
-                    const { count, error: countError } = await supabase
-                        .from('entries')
-                        .select('*', { count: 'exact', head: true });
-
-                    if (countError) {
-                        console.error('❌ Count error:', countError);
-                    } else {
-                        totalCount = count || 0;
-                        console.log('✅ Total records in database:', totalCount);
-                    }
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
                 }
 
-                // Calculate range for pagination
-                const start = (page - 1) * itemsPerPage;
-                const end = start + itemsPerPage - 1;
+                console.log(`🔍 Fetching page ${page} from API...`);
 
-                console.log(`🔍 Fetching records ${start} to ${end}...`);
+                // Fetch data from backend API
+                const response = await fetch(`/api/data-management/entries?page=${page}&limit=${itemsPerPage}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                // Fetch data for current page
-                const { data, error } = await supabase
-                    .from('entries')
-                    .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, status, foto_url_1, foto_url_2, created_by, created_at, updated_at, notes')
-                    .order('created_at', { ascending: false })
-                    .range(start, end);
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
 
-                console.log('📦 Response received:', { dataCount: data?.length, error });
+                const result = await response.json();
 
-                if (error) throw error;
+                console.log('📦 API Response:', result);
 
-                if (!data || data.length === 0) {
-                    console.log('⚠️ No data returned from query');
+                if (!result.success) {
+                    throw new Error(result.message || 'API request failed');
+                }
+
+                const data = result.data || [];
+                const pagination = result.pagination || {};
+
+                // Update total count
+                totalCount = pagination.total || 0;
+                console.log('✅ Total records in database:', totalCount);
+
+                if (data.length === 0) {
+                    console.log('⚠️ No data returned from API');
                     allData = [];
                     filteredData = [];
                     document.getElementById('loadingState').style.display = 'none';
@@ -1018,7 +1022,6 @@
 
             } catch (error) {
                 console.error('❌ fetchData ERROR:', error);
-                console.error('❌ Error details:', error.message, error.code, error.details);
                 document.getElementById('loadingState').innerHTML =
                     '<i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: #ff9500;"></i><div>Error loading data: ' + error.message + '</div>';
             }
@@ -1376,25 +1379,41 @@
 
                 console.log(`💾 Updating entry ID ${id}...`);
 
-                // Update Supabase
-                const { data, error } = await supabase
-                    .from('entries')
-                    .update({
-                        nama: nama,
-                        no_resi: no_resi,
-                        berat_resi: berat_resi,
-                        berat_aktual: berat_aktual,
-                        selisih: selisih,
-                        status: status,
-                        notes: notes || null,
-                        updated_at: new Date().toISOString()
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
+                }
+
+                // Update via API
+                const response = await fetch(`/api/data-management/entries/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nama,
+                        no_resi,
+                        berat_resi,
+                        berat_aktual,
+                        selisih,
+                        status,
+                        notes: notes || null
                     })
-                    .eq('id', id)
-                    .select();
+                });
 
-                if (error) throw error;
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
 
-                console.log('✅ Entry updated successfully:', data);
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Update failed');
+                }
+
+                console.log('✅ Entry updated successfully:', result.data);
 
                 // Success feedback
                 saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
@@ -1402,7 +1421,7 @@
                 // Close modal and refresh data
                 setTimeout(() => {
                     closeEditModal();
-                    fetchData(); // Refresh table
+                    fetchData(currentPage); // Refresh current page
                     alert('✅ Data berhasil diupdate!');
 
                     // Reset button
@@ -1450,30 +1469,47 @@
             if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
 
             try {
-                const { error } = await supabase
-                    .from('entries')
-                    .delete()
-                    .eq('id', id);
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
+                }
 
-                if (error) throw error;
+                console.log(`🗑️ Deleting entry ID ${id}...`);
 
-                alert('Data berhasil dihapus!');
-                fetchData();
+                // Delete via API
+                const response = await fetch(`/api/data-management/entries/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Delete failed');
+                }
+
+                console.log('✅ Entry deleted successfully');
+
+                alert('✅ Data berhasil dihapus!');
+                fetchData(currentPage); // Refresh current page
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error menghapus data: ' + error.message);
+                console.error('❌ Error deleting entry:', error);
+                alert('❌ Error menghapus data: ' + error.message);
             }
         }
 
         // Initialize Everything
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Initializing Data Management...');
-            console.log('🔍 Checking Supabase library:', typeof window.supabase);
-            console.log('🔍 Checking supabase client:', typeof supabase);
-
-            // Test Supabase connection first
-            const connected = await testConnection();
-            console.log('🔌 Supabase connection test:', connected ? '✅ SUCCESS' : '❌ FAILED');
+            console.log('🔍 Using Backend API for data operations');
 
             // Setup event listeners for filter buttons
             const applyBtn = document.getElementById('applyFilter');
