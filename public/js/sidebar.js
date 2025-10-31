@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="sidebar-header">
                 <div class="logo-section">
                     <i class="fas fa-weight-hanging logo-icon"></i>
-                    <span class="logo-text">WeightTracker Pro</span>
+                    <span class="logo-text">Aplikasi Deteksi Selisih Berat</span>
                 </div>
             </div>
 
@@ -489,4 +489,5 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebarToggle.click();
         }
     });
+
 });

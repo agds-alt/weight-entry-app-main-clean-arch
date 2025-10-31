@@ -718,7 +718,7 @@
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn-holographic" onclick="applyFilters()">
-                    <i class="fas fa-search me-2"></i> Apply Filters
+                    <i class="fas fa-search me-2"></i> Terapkan Filter
                 </button>
                 <button class="btn-holographic" onclick="resetFilters()">
                     <i class="fas fa-redo me-2"></i> Reset
@@ -733,37 +733,30 @@
             </div>
         </div>
 
-        <!-- Controls Bar: Pagination/View Mode (Left) + Export/Delete (Right) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 20px; flex-wrap: wrap;">
-            <!-- Left Side: View Mode Toggle + Pagination -->
-            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                <div class="view-mode-toggle" style="margin: 0;">
-                    <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
-                        <i class="fas fa-th"></i> Pagination Mode
-                    </button>
-                    <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
-                        <i class="fas fa-infinity"></i> Infinite Scroll (Virtual)
-                    </button>
-                </div>
-                <!-- Pagination controls will be placed here via JavaScript -->
-                <div class="pagination" id="paginationTop" style="margin: 0;"></div>
-            </div>
+        <!-- View Mode Toggle -->
+        <div class="view-mode-toggle">
+            <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
+                <i class="fas fa-th"></i> Mode 500 Foto
+            </button>
+            <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
+                <i class="fas fa-infinity"></i> Tampilkan 2000 Foto (Virtual)
+            </button>
+        </div>
 
-            <!-- Right Side: Select All/Unselect + Download/Delete Buttons -->
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button class="btn-holographic" onclick="selectAll()">
-                    <i class="fas fa-check-square me-2"></i> Select All
-                </button>
-                <button class="btn-holographic" onclick="unselectAll()">
-                    <i class="fas fa-square me-2"></i> Unselect All
-                </button>
-                <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
-                    <i class="fas fa-download me-2"></i> Download Selected
-                </button>
-                <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
-                    <i class="fas fa-trash me-2"></i> Delete Selected
-                </button>
-            </div>
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn-holographic" onclick="selectAll()">
+                <i class="fas fa-check-square me-2"></i> Pilih All
+            </button>
+            <button class="btn-holographic" onclick="unselectAll()">
+                <i class="fas fa-square me-2"></i> Gak Pilih All
+            </button>
+            <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
+                <i class="fas fa-download me-2"></i> Unduh Mang!
+            </button>
+            <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
+                <i class="fas fa-trash me-2"></i> Hapus Mang?
+            </button>
         </div>
 
         <!-- Loading State -->
@@ -819,9 +812,9 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        const SUPABASE_URL = 'https://rwxgpbikdxlialoegghq.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3eGdwYmlrZHhsaWFsb2VnZ2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1OTQwNDUsImV4cCI6MjA3NTE3MDA0NX0.qxOwPHR9XSzSwaDUyo5a11Ok2Irs7I4N45uJPiyi4Ug';
-        const CLOUDINARY_CLOUD_NAME = 'ddzzlusek';
+        const SUPABASE_URL = 'https://lvsfcxfrvtsjkhbpgllq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2c2ZjeGZydnRzamtoYnBnbGxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwNDczNzAsImV4cCI6MjA3MzYyMzM3MH0.VC9Bv8eUAak4jX5Vmwd-jJUPPfb-fGYdEX33qfwHelQ';
+        const CLOUDINARY_CLOUD_NAME = 'dl6xk437w';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
@@ -830,7 +823,7 @@
         let filteredPhotos = [];
         let selectedPhotos = new Set();
         let currentPage = 1;
-        const photosPerPage = 12;
+        const photosPerPage = 50;
 
         // View Mode State
         let viewMode = 'pagination'; // 'pagination' or 'infinite'
