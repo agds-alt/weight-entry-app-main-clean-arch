@@ -1361,6 +1361,20 @@
                 return;
             }
 
+            // Optional warning for large batches
+            if (photos.length > 1000) {
+                const proceed = confirm(
+                    `⚠️ HAYU ATUH!\n\n` +
+                    `Akang mau download ${photos.length} foto teh!\n` +
+                    `Ieu mah LOBA PISAN euy! Bisa:\n` +
+                    `- Ngantosan 5-10 menit\n` +
+                    `- Makeunkeun memory 1GB+\n` +
+                    `- Browser teh bisa rusak\n\n` +
+                    `Yakin atuh?`
+                );
+                if (!proceed) return;
+            }
+
             const confirmMsg = `Download ${photos.length} foto sebagai ZIP file?\n\nSemua foto akan di-bundle jadi 1 file .zip`;
             if (!confirm(confirmMsg)) return;
 
