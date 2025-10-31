@@ -726,30 +726,37 @@
             </div>
         </div>
 
-        <!-- View Mode Toggle -->
-        <div class="view-mode-toggle">
-            <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
-                <i class="fas fa-th"></i> Pagination Mode
-            </button>
-            <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
-                <i class="fas fa-infinity"></i> Infinite Scroll (Virtual)
-            </button>
-        </div>
+        <!-- Controls Bar: Pagination/View Mode (Left) + Export/Delete (Right) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 20px; flex-wrap: wrap;">
+            <!-- Left Side: View Mode Toggle + Pagination -->
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="view-mode-toggle" style="margin: 0;">
+                    <button class="view-mode-btn active" id="paginationModeBtn" onclick="switchViewMode('pagination')">
+                        <i class="fas fa-th"></i> Pagination Mode
+                    </button>
+                    <button class="view-mode-btn" id="infiniteModeBtn" onclick="switchViewMode('infinite')">
+                        <i class="fas fa-infinity"></i> Infinite Scroll (Virtual)
+                    </button>
+                </div>
+                <!-- Pagination controls will be placed here via JavaScript -->
+                <div class="pagination" id="paginationTop" style="margin: 0;"></div>
+            </div>
 
-        <!-- Action Bar -->
-        <div class="action-bar">
-            <button class="btn-holographic" onclick="selectAll()">
-                <i class="fas fa-check-square me-2"></i> Select All
-            </button>
-            <button class="btn-holographic" onclick="unselectAll()">
-                <i class="fas fa-square me-2"></i> Unselect All
-            </button>
-            <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
-                <i class="fas fa-download me-2"></i> Download Selected
-            </button>
-            <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
-                <i class="fas fa-trash me-2"></i> Delete Selected
-            </button>
+            <!-- Right Side: Select All/Unselect + Download/Delete Buttons -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn-holographic" onclick="selectAll()">
+                    <i class="fas fa-check-square me-2"></i> Select All
+                </button>
+                <button class="btn-holographic" onclick="unselectAll()">
+                    <i class="fas fa-square me-2"></i> Unselect All
+                </button>
+                <button class="btn-holographic btn-success" onclick="downloadSelected()" id="btnDownload">
+                    <i class="fas fa-download me-2"></i> Download Selected
+                </button>
+                <button class="btn-holographic btn-danger" onclick="deleteSelected()" id="btnDelete">
+                    <i class="fas fa-trash me-2"></i> Delete Selected
+                </button>
+            </div>
         </div>
 
         <!-- Loading State -->
@@ -1089,10 +1096,12 @@
         // ==========================================
         function renderPagination() {
             const pagination = document.getElementById('pagination');
+            const paginationTop = document.getElementById('paginationTop');
             const totalPages = Math.ceil(filteredPhotos.length / photosPerPage);
 
             if (totalPages <= 1) {
-                pagination.innerHTML = '';
+                if (pagination) pagination.innerHTML = '';
+                if (paginationTop) paginationTop.innerHTML = '';
                 return;
             }
 
@@ -1120,7 +1129,9 @@
                 </button>
             `;
 
-            pagination.innerHTML = html;
+            // Update both pagination elements
+            if (pagination) pagination.innerHTML = html;
+            if (paginationTop) paginationTop.innerHTML = html;
         }
 
         function changePage(page) {
