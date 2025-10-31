@@ -61,6 +61,17 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Cloudinary config endpoint for frontend
+app.get('/api/config/cloudinary', (req, res) => {
+    const cloudinary = require('./config/cloudinary');
+    const config = cloudinary.getUnsignedConfig();
+
+    res.json({
+        success: true,
+        data: config
+    });
+});
+
 
 
 // Root endpoint
