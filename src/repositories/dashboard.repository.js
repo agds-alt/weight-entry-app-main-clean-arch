@@ -6,6 +6,8 @@ class DashboardRepository {
      */
     async getGlobalStats() {
         try {
+            console.log('🔍 Fetching ALL entries with limit 100000...');
+
             // Fetch ALL entries from database (override default 1000 limit)
             const { data: entries, error } = await supabase
                 .from('entries')
@@ -15,6 +17,9 @@ class DashboardRepository {
             if (error) {
                 throw error;
             }
+
+            console.log(`✅ Fetched ${entries.length} entries from database`);
+            console.log('📊 Expected: 18149, Got:', entries.length);
 
             // Calculate statistics
             const now = new Date();
