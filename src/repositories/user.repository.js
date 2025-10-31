@@ -1,34 +1,38 @@
-const db = require('../config/database');
+const { supabase } = require('../config/database');
 
 class UserRepository {
     /**
      * Create new user
      */
     async create(userData) {
-        const query = `
-            INSERT INTO users (username, password, email, full_name, role)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING id, username, email, full_name, role, created_at
-        `;
-
-        const values = [
-            userData.username,
-            userData.password,
-            userData.email,
-            userData.full_name,
-            userData.role || 'user'
-        ];
-
         try {
-            const rows = await db.execute(query, values);
-            return rows[0];
+            const { data, error } = await supabase
+                .from('users')
+                .insert([{
+                    username: userData.username,
+                    password: userData.password,
+                    email: userData.email,
+                    full_name: userData.full_name,
+                    role: userData.role || 'user'
+                }])
+                .select('id, username, email, full_name, role, created_at')
+                .single();
+
+            if (error) {
+                if (error.code === '23505') { // PostgreSQL unique violation
+                    throw new Error('Username atau email sudah digunakan');
+                }
+                throw error;
+            }
+
+            return data;
         } catch (error) {
             console.error('User repository create error:', error);
-            
-            if (error.code === '23505') { // PostgreSQL unique violation
-                throw new Error('Username atau email sudah digunakan');
+
+            if (error.message === 'Username atau email sudah digunakan') {
+                throw error;
             }
-            
+
             throw new Error('Gagal membuat user');
         }
     }
@@ -37,16 +41,21 @@ class UserRepository {
      * Find user by username
      */
     async findByUsername(username) {
-        const query = `
-            SELECT id, username, password, email, full_name, role, is_active, 
-                   created_at, updated_at, last_login
-            FROM users
-            WHERE username = $1
-        `;
-
         try {
-            const rows = await db.execute(query, [username]);
-            return rows[0] || null;
+            const { data, error } = await supabase
+                .from('users')
+                .select('id, username, password, email, full_name, role, is_active, created_at, updated_at, last_login')
+                .eq('username', username)
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') { // No rows returned
+                    return null;
+                }
+                throw error;
+            }
+
+            return data;
         } catch (error) {
             console.error('User repository findByUsername error:', error);
             return null;
@@ -57,16 +66,21 @@ class UserRepository {
      * Find user by email
      */
     async findByEmail(email) {
-        const query = `
-            SELECT id, username, password, email, full_name, role, is_active,
-                   created_at, updated_at
-            FROM users
-            WHERE email = $1
-        `;
-
         try {
-            const rows = await db.execute(query, [email]);
-            return rows[0] || null;
+            const { data, error } = await supabase
+                .from('users')
+                .select('id, username, password, email, full_name, role, is_active, created_at, updated_at')
+                .eq('email', email)
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') { // No rows returned
+                    return null;
+                }
+                throw error;
+            }
+
+            return data;
         } catch (error) {
             console.error('User repository findByEmail error:', error);
             return null;
@@ -77,16 +91,21 @@ class UserRepository {
      * Find user by ID
      */
     async findById(id) {
-        const query = `
-            SELECT id, username, email, full_name, role, is_active,
-                   created_at, updated_at, last_login
-            FROM users
-            WHERE id = $1
-        `;
-
         try {
-            const rows = await db.execute(query, [id]);
-            return rows[0] || null;
+            const { data, error } = await supabase
+                .from('users')
+                .select('id, username, email, full_name, role, is_active, created_at, updated_at, last_login')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') { // No rows returned
+                    return null;
+                }
+                throw error;
+            }
+
+            return data;
         } catch (error) {
             console.error('User repository findById error:', error);
             return null;
@@ -97,41 +116,38 @@ class UserRepository {
      * Find all users
      */
     async findAll(filter = {}, limit = 50, offset = 0) {
-        let query = `
-            SELECT id, username, email, full_name, role, is_active,
-                   created_at, last_login
-            FROM users
-            WHERE 1=1
-        `;
-
-        const values = [];
-        let paramCount = 1;
-
-        if (filter.role) {
-            query += ` AND role = $${paramCount}`;
-            values.push(filter.role);
-            paramCount++;
-        }
-
-        if (filter.is_active !== undefined) {
-            query += ` AND is_active = $${paramCount}`;
-            values.push(filter.is_active);
-            paramCount++;
-        }
-
-        if (filter.search) {
-            query += ` AND (username ILIKE $${paramCount} OR email ILIKE $${paramCount + 1} OR full_name ILIKE $${paramCount + 2})`;
-            const searchTerm = `%${filter.search}%`;
-            values.push(searchTerm, searchTerm, searchTerm);
-            paramCount += 3;
-        }
-
-        query += ` ORDER BY created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
-        values.push(limit, offset);
-
         try {
-            const rows = await db.execute(query, values);
-            return rows;
+            let query = supabase
+                .from('users')
+                .select('id, username, email, full_name, role, is_active, created_at, last_login');
+
+            // Apply filters
+            if (filter.role) {
+                query = query.eq('role', filter.role);
+            }
+
+            if (filter.is_active !== undefined) {
+                query = query.eq('is_active', filter.is_active);
+            }
+
+            if (filter.search) {
+                // Supabase doesn't support OR with multiple fields directly, so we need to use a workaround
+                // For now, we'll search by username only. For more complex searches, consider using RPC
+                query = query.or(`username.ilike.%${filter.search}%,email.ilike.%${filter.search}%,full_name.ilike.%${filter.search}%`);
+            }
+
+            // Order by and pagination
+            query = query
+                .order('created_at', { ascending: false })
+                .range(offset, offset + limit - 1);
+
+            const { data, error } = await query;
+
+            if (error) {
+                throw error;
+            }
+
+            return data || [];
         } catch (error) {
             console.error('User repository findAll error:', error);
             return [];
@@ -142,31 +158,31 @@ class UserRepository {
      * Count users
      */
     async count(filter = {}) {
-        let query = `SELECT COUNT(*) as total FROM users WHERE 1=1`;
-        const values = [];
-        let paramCount = 1;
-
-        if (filter.role) {
-            query += ` AND role = $${paramCount}`;
-            values.push(filter.role);
-            paramCount++;
-        }
-
-        if (filter.is_active !== undefined) {
-            query += ` AND is_active = $${paramCount}`;
-            values.push(filter.is_active);
-            paramCount++;
-        }
-
-        if (filter.search) {
-            query += ` AND (username ILIKE $${paramCount} OR email ILIKE $${paramCount + 1} OR full_name ILIKE $${paramCount + 2})`;
-            const searchTerm = `%${filter.search}%`;
-            values.push(searchTerm, searchTerm, searchTerm);
-        }
-
         try {
-            const rows = await db.execute(query, values);
-            return parseInt(rows[0].total);
+            let query = supabase
+                .from('users')
+                .select('*', { count: 'exact', head: true });
+
+            // Apply filters
+            if (filter.role) {
+                query = query.eq('role', filter.role);
+            }
+
+            if (filter.is_active !== undefined) {
+                query = query.eq('is_active', filter.is_active);
+            }
+
+            if (filter.search) {
+                query = query.or(`username.ilike.%${filter.search}%,email.ilike.%${filter.search}%,full_name.ilike.%${filter.search}%`);
+            }
+
+            const { count, error } = await query;
+
+            if (error) {
+                throw error;
+            }
+
+            return count || 0;
         } catch (error) {
             console.error('User repository count error:', error);
             return 0;
@@ -177,46 +193,42 @@ class UserRepository {
      * Update user
      */
     async update(id, updateData) {
-        const fields = [];
-        const values = [];
-        let paramCount = 1;
+        const updates = {};
 
         if (updateData.email !== undefined) {
-            fields.push(`email = $${paramCount}`);
-            values.push(updateData.email);
-            paramCount++;
+            updates.email = updateData.email;
         }
 
         if (updateData.full_name !== undefined) {
-            fields.push(`full_name = $${paramCount}`);
-            values.push(updateData.full_name);
-            paramCount++;
+            updates.full_name = updateData.full_name;
         }
 
         if (updateData.role !== undefined) {
-            fields.push(`role = $${paramCount}`);
-            values.push(updateData.role);
-            paramCount++;
+            updates.role = updateData.role;
         }
 
         if (updateData.is_active !== undefined) {
-            fields.push(`is_active = $${paramCount}`);
-            values.push(updateData.is_active);
-            paramCount++;
+            updates.is_active = updateData.is_active;
         }
 
-        if (fields.length === 0) {
+        if (Object.keys(updates).length === 0) {
             throw new Error('Tidak ada data untuk diupdate');
         }
 
-        values.push(id);
-
-        const query = `UPDATE users SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramCount}`;
+        updates.updated_at = new Date().toISOString();
 
         try {
-            const result = await db.query(query, values);
+            const { data, error } = await supabase
+                .from('users')
+                .update(updates)
+                .eq('id', id)
+                .select();
 
-            if (result.rowCount === 0) {
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
                 throw new Error('User tidak ditemukan');
             }
 
@@ -231,16 +243,21 @@ class UserRepository {
      * Update password
      */
     async updatePassword(id, hashedPassword) {
-        const query = `
-            UPDATE users 
-            SET password = $1, updated_at = CURRENT_TIMESTAMP
-            WHERE id = $2
-        `;
-
         try {
-            const result = await db.query(query, [hashedPassword, id]);
+            const { data, error } = await supabase
+                .from('users')
+                .update({
+                    password: hashedPassword,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id)
+                .select();
 
-            if (result.rowCount === 0) {
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
                 throw new Error('User tidak ditemukan');
             }
 
@@ -255,14 +272,18 @@ class UserRepository {
      * Update last login time
      */
     async updateLastLogin(id) {
-        const query = `
-            UPDATE users 
-            SET last_login = CURRENT_TIMESTAMP
-            WHERE id = $1
-        `;
-
         try {
-            await db.execute(query, [id]);
+            const { error } = await supabase
+                .from('users')
+                .update({
+                    last_login: new Date().toISOString()
+                })
+                .eq('id', id);
+
+            if (error) {
+                throw error;
+            }
+
             return { success: true };
         } catch (error) {
             console.error('User repository updateLastLogin error:', error);
@@ -274,16 +295,21 @@ class UserRepository {
      * Delete user (soft delete by setting is_active = false)
      */
     async softDelete(id) {
-        const query = `
-            UPDATE users 
-            SET is_active = false, updated_at = CURRENT_TIMESTAMP
-            WHERE id = $1
-        `;
-
         try {
-            const result = await db.query(query, [id]);
+            const { data, error } = await supabase
+                .from('users')
+                .update({
+                    is_active: false,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id)
+                .select();
 
-            if (result.rowCount === 0) {
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
                 throw new Error('User tidak ditemukan');
             }
 
@@ -298,12 +324,18 @@ class UserRepository {
      * Delete user permanently
      */
     async delete(id) {
-        const query = `DELETE FROM users WHERE id = $1`;
-
         try {
-            const result = await db.query(query, [id]);
+            const { data, error } = await supabase
+                .from('users')
+                .delete()
+                .eq('id', id)
+                .select();
 
-            if (result.rowCount === 0) {
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
                 throw new Error('User tidak ditemukan');
             }
 
@@ -318,16 +350,21 @@ class UserRepository {
      * Activate user
      */
     async activate(id) {
-        const query = `
-            UPDATE users 
-            SET is_active = true, updated_at = CURRENT_TIMESTAMP
-            WHERE id = $1
-        `;
-
         try {
-            const result = await db.query(query, [id]);
+            const { data, error } = await supabase
+                .from('users')
+                .update({
+                    is_active: true,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id)
+                .select();
 
-            if (result.rowCount === 0) {
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
                 throw new Error('User tidak ditemukan');
             }
 
@@ -340,27 +377,39 @@ class UserRepository {
 
     /**
      * Get user statistics
+     * Note: This requires a Supabase RPC function for optimal performance
+     * For now, we'll fetch all users and calculate in-memory
      */
     async getStats() {
-        const query = `
-            SELECT 
-                COUNT(*) as total,
-                COUNT(CASE WHEN role = 'admin' THEN 1 END) as total_admin,
-                COUNT(CASE WHEN role = 'user' THEN 1 END) as total_user,
-                COUNT(CASE WHEN is_active = true THEN 1 END) as total_active,
-                COUNT(CASE WHEN created_at::date = CURRENT_DATE THEN 1 END) as today_registered
-            FROM users
-        `;
-
         try {
-            const rows = await db.execute(query);
-            return rows[0] || {
-                total: 0,
+            const { data, error } = await supabase
+                .from('users')
+                .select('role, is_active, created_at');
+
+            if (error) {
+                throw error;
+            }
+
+            const stats = {
+                total: data.length,
                 total_admin: 0,
                 total_user: 0,
                 total_active: 0,
                 today_registered: 0
             };
+
+            const today = new Date().toDateString();
+
+            data.forEach(user => {
+                if (user.role === 'admin') stats.total_admin++;
+                if (user.role === 'user') stats.total_user++;
+                if (user.is_active) stats.total_active++;
+
+                const userDate = new Date(user.created_at).toDateString();
+                if (userDate === today) stats.today_registered++;
+            });
+
+            return stats;
         } catch (error) {
             console.error('User repository getStats error:', error);
             return {
@@ -377,11 +426,18 @@ class UserRepository {
      * Check if username exists
      */
     async usernameExists(username) {
-        const query = `SELECT id FROM users WHERE username = $1`;
-
         try {
-            const rows = await db.execute(query, [username]);
-            return rows.length > 0;
+            const { data, error } = await supabase
+                .from('users')
+                .select('id')
+                .eq('username', username)
+                .maybeSingle();
+
+            if (error) {
+                throw error;
+            }
+
+            return !!data;
         } catch (error) {
             console.error('User repository usernameExists error:', error);
             return false;
@@ -392,11 +448,18 @@ class UserRepository {
      * Check if email exists
      */
     async emailExists(email) {
-        const query = `SELECT id FROM users WHERE email = $1`;
-
         try {
-            const rows = await db.execute(query, [email]);
-            return rows.length > 0;
+            const { data, error } = await supabase
+                .from('users')
+                .select('id')
+                .eq('email', email)
+                .maybeSingle();
+
+            if (error) {
+                throw error;
+            }
+
+            return !!data;
         } catch (error) {
             console.error('User repository emailExists error:', error);
             return false;

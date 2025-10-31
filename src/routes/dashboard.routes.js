@@ -1,120 +1,174 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const db = require('../config/database');
+const { supabase } = require('../config/database');
 
 // Get user statistics and earnings
-// Get user statistics and earnings - FINAL VERSION
 router.get('/user-stats', authenticateToken, async (req, res) => {
     try {
         const username = req.user.username || req.user.userName;
-        
+
         console.log('📊 Fetching user stats for:', username);
 
-        // Simple query untuk avoid complex date functions
-        const statsQuery = `
-            SELECT 
-                COUNT(*) as total_entries,
-                COUNT(CASE WHEN status = 'verified' THEN 1 END) as verified_count,
-                COUNT(CASE WHEN status = 'disputed' THEN 1 END) as disputed_count,
-                COALESCE(AVG(selisih)::numeric, 0) as avg_selisih
-            FROM entries 
-            WHERE created_by = $1
-        `;
-        
-        console.log('📊 Executing query for user:', username);
-        const result = await db.query(statsQuery, [username]);
-        const stats = result.rows[0];
-        
-        console.log('📊 Raw database result:', stats);
+        // Fetch entries for the user
+        const { data: entries, error } = await supabase
+            .from('entries')
+            .select('status, selisih, created_at')
+            .eq('created_by', username);
 
-        // Untuk entries today/week/month, kita simplify dulu
+        if (error) {
+            throw error;
+        }
+
+        console.log('📊 Retrieved entries count:', entries.length);
+
+        // Calculate statistics
+        const now = new Date();
+        const today = now.toDateString();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        let totalEntries = entries.length;
+        let entriesToday = 0;
+        let entriesThisWeek = 0;
+        let entriesThisMonth = 0;
+        let verifiedCount = 0;
+        let disputedCount = 0;
+        let totalSelisih = 0;
+
+        entries.forEach(entry => {
+            const entryDate = new Date(entry.created_at);
+
+            if (entryDate.toDateString() === today) entriesToday++;
+            if (entryDate >= startOfWeek) entriesThisWeek++;
+            if (entryDate >= startOfMonth) entriesThisMonth++;
+
+            if (entry.status === 'verified') verifiedCount++;
+            if (entry.status === 'disputed') disputedCount++;
+
+            totalSelisih += parseFloat(entry.selisih || 0);
+        });
+
         const response = {
-            total_entries: parseInt(stats.total_entries) || 0,
-            entries_today: parseInt(stats.total_entries) || 0, // Temporary: assume all are today
-            entries_this_week: parseInt(stats.total_entries) || 0, // Temporary: assume all are this week
-            entries_this_month: parseInt(stats.total_entries) || 0, // Temporary: assume all are this month
-            avg_selisih: parseFloat(stats.avg_selisih || 0).toFixed(2),
-            verified_count: parseInt(stats.verified_count) || 0,
-            disputed_count: parseInt(stats.disputed_count) || 0
+            total_entries: totalEntries,
+            entries_today: entriesToday,
+            entries_this_week: entriesThisWeek,
+            entries_this_month: entriesThisMonth,
+            avg_selisih: totalEntries > 0 ? (totalSelisih / totalEntries).toFixed(2) : '0.00',
+            verified_count: verifiedCount,
+            disputed_count: disputedCount
         };
 
         console.log('📊 Final response:', response);
         res.json(response);
-        
+
     } catch (error) {
         console.error('❌ Error in user-stats:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Error: ' + error.message,
             hint: 'Check server logs for details'
         });
     }
 });
-// Get leaderboard - FINAL VERSION
+
+// Get leaderboard
 router.get('/leaderboard', authenticateToken, async (req, res) => {
     try {
         console.log('🏆 Fetching leaderboard');
-        
-        const query = `
-            SELECT 
-                created_by as username,
-                COUNT(*) as total_entries
-            FROM entries 
-            WHERE created_by IS NOT NULL
-            GROUP BY created_by 
-            ORDER BY total_entries DESC 
-            LIMIT 10
-        `;
-        
-        const result = await db.query(query);
-        
-        const leaderboard = result.rows.map((row, index) => ({
-            rank: index + 1,
-            username: row.username,
-            total_entries: parseInt(row.total_entries) || 0,
-            total_earnings: (parseInt(row.total_entries) || 0) * 500
-        }));
-        
+
+        // Fetch all entries with created_by
+        const { data: entries, error } = await supabase
+            .from('entries')
+            .select('created_by')
+            .not('created_by', 'is', null);
+
+        if (error) {
+            throw error;
+        }
+
+        // Count entries per user
+        const userCounts = {};
+        entries.forEach(entry => {
+            const username = entry.created_by;
+            userCounts[username] = (userCounts[username] || 0) + 1;
+        });
+
+        // Convert to array, sort, and add rankings
+        const leaderboard = Object.entries(userCounts)
+            .map(([username, total_entries]) => ({
+                username,
+                total_entries
+            }))
+            .sort((a, b) => b.total_entries - a.total_entries)
+            .slice(0, 10) // Top 10
+            .map((item, index) => ({
+                rank: index + 1,
+                username: item.username,
+                total_entries: item.total_entries,
+                total_earnings: item.total_entries * 500
+            }));
+
         console.log('🏆 Leaderboard result:', leaderboard);
         res.json(leaderboard);
-        
+
     } catch (error) {
         console.error('❌ Error in leaderboard:', error);
-        res.status(500).json({ 
-            message: 'Error: ' + error.message 
+        res.status(500).json({
+            message: 'Error: ' + error.message
         });
     }
 });
 
-
-// Debug endpoint untuk troubleshooting
+// Debug endpoint for troubleshooting
 router.get('/debug-info', authenticateToken, async (req, res) => {
     try {
         const username = req.user.username || req.user.userName;
         const userId = req.user.id;
-        
+
         console.log('🔍 Debug info for:', { username, userId });
-        
-        // 1. Cek user di database
-        const userQuery = 'SELECT id, username, email FROM users WHERE username = $1 OR id = $2';
-        const userResult = await db.query(userQuery, [username, userId]);
-        
-        // 2. Cek entries untuk user ini
-        const entriesQuery = 'SELECT id, created_by, status, created_at FROM entries WHERE created_by = $1 LIMIT 5';
-        const entriesResult = await db.query(entriesQuery, [username]);
-        
-        // 3. Cek total entries count
-        const countQuery = 'SELECT COUNT(*) as total FROM entries WHERE created_by = $1';
-        const countResult = await db.query(countQuery, [username]);
-        
+
+        // 1. Check user in database
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id, username, email')
+            .or(`username.eq.${username},id.eq.${userId}`)
+            .limit(1);
+
+        if (userError) {
+            throw userError;
+        }
+
+        // 2. Check entries for this user
+        const { data: entriesData, error: entriesError } = await supabase
+            .from('entries')
+            .select('id, created_by, status, created_at')
+            .eq('created_by', username)
+            .limit(5);
+
+        if (entriesError) {
+            throw entriesError;
+        }
+
+        // 3. Count total entries
+        const { count: totalEntries, error: countError } = await supabase
+            .from('entries')
+            .select('*', { count: 'exact', head: true })
+            .eq('created_by', username);
+
+        if (countError) {
+            throw countError;
+        }
+
         res.json({
-            user_info: userResult.rows[0] || 'User not found in database',
-            user_matches: userResult.rows.length,
-            entries_found: entriesResult.rows,
-            total_entries: countResult.rows[0].total,
+            user_info: userData && userData.length > 0 ? userData[0] : 'User not found in database',
+            user_matches: userData ? userData.length : 0,
+            entries_found: entriesData || [],
+            total_entries: totalEntries || 0,
             request_user: { username, userId }
         });
-        
+
     } catch (error) {
         console.error('Debug error:', error);
         res.status(500).json({ error: error.message });

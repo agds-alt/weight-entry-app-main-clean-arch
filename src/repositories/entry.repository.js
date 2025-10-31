@@ -1,43 +1,43 @@
-﻿const db = require('../config/database');
+const { supabase } = require('../config/database');
 
 class EntryRepository {
     /**
      * Create new entry
      */
     async create(entryData) {
-       // Di method create - GANTI query dan values:
-const query = `
-    INSERT INTO entries (
-        nama, no_resi, berat_resi, berat_aktual, selisih,
-        foto_url_1, foto_url_2, notes, status, created_by  -- ❗UBAH: catatan → notes
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING id, nama, no_resi, berat_resi, berat_aktual, selisih,
-              foto_url_1, foto_url_2, notes, status, created_by, created_at  -- ❗UBAH
-`;
-
-const values = [
-    entryData.nama,
-    entryData.no_resi,
-    entryData.berat_resi,
-    entryData.berat_aktual,
-    entryData.selisih,
-    entryData.foto_url_1,
-    entryData.foto_url_2,
-    entryData.notes || null,  // ❗UBAH: catatan → notes
-    entryData.status,
-    entryData.created_by
-];
-
         try {
-            const rows = await db.execute(query, values);
-            return rows[0];
+            const { data, error } = await supabase
+                .from('entries')
+                .insert([{
+                    nama: entryData.nama,
+                    no_resi: entryData.no_resi,
+                    berat_resi: entryData.berat_resi,
+                    berat_aktual: entryData.berat_aktual,
+                    selisih: entryData.selisih,
+                    foto_url_1: entryData.foto_url_1,
+                    foto_url_2: entryData.foto_url_2,
+                    catatan: entryData.catatan || entryData.notes || null,
+                    status: entryData.status,
+                    created_by: entryData.created_by
+                }])
+                .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, foto_url_1, foto_url_2, catatan, status, created_by, created_at')
+                .single();
+
+            if (error) {
+                if (error.code === '23505') { // PostgreSQL unique violation
+                    throw new Error('No Resi sudah ada dalam database');
+                }
+                throw error;
+            }
+
+            return data;
         } catch (error) {
             console.error('Repository create error:', error);
-            
-            if (error.code === '23505') { // PostgreSQL unique violation
-                throw new Error('No Resi sudah ada dalam database');
+
+            if (error.message === 'No Resi sudah ada dalam database') {
+                throw error;
             }
-            
+
             throw new Error('Gagal menyimpan data ke database');
         }
     }
@@ -46,44 +46,38 @@ const values = [
      * Find all entries with filters
      */
     async findAll(filter, limit, offset) {
-        let query = `
-            SELECT 
-                id, nama, no_resi, berat_resi, berat_aktual, selisih,
-                foto_url_1, foto_url_2, catatan, status,
-                created_by, created_at, updated_by, updated_at
-            FROM entries
-            WHERE 1=1
-        `;
-
-        const values = [];
-        let paramCount = 1;
-
-        if (filter.search && filter.search.trim() !== '') {
-            query += ` AND (nama ILIKE $${paramCount} OR no_resi ILIKE $${paramCount + 1})`;
-            const searchTerm = `%${filter.search}%`;
-            values.push(searchTerm, searchTerm);
-            paramCount += 2;
-        }
-
-        if (filter.status && filter.status !== '') {
-            query += ` AND status = $${paramCount}`;
-            values.push(filter.status);
-            paramCount++;
-        }
-
-        if (filter.username) {
-            query += ` AND created_by = $${paramCount}`;
-            values.push(filter.username);
-            paramCount++;
-        }
-
-        query += ` ORDER BY created_at DESC`;
-        query += ` LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
-        values.push(limit, offset);
-
         try {
-            const rows = await db.execute(query, values);
-            return rows;
+            let query = supabase
+                .from('entries')
+                .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, foto_url_1, foto_url_2, catatan, status, created_by, created_at, updated_by, updated_at');
+
+            // Apply search filter
+            if (filter.search && filter.search.trim() !== '') {
+                query = query.or(`nama.ilike.%${filter.search}%,no_resi.ilike.%${filter.search}%`);
+            }
+
+            // Apply status filter
+            if (filter.status && filter.status !== '') {
+                query = query.eq('status', filter.status);
+            }
+
+            // Apply username filter
+            if (filter.username) {
+                query = query.eq('created_by', filter.username);
+            }
+
+            // Order by and pagination
+            query = query
+                .order('created_at', { ascending: false })
+                .range(offset, offset + limit - 1);
+
+            const { data, error } = await query;
+
+            if (error) {
+                throw error;
+            }
+
+            return data || [];
         } catch (error) {
             console.error('Repository findAll error:', error);
             throw new Error('Gagal mengambil data dari database');
@@ -94,31 +88,33 @@ const values = [
      * Count entries with filters
      */
     async count(filter) {
-        let query = `SELECT COUNT(*) as total FROM entries WHERE 1=1`;
-        const values = [];
-        let paramCount = 1;
-
-        if (filter.search && filter.search.trim() !== '') {
-            query += ` AND (nama ILIKE $${paramCount} OR no_resi ILIKE $${paramCount + 1})`;
-            const searchTerm = `%${filter.search}%`;
-            values.push(searchTerm, searchTerm);
-            paramCount += 2;
-        }
-
-        if (filter.status && filter.status !== '') {
-            query += ` AND status = $${paramCount}`;
-            values.push(filter.status);
-            paramCount++;
-        }
-
-        if (filter.username) {
-            query += ` AND created_by = $${paramCount}`;
-            values.push(filter.username);
-        }
-
         try {
-            const rows = await db.execute(query, values);
-            return parseInt(rows[0].total);
+            let query = supabase
+                .from('entries')
+                .select('*', { count: 'exact', head: true });
+
+            // Apply search filter
+            if (filter.search && filter.search.trim() !== '') {
+                query = query.or(`nama.ilike.%${filter.search}%,no_resi.ilike.%${filter.search}%`);
+            }
+
+            // Apply status filter
+            if (filter.status && filter.status !== '') {
+                query = query.eq('status', filter.status);
+            }
+
+            // Apply username filter
+            if (filter.username) {
+                query = query.eq('created_by', filter.username);
+            }
+
+            const { count, error } = await query;
+
+            if (error) {
+                throw error;
+            }
+
+            return count || 0;
         } catch (error) {
             console.error('Repository count error:', error);
             return 0;
@@ -129,29 +125,28 @@ const values = [
      * Find recent entries
      */
     async findRecent(filter, limit) {
-        let query = `
-            SELECT 
-                id, nama, no_resi, berat_resi, berat_aktual, selisih,
-                foto_url_1, foto_url_2, status, created_by, created_at
-            FROM entries
-            WHERE 1=1
-        `;
-
-        const values = [];
-        let paramCount = 1;
-
-        if (filter.username) {
-            query += ` AND created_by = $${paramCount}`;
-            values.push(filter.username);
-            paramCount++;
-        }
-
-        query += ` ORDER BY created_at DESC LIMIT $${paramCount}`;
-        values.push(limit);
-
         try {
-            const rows = await db.execute(query, values);
-            return rows;
+            let query = supabase
+                .from('entries')
+                .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, foto_url_1, foto_url_2, status, created_by, created_at');
+
+            // Apply username filter
+            if (filter.username) {
+                query = query.eq('created_by', filter.username);
+            }
+
+            // Order by and limit
+            query = query
+                .order('created_at', { ascending: false })
+                .limit(limit);
+
+            const { data, error } = await query;
+
+            if (error) {
+                throw error;
+            }
+
+            return data || [];
         } catch (error) {
             console.error('Repository findRecent error:', error);
             return [];
@@ -162,18 +157,21 @@ const values = [
      * Find entry by ID
      */
     async findById(id) {
-        const query = `
-            SELECT 
-                id, nama, no_resi, berat_resi, berat_aktual, selisih,
-                foto_url_1, foto_url_2, catatan, status,
-                created_by, created_at, updated_by, updated_at
-            FROM entries
-            WHERE id = $1
-        `;
-
         try {
-            const rows = await db.execute(query, [id]);
-            return rows[0] || null;
+            const { data, error } = await supabase
+                .from('entries')
+                .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, foto_url_1, foto_url_2, catatan, status, created_by, created_at, updated_by, updated_at')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') { // No rows returned
+                    return null;
+                }
+                throw error;
+            }
+
+            return data;
         } catch (error) {
             console.error('Repository findById error:', error);
             return null;
@@ -184,15 +182,21 @@ const values = [
      * Find entry by no_resi
      */
     async findByNoResi(noResi) {
-        const query = `
-            SELECT id, no_resi, created_at
-            FROM entries
-            WHERE no_resi = $1
-        `;
-
         try {
-            const rows = await db.execute(query, [noResi]);
-            return rows[0] || null;
+            const { data, error } = await supabase
+                .from('entries')
+                .select('id, no_resi, created_at')
+                .eq('no_resi', noResi)
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') { // No rows returned
+                    return null;
+                }
+                throw error;
+            }
+
+            return data;
         } catch (error) {
             console.error('Repository findByNoResi error:', error);
             return null;
@@ -203,40 +207,38 @@ const values = [
      * Update entry
      */
     async update(id, updateData) {
-        const fields = [];
-        const values = [];
-        let paramCount = 1;
+        const updates = {};
 
         if (updateData.status !== undefined) {
-            fields.push(`status = $${paramCount}`);
-            values.push(updateData.status);
-            paramCount++;
+            updates.status = updateData.status;
         }
 
         if (updateData.catatan !== undefined) {
-            fields.push(`catatan = $${paramCount}`);
-            values.push(updateData.catatan);
-            paramCount++;
+            updates.catatan = updateData.catatan;
         }
 
         if (updateData.updated_by) {
-            fields.push(`updated_by = $${paramCount}`);
-            values.push(updateData.updated_by);
-            paramCount++;
+            updates.updated_by = updateData.updated_by;
         }
 
-        if (fields.length === 0) {
+        if (Object.keys(updates).length === 0) {
             throw new Error('Tidak ada data untuk diupdate');
         }
 
-        values.push(id);
-
-        const query = `UPDATE entries SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramCount}`;
+        updates.updated_at = new Date().toISOString();
 
         try {
-            const result = await db.query(query, values);
+            const { data, error } = await supabase
+                .from('entries')
+                .update(updates)
+                .eq('id', id)
+                .select();
 
-            if (result.rowCount === 0) {
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
                 throw new Error('Entry tidak ditemukan');
             }
 
@@ -251,12 +253,18 @@ const values = [
      * Delete entry
      */
     async delete(id) {
-        const query = `DELETE FROM entries WHERE id = $1`;
-
         try {
-            const result = await db.query(query, [id]);
+            const { data, error } = await supabase
+                .from('entries')
+                .delete()
+                .eq('id', id)
+                .select();
 
-            if (result.rowCount === 0) {
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
                 throw new Error('Entry tidak ditemukan');
             }
 
@@ -271,17 +279,31 @@ const values = [
      * Get statistics
      */
     async getStats() {
-        const query = `
-            SELECT 
-                COUNT(*) as total,
-                COUNT(CASE WHEN created_at::date = CURRENT_DATE THEN 1 END) as today,
-                COALESCE(AVG(selisih), 0) as avg_selisih
-            FROM entries
-        `;
-
         try {
-            const rows = await db.execute(query);
-            return rows[0] || { total: 0, today: 0, avg_selisih: 0 };
+            // Get all entries to calculate stats
+            const { data, error } = await supabase
+                .from('entries')
+                .select('selisih, created_at');
+
+            if (error) {
+                throw error;
+            }
+
+            const total = data.length;
+            const today = new Date().toDateString();
+            const todayEntries = data.filter(entry =>
+                new Date(entry.created_at).toDateString() === today
+            );
+
+            const avgSelisih = total > 0
+                ? data.reduce((sum, entry) => sum + parseFloat(entry.selisih || 0), 0) / total
+                : 0;
+
+            return {
+                total,
+                today: todayEntries.length,
+                avg_selisih: avgSelisih
+            };
         } catch (error) {
             console.error('Repository getStats error:', error);
             return { total: 0, today: 0, avg_selisih: 0 };
@@ -292,34 +314,33 @@ const values = [
      * Find entries for export with date filter
      */
     async findForExport(filter) {
-        let query = `
-            SELECT 
-                nama, no_resi, berat_resi, berat_aktual, selisih,
-                status, created_by, created_at
-            FROM entries
-            WHERE 1=1
-        `;
-
-        const values = [];
-        let paramCount = 1;
-
-        if (filter.startDate) {
-            query += ` AND created_at::date >= $${paramCount}`;
-            values.push(filter.startDate);
-            paramCount++;
-        }
-
-        if (filter.endDate) {
-            query += ` AND created_at::date <= $${paramCount}`;
-            values.push(filter.endDate);
-            paramCount++;
-        }
-
-        query += ` ORDER BY created_at DESC`;
-
         try {
-            const rows = await db.execute(query, values);
-            return rows;
+            let query = supabase
+                .from('entries')
+                .select('nama, no_resi, berat_resi, berat_aktual, selisih, status, created_by, created_at');
+
+            // Apply date range filters
+            if (filter.startDate) {
+                query = query.gte('created_at', filter.startDate);
+            }
+
+            if (filter.endDate) {
+                // Add one day to include the end date
+                const endDate = new Date(filter.endDate);
+                endDate.setDate(endDate.getDate() + 1);
+                query = query.lt('created_at', endDate.toISOString());
+            }
+
+            // Order by created_at descending
+            query = query.order('created_at', { ascending: false });
+
+            const { data, error } = await query;
+
+            if (error) {
+                throw error;
+            }
+
+            return data || [];
         } catch (error) {
             console.error('Repository findForExport error:', error);
             return [];
@@ -330,18 +351,19 @@ const values = [
      * Get entries by date range
      */
     async findByDateRange(startDate, endDate) {
-        const query = `
-            SELECT 
-                id, nama, no_resi, berat_resi, berat_aktual, selisih,
-                foto_url_1, foto_url_2, status, created_at
-            FROM entries
-            WHERE created_at::date BETWEEN $1 AND $2
-            ORDER BY created_at DESC
-        `;
-
         try {
-            const rows = await db.execute(query, [startDate, endDate]);
-            return rows;
+            const { data, error } = await supabase
+                .from('entries')
+                .select('id, nama, no_resi, berat_resi, berat_aktual, selisih, foto_url_1, foto_url_2, status, created_at')
+                .gte('created_at', startDate)
+                .lte('created_at', endDate + 'T23:59:59.999Z')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                throw error;
+            }
+
+            return data || [];
         } catch (error) {
             console.error('Repository findByDateRange error:', error);
             return [];
@@ -352,25 +374,40 @@ const values = [
      * Get statistics by date range
      */
     async getStatsByDateRange(startDate, endDate) {
-        const query = `
-            SELECT 
-                COUNT(*) as total,
-                SUM(selisih) as total_selisih,
-                AVG(selisih) as avg_selisih,
-                MIN(selisih) as min_selisih,
-                MAX(selisih) as max_selisih
-            FROM entries
-            WHERE created_at::date BETWEEN $1 AND $2
-        `;
-
         try {
-            const rows = await db.execute(query, [startDate, endDate]);
-            return rows[0] || {
-                total: 0,
-                total_selisih: 0,
-                avg_selisih: 0,
-                min_selisih: 0,
-                max_selisih: 0
+            const { data, error } = await supabase
+                .from('entries')
+                .select('selisih')
+                .gte('created_at', startDate)
+                .lte('created_at', endDate + 'T23:59:59.999Z');
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
+                return {
+                    total: 0,
+                    total_selisih: 0,
+                    avg_selisih: 0,
+                    min_selisih: 0,
+                    max_selisih: 0
+                };
+            }
+
+            const selisihValues = data.map(entry => parseFloat(entry.selisih || 0));
+            const total = data.length;
+            const totalSelisih = selisihValues.reduce((sum, val) => sum + val, 0);
+            const avgSelisih = totalSelisih / total;
+            const minSelisih = Math.min(...selisihValues);
+            const maxSelisih = Math.max(...selisihValues);
+
+            return {
+                total,
+                total_selisih: totalSelisih,
+                avg_selisih: avgSelisih,
+                min_selisih: minSelisih,
+                max_selisih: maxSelisih
             };
         } catch (error) {
             console.error('Repository getStatsByDateRange error:', error);

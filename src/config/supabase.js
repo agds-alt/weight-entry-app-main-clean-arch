@@ -1,13 +1,14 @@
 ﻿const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-// Initialize Supabase client
+// Initialize Supabase client for storage and auth operations
+// Note: For database operations, use the client exported from ./database.js
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY; // Use service key for backend
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.warn('⚠️  Supabase client not configured');
-  console.warn('   Add SUPABASE_URL and SUPABASE_SERVICE_KEY to .env');
+  console.warn('⚠️  Supabase Storage/Auth client not configured');
+  console.warn('   Add SUPABASE_URL and SUPABASE_SERVICE_KEY (or SUPABASE_ANON_KEY) to .env');
 }
 
 const supabase = supabaseUrl && supabaseServiceKey
