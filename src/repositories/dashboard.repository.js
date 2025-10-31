@@ -6,10 +6,11 @@ class DashboardRepository {
      */
     async getGlobalStats() {
         try {
-            // Fetch ALL entries from database
+            // Fetch ALL entries from database (override default 1000 limit)
             const { data: entries, error } = await supabase
                 .from('entries')
-                .select('selisih, status, created_at');
+                .select('selisih, status, created_at')
+                .limit(100000); // Set high limit to get all entries
 
             if (error) {
                 throw error;
