@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
             body {
                 margin: 0;
                 padding: 0;
-                font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
                 transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
