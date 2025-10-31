@@ -43,14 +43,20 @@ class RealtimeDashboard {
 
             console.log('🔄 Loading dashboard data...');
 
-            const [statsResponse, leaderboardResponse] = await Promise.all([
+            const [statsResponse, dailyLeaderboardResponse, totalLeaderboardResponse] = await Promise.all([
                 fetch('/api/dashboard/global-stats', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 }),
-                fetch('/api/dashboard/leaderboard', {
+                fetch('/api/dashboard/leaderboard/daily', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }),
+                fetch('/api/dashboard/leaderboard/total', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -70,14 +76,22 @@ class RealtimeDashboard {
                 this.showErrorNotification('Gagal memuat data statistik');
             }
 
-            // Handle leaderboard response
-            if (leaderboardResponse.ok) {
-                const leaderboardData = await leaderboardResponse.json();
-                console.log('🏆 Leaderboard data from API:', leaderboardData);
-                this.updateLeaderboard(leaderboardData);
+            // Handle daily leaderboard response
+            if (dailyLeaderboardResponse.ok) {
+                const dailyData = await dailyLeaderboardResponse.json();
+                console.log('🔥 Daily leaderboard data from API:', dailyData);
+                this.updateDailyLeaderboard(dailyData);
             } else {
-                console.error('Leaderboard API error:', leaderboardResponse.status);
-                this.showErrorNotification('Gagal memuat leaderboard');
+                console.error('Daily leaderboard API error:', dailyLeaderboardResponse.status);
+            }
+
+            // Handle total leaderboard response
+            if (totalLeaderboardResponse.ok) {
+                const totalData = await totalLeaderboardResponse.json();
+                console.log('🏆 Total leaderboard data from API:', totalData);
+                this.updateTotalLeaderboard(totalData);
+            } else {
+                console.error('Total leaderboard API error:', totalLeaderboardResponse.status);
             }
 
         } catch (error) {
@@ -199,37 +213,73 @@ class RealtimeDashboard {
         }
     }
 
-    updateLeaderboard(leaderboard) {
-        console.log('🎯 updateLeaderboard called with:', leaderboard);
+    updateDailyLeaderboard(leaderboard) {
+        console.log('🔥 updateDailyLeaderboard called with:', leaderboard);
 
         if (!leaderboard || !Array.isArray(leaderboard)) {
-            console.error('❌ Invalid leaderboard data:', leaderboard);
+            console.error('❌ Invalid daily leaderboard data:', leaderboard);
             return;
         }
 
         if (leaderboard.length === 0) {
-            console.warn('⚠️ Leaderboard is empty');
+            console.log('⚠️ No daily entries yet');
+            this.safeUpdateElement('dailyLeaderboardList', '<p style="text-align: center; color: var(--text-gray); padding: 20px;">Belum ada data hari ini</p>');
             return;
         }
 
-        console.log(`✅ Processing ${leaderboard.length} leaderboard entries`);
+        console.log(`✅ Processing ${leaderboard.length} daily leaderboard entries`);
 
-        const leaderboardHtml = leaderboard.map(user => {
-            const rankClass = user.rank <= 3 ? `rank-${user.rank}` : '';
-
-            // Use total_earnings from user_statistics table if available
-            const totalEarnings = user.total_earnings || ((user.total_entries || 0) * 500);
+        const leaderboardHtml = leaderboard.map((user, index) => {
+            const rank = index + 1;
+            const rankClass = rank <= 3 ? `rank-${rank}` : '';
             const dailyEntries = user.daily_entries || 0;
-            const totalEntries = user.total_entries || user.entries_count || 0;
+            const dailyEarnings = user.daily_earnings || (dailyEntries * 500);
 
             return `
                 <div class="leaderboard-item">
-                    <div class="leaderboard-rank ${rankClass}">${user.rank}</div>
+                    <div class="leaderboard-rank ${rankClass}">${rank}</div>
                     <div class="leaderboard-user">
                         <div class="leaderboard-name">${user.username}</div>
                         <div class="leaderboard-entries">
-                            <span style="font-weight: 600;">${totalEntries} total</span>
-                            ${dailyEntries > 0 ? `<span style="color: var(--primary-red); margin-left: 8px;">+${dailyEntries} hari ini</span>` : ''}
+                            <span style="font-weight: 600; color: var(--primary-red);">${dailyEntries} entries hari ini</span>
+                        </div>
+                    </div>
+                    <div class="leaderboard-earnings">${this.formatCurrency(dailyEarnings)}</div>
+                </div>
+            `;
+        }).join('');
+
+        this.safeUpdateElement('dailyLeaderboardList', leaderboardHtml);
+    }
+
+    updateTotalLeaderboard(leaderboard) {
+        console.log('🏆 updateTotalLeaderboard called with:', leaderboard);
+
+        if (!leaderboard || !Array.isArray(leaderboard)) {
+            console.error('❌ Invalid total leaderboard data:', leaderboard);
+            return;
+        }
+
+        if (leaderboard.length === 0) {
+            console.warn('⚠️ No leaderboard data');
+            return;
+        }
+
+        console.log(`✅ Processing ${leaderboard.length} total leaderboard entries`);
+
+        const leaderboardHtml = leaderboard.map((user, index) => {
+            const rank = index + 1;
+            const rankClass = rank <= 3 ? `rank-${rank}` : '';
+            const totalEntries = user.total_entries || 0;
+            const totalEarnings = user.total_earnings || (totalEntries * 500);
+
+            return `
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank ${rankClass}">${rank}</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-name">${user.username}</div>
+                        <div class="leaderboard-entries">
+                            <span style="font-weight: 600;">${totalEntries} total entries</span>
                         </div>
                     </div>
                     <div class="leaderboard-earnings">${this.formatCurrency(totalEarnings)}</div>
@@ -237,8 +287,7 @@ class RealtimeDashboard {
             `;
         }).join('');
 
-        // Safe DOM update with retry
-        this.safeUpdateElement('leaderboardList', leaderboardHtml);
+        this.safeUpdateElement('totalLeaderboardList', leaderboardHtml);
     }
 
     safeUpdateElement(elementId, html, retryCount = 0, maxRetries = 5) {

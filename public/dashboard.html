@@ -885,23 +885,47 @@
 
         </div>
 
-        <!-- Top Performers Leaderboard -->
-        <div class="leaderboard-card">
-            <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-trophy" style="color: var(--primary-red); font-size: 22px;"></i>
-                <span>Top Performers</span>
-            </h3>
-            <div id="leaderboardList">
-                <!-- Will be populated by JavaScript -->
-                <div class="leaderboard-item">
-                    <div class="leaderboard-rank rank-1">1</div>
-                    <div class="leaderboard-user">
-                        <div class="leaderboard-name">Loading...</div>
-                        <div class="leaderboard-entries">0 entries</div>
+        <!-- Leaderboards Section -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; margin-bottom: 30px;">
+
+            <!-- Daily Top Performers -->
+            <div class="leaderboard-card">
+                <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-fire" style="color: var(--primary-red); font-size: 22px;"></i>
+                    <span>🔥 Top Hari Ini</span>
+                </h3>
+                <div id="dailyLeaderboardList">
+                    <!-- Will be populated by JavaScript -->
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-name">Loading...</div>
+                            <div class="leaderboard-entries">0 entries today</div>
+                        </div>
+                        <div class="leaderboard-earnings">Rp 0</div>
                     </div>
-                    <div class="leaderboard-earnings">Rp 0</div>
                 </div>
             </div>
+
+            <!-- Total Top Performers (All Time) -->
+            <div class="leaderboard-card">
+                <h3 style="color: var(--text-dark); margin-bottom: 24px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-trophy" style="color: var(--primary-red); font-size: 22px;"></i>
+                    <span>🏆 Top All Time</span>
+                </h3>
+                <div id="totalLeaderboardList">
+                    <!-- Will be populated by JavaScript -->
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-name">Loading...</div>
+                            <div class="leaderboard-entries">0 total entries</div>
+                        </div>
+                        <div class="leaderboard-earnings">Rp 0</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -937,7 +961,7 @@
         // Dashboard initialization is handled by dashboard.js
         // All chart and data loading logic moved to external JS file
     </script>
-    <script src="/js/dashboard.js?v=3.0"></script>
+    <script src="/js/dashboard.js?v=3.1"></script>
 </body>
 
 </html>
