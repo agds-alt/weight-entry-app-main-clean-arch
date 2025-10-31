@@ -6,99 +6,97 @@ class DashboardRepository {
      */
     async getGlobalStats() {
         try {
-            console.log('🔍 Fetching global stats using COUNT query...');
+            console.log('🔍 Fetching global stats using COUNT queries...');
 
-            // SOLUTION: Use COUNT query instead of fetching all rows
-            // This is MUCH faster and doesn't hit 1000 row limit
-            const { count: totalCount, error: countError } = await supabase
-                .from('entries')
-                .select('*', { count: 'exact', head: true });
-
-            if (countError) {
-                throw countError;
-            }
-
-            console.log(`✅ Total entries from COUNT: ${totalCount}`);
-
-            // Fetch sample data for calculations (today, week, month, avg)
-            // We need recent data for accurate today/week/month calculations
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-            const { data: recentEntries, error: entriesError } = await supabase
-                .from('entries')
-                .select('selisih, status, created_at')
-                .gte('created_at', thirtyDaysAgo.toISOString())
-                .order('created_at', { ascending: false });
-
-            if (entriesError) {
-                throw entriesError;
-            }
-
-            console.log(`✅ Fetched ${recentEntries.length} recent entries for calculations`);
-
-            // Calculate statistics using COUNT + recent entries
+            // Calculate date boundaries
             const now = new Date();
-            const today = now.toDateString();
+            const today = new Date(now);
+            today.setHours(0, 0, 0, 0);
+
             const startOfWeek = new Date(now);
             startOfWeek.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
             startOfWeek.setHours(0, 0, 0, 0);
 
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
 
-            const stats = {
-                total_entries: totalCount, // ✅ Use COUNT query result!
-                today_entries: 0,
-                week_entries: 0,
-                month_entries: 0,
-                avg_selisih: 0,
-                verified_count: 0
-            };
+            // Run all COUNT queries in parallel for better performance
+            const [
+                totalResult,
+                todayResult,
+                weekResult,
+                monthResult,
+                recentResult
+            ] = await Promise.all([
+                // Total count (all time)
+                supabase.from('entries').select('*', { count: 'exact', head: true }),
 
+                // Today count
+                supabase.from('entries').select('*', { count: 'exact', head: true })
+                    .gte('created_at', today.toISOString()),
+
+                // This week count
+                supabase.from('entries').select('*', { count: 'exact', head: true })
+                    .gte('created_at', startOfWeek.toISOString()),
+
+                // This month count
+                supabase.from('entries').select('*', { count: 'exact', head: true })
+                    .gte('created_at', startOfMonth.toISOString()),
+
+                // Fetch recent entries for avg_selisih and verified_count
+                supabase.from('entries').select('selisih, status')
+                    .gte('created_at', startOfMonth.toISOString())
+                    .limit(1000)
+            ]);
+
+            if (totalResult.error) throw totalResult.error;
+            if (todayResult.error) throw todayResult.error;
+            if (weekResult.error) throw weekResult.error;
+            if (monthResult.error) throw monthResult.error;
+            if (recentResult.error) throw recentResult.error;
+
+            console.log(`✅ Total entries: ${totalResult.count}`);
+            console.log(`✅ Today entries: ${todayResult.count}`);
+            console.log(`✅ Week entries: ${weekResult.count}`);
+            console.log(`✅ Month entries: ${monthResult.count}`);
+
+            // Calculate avg_selisih and verified_count from recent data
+            const recentEntries = recentResult.data || [];
             let totalSelisih = 0;
             let selisihCount = 0;
+            let verifiedCount = 0;
 
-            // Calculate from recent entries (last 30 days)
             recentEntries.forEach(entry => {
-                const entryDate = new Date(entry.created_at);
-
-                // Today's entries
-                if (entryDate.toDateString() === today) {
-                    stats.today_entries++;
-                }
-
-                // This week's entries
-                if (entryDate >= startOfWeek) {
-                    stats.week_entries++;
-                }
-
-                // This month's entries
-                if (entryDate >= startOfMonth) {
-                    stats.month_entries++;
-                }
-
-                // Sum selisih for average (from recent data)
+                // Sum selisih for average
                 const selisih = parseFloat(entry.selisih || 0);
                 if (!isNaN(selisih)) {
                     totalSelisih += selisih;
                     selisihCount++;
                 }
 
-                // Verified count
+                // Count verified entries
                 if (entry.status === 'verified') {
-                    stats.verified_count++;
+                    verifiedCount++;
                 }
             });
 
-            // Calculate average selisih from recent data
-            stats.avg_selisih = selisihCount > 0 ? totalSelisih / selisihCount : 0;
+            const avgSelisih = selisihCount > 0 ? totalSelisih / selisihCount : 0;
+
+            const stats = {
+                total_entries: totalResult.count,
+                today_entries: todayResult.count,
+                week_entries: weekResult.count,
+                month_entries: monthResult.count,
+                avg_selisih: avgSelisih,
+                verified_count: verifiedCount
+            };
 
             console.log('📊 Final global stats:', {
                 total: stats.total_entries,
                 today: stats.today_entries,
                 week: stats.week_entries,
                 month: stats.month_entries,
-                recent_sample: recentEntries.length
+                avg_selisih: avgSelisih.toFixed(2)
             });
 
             return stats;
