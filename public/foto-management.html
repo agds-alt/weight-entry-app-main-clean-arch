@@ -834,7 +834,7 @@
         };
 
         // ==========================================
-        // FETCH PHOTOS FROM SUPABASE
+        // FETCH PHOTOS FROM BACKEND API
         // ==========================================
         async function fetchPhotos() {
             try {
@@ -842,14 +842,36 @@
                 document.getElementById('photoGallery').style.display = 'none';
                 document.getElementById('noPhotosState').style.display = 'none';
 
-                // Fetch dari entries table yang ada foto_url_1 atau foto_url_2
-                const { data, error } = await supabase
-                    .from('entries')
-                    .select('id, nama, foto_url_1, foto_url_2, created_at')
-                    .or('foto_url_1.not.is.null,foto_url_2.not.is.null')
-                    .order('created_at', { ascending: false });
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
+                }
 
-                if (error) throw error;
+                console.log('📸 Fetching photos from API...');
+
+                // Fetch from backend API (fetches ALL photos - no pagination for foto-management)
+                const response = await fetch('/api/foto-management/photos?limit=10000', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                console.log('📦 API Response:', result);
+
+                if (!result.success) {
+                    throw new Error(result.message || 'API request failed');
+                }
+
+                const data = result.data || [];
 
                 // Transform data - pisahkan foto_url_1 dan foto_url_2
                 allPhotos = [];
@@ -876,14 +898,16 @@
                     }
                 });
 
+                console.log('✅ Loaded photos:', allPhotos.length);
+
                 filteredPhotos = [...allPhotos];
                 updateStats();
                 renderGallery();
 
             } catch (error) {
-                console.error('Error fetching photos:', error);
-                document.getElementById('loadingState').innerHTML = 
-                    '<i class="fas fa-exclamation-triangle fa-3x mb-3"></i><div>Error loading photos</div>';
+                console.error('❌ Error fetching photos:', error);
+                document.getElementById('loadingState').innerHTML =
+                    '<i class="fas fa-exclamation-triangle fa-3x mb-3"></i><div>Error loading photos: ' + error.message + '</div>';
             }
         }
 
@@ -1308,20 +1332,41 @@
                 const photo = allPhotos.find(p => p.id === photoId);
                 if (!photo) return;
 
-                // Update database - set URL to null
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
+                }
+
                 const field = photo.type === 'foto_1' ? 'foto_url_1' : 'foto_url_2';
-                const { error } = await supabase
-                    .from('entries')
-                    .update({ [field]: null })
-                    .eq('id', photo.entryId);
+                console.log(`🗑️ Deleting photo: entry ${photo.entryId}, field ${field}`);
 
-                if (error) throw error;
+                // Delete via API
+                const response = await fetch(`/api/foto-management/photos/${photo.entryId}/${field}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                alert('Foto berhasil dihapus dari database!');
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Delete failed');
+                }
+
+                console.log('✅ Photo deleted successfully');
+
+                alert('✅ Foto berhasil dihapus dari database!');
                 fetchPhotos();
             } catch (error) {
-                console.error('Delete error:', error);
-                alert('Error deleting photo');
+                console.error('❌ Delete error:', error);
+                alert('❌ Error deleting photo: ' + error.message);
             }
         }
 
@@ -1489,29 +1534,58 @@
 
         async function deleteSelected() {
             if (selectedPhotos.size === 0) {
-                alert('Pilih foto terlebih dahulu');
+                alert('⚠️ Pilih foto terlebih dahulu');
                 return;
             }
 
             if (!confirm(`Hapus ${selectedPhotos.size} foto yang dipilih?`)) return;
 
             try {
-                const photos = allPhotos.filter(p => selectedPhotos.has(p.id));
-                
-                for (const photo of photos) {
-                    const field = photo.type === 'foto_1' ? 'foto_url_1' : 'foto_url_2';
-                    await supabase
-                        .from('entries')
-                        .update({ [field]: null })
-                        .eq('id', photo.entryId);
+                // Get auth token
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('No access token found. Please login again.');
                 }
 
-                alert(`${photos.length} foto berhasil dihapus!`);
+                const photos = allPhotos.filter(p => selectedPhotos.has(p.id));
+
+                // Prepare bulk delete payload
+                const deletePayload = photos.map(photo => ({
+                    entryId: photo.entryId,
+                    field: photo.type === 'foto_1' ? 'foto_url_1' : 'foto_url_2'
+                }));
+
+                console.log(`🗑️ Bulk deleting ${photos.length} photos...`);
+
+                // Call bulk delete API
+                const response = await fetch('/api/foto-management/photos/bulk-delete', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ photos: deletePayload })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                console.log('📦 Bulk delete result:', result);
+
+                if (result.failCount > 0) {
+                    alert(`⚠️ Bulk delete selesai:\n✅ Berhasil: ${result.successCount}\n❌ Gagal: ${result.failCount}`);
+                } else {
+                    alert(`✅ ${result.successCount} foto berhasil dihapus!`);
+                }
+
                 selectedPhotos.clear();
                 fetchPhotos();
             } catch (error) {
-                console.error('Batch delete error:', error);
-                alert('Error deleting photos');
+                console.error('❌ Batch delete error:', error);
+                alert('❌ Error deleting photos: ' + error.message);
             }
         }
 
