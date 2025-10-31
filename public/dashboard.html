@@ -144,18 +144,16 @@
             z-index: 1;
         }
 
-        /* 3D Header Card with Holographic Effect */
+        /* 3D Header Card with Light Theme */
         .header-card {
-            background: var(--card-bg);
-            border-radius: 30px;
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
             padding: 40px;
             margin-bottom: 40px;
             position: relative;
-            transform: perspective(1000px) rotateX(5deg);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 243, 255, 0.1), inset 0 0 0 1px var(--glass-border);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-3d);
+            border: none;
             overflow: hidden;
         }
 
@@ -165,46 +163,36 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                bottom: 0;
-                background: conic-gradient( from 0deg at 50% 50%, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 25%, rgba(0, 255, 0, 0.1) 50%, rgba(0, 102, 255, 0.1) 75%, rgba(0, 255, 255, 0.1) 100% );
-                animation: aurora 20s linear infinite;
-                z-index: 0;
-                border-radius: 30px;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+                z-index: 1;
             }
 
             .header-card:hover {
-                transform: perspective(1000px) rotateX(0deg) translateY(-10px);
-                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(0, 243, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+                transform: translateY(-4px);
+                box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
             }
 
         .header-title {
             font-size: 42px;
             font-weight: 700;
-            background: var(--hologram-gradient);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicWave 5s linear infinite;
+            color: var(--text-dark);
             margin-bottom: 10px;
             position: relative;
             z-index: 1;
         }
 
-        /* Earnings Card - Holographic Design */
+        /* Earnings Card - Light Theme with 3D Shadow */
         .earnings-card {
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.3) 0%, rgba(255, 0, 255, 0.3) 50%, rgba(0, 255, 157, 0.3) 100%);
-            border-radius: 25px;
-            padding: 30px;
-            color: white;
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 32px;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            transform: perspective(1000px) rotateX(5deg);
-            box-shadow: 0 20px 60px rgba(0, 102, 255, 0.4), inset 0 0 0 1px var(--glass-border);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-3d);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
         }
 
             .earnings-card::before {
@@ -213,37 +201,14 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 3px;
-                background: var(--hologram-gradient);
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
                 z-index: 1;
             }
 
-            .earnings-card::after {
-                content: '';
-                position: absolute;
-                top: -50%;
-                right: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-                animation: pulse 4s ease-in-out infinite;
-            }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.5;
-            }
-
-            50% {
-                transform: scale(1.2);
-                opacity: 0.8;
-            }
-        }
-
         .earnings-card:hover {
-            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
-            box-shadow: 0 30px 80px rgba(0, 102, 255, 0.5), 0 0 100px rgba(0, 243, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
         }
 
         .earnings-header {
@@ -257,7 +222,7 @@
 
         .earnings-title {
             font-size: 18px;
-            opacity: 0.9;
+            color: var(--text-gray);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -267,7 +232,7 @@
             font-size: 48px;
             font-weight: 800;
             margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            color: var(--text-dark);
             position: relative;
             z-index: 1;
         }
@@ -279,7 +244,7 @@
 
         .earnings-subtitle {
             font-size: 16px;
-            opacity: 0.85;
+            color: var(--text-gray);
             margin-bottom: 25px;
             position: relative;
             z-index: 1;
@@ -290,7 +255,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
             position: relative;
             z-index: 1;
         }
@@ -303,11 +268,12 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
+            color: var(--primary-red);
         }
 
         .earning-stat-label {
             font-size: 13px;
-            opacity: 0.8;
+            color: var(--text-gray);
         }
 
         /* Stats Grid with Holographic Effects */
@@ -522,35 +488,39 @@
             border-radius: 20px;
             font-weight: 600;
             font-size: 14px;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: var(--bg-gray);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .level-diamond {
-            background: var(--hologram-gradient);
-            color: var(--dark-bg);
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+            color: white;
+            border-color: var(--primary-red);
         }
 
         .level-gold {
             background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
             color: #713f12;
+            border-color: #facc15;
         }
 
         .level-silver {
             background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
             color: #1f2937;
+            border-color: #9ca3af;
         }
 
         .level-bronze {
             background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
             color: #7c2d12;
+            border-color: #fb923c;
         }
 
         .level-beginner {
-            background: linear-gradient(135deg, rgba(0, 243, 255, 0.3) 0%, rgba(0, 102, 255, 0.3) 100%);
-            color: white;
-            border: 1px solid rgba(0, 243, 255, 0.3);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: #075985;
+            border-color: #0ea5e9;
         }
 
         /* 3D Chart Container */
@@ -813,11 +783,11 @@
                     <h1 id="welcomeMessage" class="header-title">
                         Welcome back, User! 👋
                     </h1>
-                    <p style="color: rgba(255, 255, 255, 0.7); position: relative; z-index: 1;">Dashboard penghasilan dan performa Anda</p>
+                    <p style="color: var(--text-gray); position: relative; z-index: 1;">Dashboard penghasilan dan performa Anda</p>
                 </div>
                 <div class="text-end">
-                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px; position: relative; z-index: 1;">Current Time</div>
-                    <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--neon-cyan); position: relative; z-index: 1;">Loading...</div>
+                    <div style="color: var(--text-gray); font-size: 14px; position: relative; z-index: 1;">Current Time</div>
+                    <div id="currentDateTime" style="font-size: 24px; font-weight: 600; color: var(--primary-red); position: relative; z-index: 1;">Loading...</div>
                 </div>
             </div>
         </div>
