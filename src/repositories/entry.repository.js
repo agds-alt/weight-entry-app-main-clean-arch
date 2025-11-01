@@ -424,11 +424,12 @@ class EntryRepository {
     /**
      * Get user earnings/omset
      * @param {string|null} username - If provided, get specific user. If null, get all users (admin only)
-     * @returns {Object} User earnings data
+     * @returns {Object} User earnings data with daily allowance + entry allowance
      */
     async getUserEarnings(username = null) {
         try {
-            const RATE_PER_ENTRY = 500; // Rp 500 per entry
+            const RATE_PER_ENTRY = 500;      // Rp 500 per entry
+            const DAILY_ALLOWANCE = 50000;    // Rp 50.000 per working day
 
             let query = supabase
                 .from('entries')
@@ -450,8 +451,14 @@ class EntryRepository {
                     return {
                         username: username,
                         total_entries: 0,
+                        total_working_days: 0,
+                        entry_earnings: 0,
+                        daily_allowance: 0,
                         total_earnings: 0,
                         today_entries: 0,
+                        today_has_work: false,
+                        today_entry_earnings: 0,
+                        today_daily_allowance: 0,
                         today_earnings: 0
                     };
                 }
@@ -471,24 +478,46 @@ class EntryRepository {
                     userStats[user] = {
                         username: user,
                         total_entries: 0,
-                        today_entries: 0
+                        today_entries: 0,
+                        working_days: new Set() // Track unique working days
                     };
                 }
 
                 userStats[user].total_entries++;
+                userStats[user].working_days.add(entryDate); // Add unique date
+
                 if (isToday) {
                     userStats[user].today_entries++;
                 }
             });
 
-            // Calculate earnings
-            const result = Object.values(userStats).map(stats => ({
-                username: stats.username,
-                total_entries: stats.total_entries,
-                total_earnings: stats.total_entries * RATE_PER_ENTRY,
-                today_entries: stats.today_entries,
-                today_earnings: stats.today_entries * RATE_PER_ENTRY
-            }));
+            // Calculate earnings with daily allowance
+            const result = Object.values(userStats).map(stats => {
+                const totalWorkingDays = stats.working_days.size;
+                const entryEarnings = stats.total_entries * RATE_PER_ENTRY;
+                const dailyAllowanceTotal = totalWorkingDays * DAILY_ALLOWANCE;
+                const totalEarnings = entryEarnings + dailyAllowanceTotal;
+
+                // Today earnings
+                const todayHasWork = stats.today_entries > 0;
+                const todayEntryEarnings = stats.today_entries * RATE_PER_ENTRY;
+                const todayDailyAllowance = todayHasWork ? DAILY_ALLOWANCE : 0;
+                const todayEarnings = todayEntryEarnings + todayDailyAllowance;
+
+                return {
+                    username: stats.username,
+                    total_entries: stats.total_entries,
+                    total_working_days: totalWorkingDays,
+                    entry_earnings: entryEarnings,
+                    daily_allowance: dailyAllowanceTotal,
+                    total_earnings: totalEarnings,
+                    today_entries: stats.today_entries,
+                    today_has_work: todayHasWork,
+                    today_entry_earnings: todayEntryEarnings,
+                    today_daily_allowance: todayDailyAllowance,
+                    today_earnings: todayEarnings
+                };
+            });
 
             // Sort by total earnings descending
             result.sort((a, b) => b.total_earnings - a.total_earnings);
@@ -498,8 +527,14 @@ class EntryRepository {
                 return result[0] || {
                     username: username,
                     total_entries: 0,
+                    total_working_days: 0,
+                    entry_earnings: 0,
+                    daily_allowance: 0,
                     total_earnings: 0,
                     today_entries: 0,
+                    today_has_work: false,
+                    today_entry_earnings: 0,
+                    today_daily_allowance: 0,
                     today_earnings: 0
                 };
             }
@@ -511,8 +546,14 @@ class EntryRepository {
                 return {
                     username: username,
                     total_entries: 0,
+                    total_working_days: 0,
+                    entry_earnings: 0,
+                    daily_allowance: 0,
                     total_earnings: 0,
                     today_entries: 0,
+                    today_has_work: false,
+                    today_entry_earnings: 0,
+                    today_daily_allowance: 0,
                     today_earnings: 0
                 };
             }
