@@ -184,6 +184,23 @@ class EntryService {
     }
 
     /**
+     * Get user earnings/omset
+     * For admin: get all users earnings
+     * For regular user: get only their earnings
+     */
+    async getUserEarnings(username, role) {
+        try {
+            // Admin can see all users, regular users can only see their own
+            const targetUsername = role === 'admin' ? null : username;
+            const earnings = await entryRepository.getUserEarnings(targetUsername);
+            return earnings;
+        } catch (error) {
+            console.error('Get user earnings error:', error);
+            throw new Error('Failed to get user earnings');
+        }
+    }
+
+    /**
      * Get entries for export
      */
     async getEntriesForExport(options) {

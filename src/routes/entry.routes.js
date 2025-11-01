@@ -59,6 +59,17 @@ router.get(
 );
 
 /**
+ * @route   GET /api/entries/earnings
+ * @desc    Get user earnings/omset (Rp 500 per entry)
+ * @access  Private
+ */
+router.get(
+    '/earnings',
+    authenticateToken,
+    entryController.getUserEarnings
+);
+
+/**
  * @route   GET /api/entries/export
  * @desc    Export entries to CSV or Excel
  * @access  Private
