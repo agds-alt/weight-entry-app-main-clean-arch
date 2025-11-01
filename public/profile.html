@@ -779,7 +779,8 @@
                 const entries = sampleEntries[period];
 
                 if (entries && entries.length > 0) {
-                    updateStats(entries);
+                    // Stats cards are handled by loadEarningsData() from API
+                    // No need to update stats from sample data
                     renderTable(entries);
                     document.getElementById('loadingState').style.display = 'none';
                     document.getElementById('tableContent').style.display = 'block';
@@ -790,24 +791,7 @@
             }, 800);
         }
 
-        function updateStats(entries) {
-            // Total entries
-            document.getElementById('totalEntries').textContent = entries.length;
-
-            // Average weight
-            const avgWeight = entries.reduce((sum, e) => sum + e.weight, 0) / entries.length;
-            document.getElementById('avgWeight').textContent = avgWeight.toFixed(1) + ' kg';
-
-            // Weight change
-            const weightChange = entries.reduce((sum, e) => sum + e.diff, 0);
-            const changeEl = document.getElementById('weightChange');
-            changeEl.textContent = (weightChange > 0 ? '+' : '') + weightChange.toFixed(1) + ' kg';
-
-            // Total earnings
-            const totalEarnings = entries.reduce((sum, e) => sum + e.earnings, 0);
-            document.getElementById('totalEarnings').textContent = 
-                'Rp ' + totalEarnings.toLocaleString('id-ID');
-        }
+        // updateStats removed - stats cards now updated via API in updateEarningsStats()
 
         function renderTable(entries) {
             const tbody = document.getElementById('entryTableBody');
