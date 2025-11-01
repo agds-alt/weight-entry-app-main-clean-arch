@@ -1087,8 +1087,8 @@
                         const locationParts = [userLocation.village, userLocation.district, userLocation.city].filter(x => x);
                         const locationStr = locationParts.length > 0 ? locationParts.join(', ') : 'Indonesia';
                         const coordsStr = userLocation.coords ? `Lat: ${userLocation.coords.lat}, Lon: ${userLocation.coords.lon}` : '';
-                        
-                        const lines = [userName, `${dateStr} ${timeStr}`, locationStr, coordsStr].filter(line => line);
+
+                        const lines = [`${dateStr} ${timeStr}`, locationStr, coordsStr].filter(line => line);
 
                         // Watermark 3x bigger: 36-48px (previously 12-16px)
                         const fontSize = Math.max(36, Math.min(48, width / 16.67));
