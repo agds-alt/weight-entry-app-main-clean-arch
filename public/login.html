@@ -9,16 +9,27 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-red: #ff3b3b;
-            --primary-red-dark: #e63535;
-            --primary-red-light: #ff6b6b;
-            --bg-white: #ffffff;
-            --bg-gray: #f5f7fa;
-            --surface: #ffffff;
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
-            --border-radius: 16px;
+            /* Ultra Minimal White Theme */
+            --white: #FFFFFF;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-200: #EEEEEE;
+            --gray-300: #E0E0E0;
+            --gray-400: #BDBDBD;
+            --gray-500: #9E9E9E;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+
+            /* Border */
+            --border-light: 1px solid #E0E0E0;
+            --border-medium: 2px solid #BDBDBD;
         }
 
         * {
@@ -30,8 +41,8 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 14px;
-            background: var(--bg-gray);
-            color: var(--text-primary);
+            background: var(--white);
+            color: var(--gray-900);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -47,10 +58,7 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background:
-                    linear-gradient(90deg, rgba(255, 59, 59, 0.02) 1px, transparent 1px),
-                    linear-gradient(rgba(255, 59, 59, 0.02) 1px, transparent 1px);
-                background-size: 50px 50px;
+                background: var(--white);
                 pointer-events: none;
                 z-index: 0;
             }
@@ -63,10 +71,11 @@
         }
 
         .login-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 32px;
-            box-shadow: var(--shadow-3d);
+            box-shadow: var(--shadow-md);
+            border: var(--border-light);
             position: relative;
             transition: all 0.3s ease;
         }
@@ -77,14 +86,13 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 4px;
-                background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
-                border-radius: var(--border-radius) var(--border-radius) 0 0;
+                height: 2px;
+                background: var(--gray-900);
+                border-radius: 12px 12px 0 0;
             }
 
             .login-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
+                box-shadow: var(--shadow-lg);
             }
 
         @media (min-width: 640px) {
@@ -102,36 +110,36 @@
             .login-header i {
                 font-size: 48px;
                 margin-bottom: 12px;
-                color: var(--primary-red);
+                color: var(--gray-900);
                 display: block;
             }
 
             .login-header h3 {
-                font-size: 22px;
+                font-size: 20px;
                 font-weight: 700;
-                color: var(--text-primary);
+                color: var(--gray-900);
                 margin-bottom: 8px;
             }
 
             .login-header p {
-                color: var(--text-secondary);
-                font-size: 14px;
+                color: var(--gray-600);
+                font-size: 13px;
             }
 
         .form-control {
-            background: var(--bg-white);
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            color: var(--text-primary);
-            border-radius: 10px;
+            background: var(--white);
+            border: var(--border-light);
+            color: var(--gray-900);
+            border-radius: 8px;
             padding: 12px 14px;
             font-size: 14px;
         }
 
             .form-control:focus {
-                background: var(--bg-white);
-                border-color: var(--primary-red);
-                box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
-                color: var(--text-primary);
+                background: var(--white);
+                border-color: var(--gray-900);
+                box-shadow: 0 0 0 3px rgba(33, 33, 33, 0.1);
+                color: var(--gray-900);
             }
 
         .password-wrapper {
@@ -145,35 +153,35 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--gray-600);
             cursor: pointer;
             padding: 8px;
             border-radius: 6px;
         }
 
             .password-toggle:hover {
-                background: rgba(255, 59, 59, 0.05);
-                color: var(--primary-red);
+                background: var(--gray-100);
+                color: var(--gray-900);
             }
 
         .btn-login {
-            background: var(--primary-red);
+            background: var(--gray-900);
             border: none;
-            color: white;
+            color: var(--white);
             padding: 13px;
             font-weight: 600;
             font-size: 14px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 8px;
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+            box-shadow: var(--shadow-md);
         }
 
             .btn-login:hover {
                 transform: translateY(-2px);
-                background: var(--primary-red-dark);
-                box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
-                color: white;
+                background: var(--gray-800);
+                box-shadow: var(--shadow-lg);
+                color: var(--white);
             }
 
             .btn-login:disabled {
@@ -187,15 +195,15 @@
             align-items: center;
             text-align: center;
             margin: 20px 0;
-            color: var(--text-secondary);
-            font-size: 13px;
+            color: var(--gray-600);
+            font-size: 12px;
         }
 
             .divider::before,
             .divider::after {
                 content: '';
                 flex: 1;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                border-bottom: var(--border-light);
             }
 
             .divider span {
@@ -203,38 +211,38 @@
             }
 
         .btn-signup {
-            border: 2px solid rgba(0, 0, 0, 0.15);
+            border: var(--border-medium);
             background: transparent;
-            color: var(--text-primary);
+            color: var(--gray-900);
             padding: 12px;
             font-weight: 600;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: all 0.3s;
         }
 
             .btn-signup:hover {
-                background: var(--primary-red);
-                color: white;
-                border-color: var(--primary-red);
+                background: var(--gray-900);
+                color: var(--white);
+                border-color: var(--gray-900);
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+                box-shadow: var(--shadow-md);
             }
 
         .forgot-link {
-            color: var(--primary-red);
+            color: var(--gray-900);
             text-decoration: none;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
             .forgot-link:hover {
-                color: var(--primary-red-dark);
+                color: var(--gray-700);
                 text-decoration: underline;
             }
 
         .alert {
-            border-radius: 10px;
-            border: none;
+            border-radius: 8px;
+            border: var(--border-light);
             padding: 12px 14px;
             font-size: 13px;
         }
