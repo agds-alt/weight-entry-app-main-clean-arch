@@ -282,13 +282,18 @@
 
         // Fetch earnings data from API
         async function loadEarningsData() {
+            console.log('🔍 [DEBUG] Starting loadEarningsData...');
             try {
                 const token = localStorage.getItem('accessToken');
+                console.log('🔑 [DEBUG] Token exists:', !!token);
+                console.log('🔑 [DEBUG] Token value:', token ? token.substring(0, 20) + '...' : 'null');
+
                 if (!token) {
-                    console.error('No access token found');
+                    console.error('❌ No access token found');
                     return;
                 }
 
+                console.log('📡 [DEBUG] Fetching from /api/entries/earnings...');
                 const response = await fetch('/api/entries/earnings', {
                     method: 'GET',
                     headers: {
@@ -297,31 +302,64 @@
                     }
                 });
 
+                console.log('📥 [DEBUG] Response status:', response.status);
+                console.log('📥 [DEBUG] Response ok:', response.ok);
+
                 if (!response.ok) {
-                    throw new Error('Failed to fetch earnings data');
+                    const errorText = await response.text();
+                    console.error('❌ API Error:', errorText);
+                    throw new Error(`Failed to fetch earnings data: ${response.status}`);
                 }
 
                 const result = await response.json();
+                console.log('📦 [DEBUG] Full API result:', result);
+                console.log('📦 [DEBUG] result.success:', result.success);
+                console.log('📦 [DEBUG] result.data:', result.data);
 
                 if (result.success && result.data) {
+                    console.log('✅ [DEBUG] Calling updateEarningsStats with data:', result.data);
                     updateEarningsStats(result.data);
+                } else {
+                    console.warn('⚠️ [DEBUG] API returned success=false or no data');
                 }
             } catch (error) {
-                console.error('Error loading earnings:', error);
+                console.error('❌ Error loading earnings:', error);
+                console.error('❌ Error stack:', error.stack);
             }
         }
 
         function updateEarningsStats(data) {
+            console.log('🎨 [DEBUG] updateEarningsStats called with:', data);
+
             // Format number to Indonesian Rupiah
             const formatRupiah = (amount) => {
-                return 'Rp ' + amount.toLocaleString('id-ID');
+                const formatted = 'Rp ' + amount.toLocaleString('id-ID');
+                console.log(`💰 [DEBUG] formatRupiah(${amount}) = ${formatted}`);
+                return formatted;
             };
 
             // Update stats cards
-            document.getElementById('totalEntries').textContent = data.total_entries || 0;
-            document.getElementById('totalEarnings').textContent = formatRupiah(data.total_earnings || 0);
-            document.getElementById('todayEntries').textContent = data.today_entries || 0;
-            document.getElementById('todayEarnings').textContent = formatRupiah(data.today_earnings || 0);
+            console.log('📝 [DEBUG] Updating totalEntries:', data.total_entries);
+            const totalEntriesEl = document.getElementById('totalEntries');
+            console.log('📝 [DEBUG] totalEntries element:', totalEntriesEl);
+            if (totalEntriesEl) totalEntriesEl.textContent = data.total_entries || 0;
+
+            console.log('📝 [DEBUG] Updating totalEarnings:', data.total_earnings);
+            const totalEarningsEl = document.getElementById('totalEarnings');
+            console.log('📝 [DEBUG] totalEarnings element:', totalEarningsEl);
+            if (totalEarningsEl) totalEarningsEl.textContent = formatRupiah(data.total_earnings || 0);
+
+            console.log('📝 [DEBUG] Updating todayEntries:', data.today_entries);
+            const todayEntriesEl = document.getElementById('todayEntries');
+            console.log('📝 [DEBUG] todayEntries element:', todayEntriesEl);
+            if (todayEntriesEl) todayEntriesEl.textContent = data.today_entries || 0;
+
+            console.log('📝 [DEBUG] Updating todayEarnings:', data.today_earnings);
+            const todayEarningsEl = document.getElementById('todayEarnings');
+            console.log('📝 [DEBUG] todayEarnings element:', todayEarningsEl);
+            if (todayEarningsEl) todayEarningsEl.textContent = formatRupiah(data.today_earnings || 0);
+
+            console.log('✅ [DEBUG] All stats updated successfully!');
         }
     </script>
     <script src="/js/sidebar.js"></script>
