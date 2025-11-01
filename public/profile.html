@@ -42,136 +42,57 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--white);
+            background: var(--gray-50);
             color: var(--gray-900);
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%);
-            animation: holographicFloat 20s ease infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        @keyframes holographicFloat {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            33% { transform: rotate(3deg) scale(1.05); }
-            66% { transform: rotate(-2deg) scale(1.02); }
         }
 
         .main-content {
             padding: 30px;
             min-height: 100vh;
-            position: relative;
-            z-index: 1;
         }
 
         /* Profile Header */
         .profile-header {
-            display: none; /* Hidden - not needed */
             background: var(--white);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 30px;
+            border-radius: 12px;
             padding: 40px;
             margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
-            transform: perspective(1000px) rotateX(2deg);
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: var(--shadow-holographic);
-            border: 1px solid var(--glass-border);
-        }
-
-        .profile-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--hologram-gradient);
-            opacity: 0.05;
-            animation: hologramShift 8s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        @keyframes hologramShift {
-            0%, 100% { filter: hue-rotate(0deg) blur(20px); transform: scale(1.2) rotate(0deg); }
-            50% { filter: hue-rotate(180deg) blur(30px); transform: scale(1.25) rotate(180deg); }
+            box-shadow: var(--shadow-md);
+            border: var(--border-light);
+            transition: all 0.3s ease;
         }
 
         .profile-header:hover {
-            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
 
         .profile-content {
             display: flex;
             align-items: center;
             gap: 30px;
-            position: relative;
-            z-index: 1;
         }
 
         .profile-avatar {
             width: 120px;
             height: 120px;
-            border-radius: 25px;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
+            border-radius: 12px;
+            background: var(--gray-900);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 42px;
             font-weight: 700;
             color: white;
-            box-shadow: var(--shadow-holographic);
-            animation: holographicWave 6s linear infinite;
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes holographicWave {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
-        }
-
-        .profile-avatar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            box-shadow: var(--shadow-md);
         }
 
         .profile-info h1 {
             font-size: 36px;
             font-weight: 700;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicWave 8s linear infinite;
+            color: var(--gray-900);
             margin-bottom: 8px;
         }
 
@@ -186,22 +107,26 @@
             align-items: center;
             gap: 10px;
             padding: 8px 18px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: var(--border-light);
             transition: all 0.3s;
         }
 
         .meta-item:hover {
-            background: rgba(0, 243, 255, 0.1);
+            background: var(--gray-100);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 243, 255, 0.2);
+            box-shadow: var(--shadow-sm);
         }
 
         .meta-item i {
             color: var(--gray-900);
             font-size: 16px;
+        }
+
+        .meta-item span {
+            color: var(--gray-900);
+            font-size: 14px;
         }
 
         /* Stats Grid */
@@ -214,57 +139,29 @@
 
         .stat-card {
             background: var(--white);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
+            border-radius: 12px;
             padding: 30px;
             text-align: center;
-            transform: perspective(1000px) rotateX(3deg);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: var(--shadow-holographic);
-            border: 1px solid var(--glass-border);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            opacity: 0.03;
-            animation: holographicWave 12s linear infinite;
-            z-index: -1;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            border: var(--border-light);
         }
 
         .stat-card:hover {
-            transform: perspective(1000px) rotateX(0deg) translateY(-8px);
-            box-shadow: 0 25px 50px rgba(0, 243, 255, 0.3), 0 0 35px rgba(255, 0, 255, 0.25);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .stat-icon {
             font-size: 42px;
             margin-bottom: 15px;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicWave 6s linear infinite;
+            color: var(--gray-900);
         }
 
         .stat-value {
             font-size: 36px;
             font-weight: 700;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicWave 8s linear infinite;
+            color: var(--gray-900);
             margin-bottom: 8px;
         }
 
