@@ -246,7 +246,7 @@ class EntryController {
     async getStatistics(req, res) {
         try {
             console.log('📊 Getting statistics');
-            
+
             const stats = await entryService.getStatistics();
 
             return res.json({
@@ -266,6 +266,40 @@ class EntryController {
                     totalEntries: 0,
                     todayEntries: 0,
                     avgSelisih: '0.00'
+                }
+            });
+        }
+    }
+
+    /**
+     * Get user earnings/omset
+     * Admin: sees all users earnings
+     * Regular user: sees only their earnings
+     */
+    async getUserEarnings(req, res) {
+        try {
+            const username = req.user?.username || req.session?.user?.username;
+            const role = req.user?.role || req.session?.user?.role || 'user';
+
+            console.log('💰 Getting user earnings for:', username, 'role:', role);
+
+            const earnings = await entryService.getUserEarnings(username, role);
+
+            return res.json({
+                success: true,
+                data: earnings
+            });
+        } catch (error) {
+            console.error('❌ Get user earnings controller error:', error);
+            return res.status(500).json({
+                success: false,
+                message: error.message || 'Gagal mengambil data omset',
+                data: role === 'admin' ? [] : {
+                    username: username || '',
+                    total_entries: 0,
+                    total_earnings: 0,
+                    today_entries: 0,
+                    today_earnings: 0
                 }
             });
         }

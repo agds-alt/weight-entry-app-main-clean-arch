@@ -420,6 +420,105 @@ class EntryRepository {
             };
         }
     }
+
+    /**
+     * Get user earnings/omset
+     * @param {string|null} username - If provided, get specific user. If null, get all users (admin only)
+     * @returns {Object} User earnings data
+     */
+    async getUserEarnings(username = null) {
+        try {
+            const RATE_PER_ENTRY = 500; // Rp 500 per entry
+
+            let query = supabase
+                .from('entries')
+                .select('created_by, created_at');
+
+            // Filter by username if provided
+            if (username) {
+                query = query.eq('created_by', username);
+            }
+
+            const { data, error } = await query;
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
+                if (username) {
+                    return {
+                        username: username,
+                        total_entries: 0,
+                        total_earnings: 0,
+                        today_entries: 0,
+                        today_earnings: 0
+                    };
+                }
+                return [];
+            }
+
+            // Group by user
+            const userStats = {};
+            const today = new Date().toDateString();
+
+            data.forEach(entry => {
+                const user = entry.created_by;
+                const entryDate = new Date(entry.created_at).toDateString();
+                const isToday = entryDate === today;
+
+                if (!userStats[user]) {
+                    userStats[user] = {
+                        username: user,
+                        total_entries: 0,
+                        today_entries: 0
+                    };
+                }
+
+                userStats[user].total_entries++;
+                if (isToday) {
+                    userStats[user].today_entries++;
+                }
+            });
+
+            // Calculate earnings
+            const result = Object.values(userStats).map(stats => ({
+                username: stats.username,
+                total_entries: stats.total_entries,
+                total_earnings: stats.total_entries * RATE_PER_ENTRY,
+                today_entries: stats.today_entries,
+                today_earnings: stats.today_entries * RATE_PER_ENTRY
+            }));
+
+            // Sort by total earnings descending
+            result.sort((a, b) => b.total_earnings - a.total_earnings);
+
+            // If specific user requested, return single object
+            if (username) {
+                return result[0] || {
+                    username: username,
+                    total_entries: 0,
+                    total_earnings: 0,
+                    today_entries: 0,
+                    today_earnings: 0
+                };
+            }
+
+            return result;
+        } catch (error) {
+            console.error('Repository getUserEarnings error:', error);
+            if (username) {
+                return {
+                    username: username,
+                    total_entries: 0,
+                    total_earnings: 0,
+                    today_entries: 0,
+                    today_earnings: 0
+                };
+            }
+            return [];
+        }
+    }
 }
 
 module.exports = new EntryRepository();
