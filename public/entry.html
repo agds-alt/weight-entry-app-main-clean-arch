@@ -1315,7 +1315,15 @@
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
+            // Validasi nomor resi
+            const noResi = document.getElementById('noResi').value.trim();
+            if (!noResi) {
+                showToast('error', 'Nomor Resi Kosong', 'Masukkan nomor resi terlebih dahulu', 4000);
+                return;
+            }
+
+            // Validasi foto
             if (!photos.slot1 || !photos.slot2) {
                 showToast('error', 'Foto Belum Lengkap', 'Upload 2 foto terlebih dahulu', 4000);
                 return;
@@ -1329,12 +1337,21 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
             try {
-                const noResi = document.getElementById('noResi').value.toUpperCase().trim();
+                // Clean up nomor resi untuk filename (hapus special chars)
+                const cleanResi = noResi.toUpperCase().replace(/[^A-Z0-9]/g, '_');
                 const timestamp = Date.now();
-                
+                const userName = document.getElementById('nama').value.trim() || 'unknown';
+
+                // Format: RESI_USERNAME_TIMESTAMP_SLOT
+                // Example: ABC123_JOHN_1234567890_1.jpg
+                const publicId1 = `${cleanResi}_${userName}_${timestamp}_foto1`;
+                const publicId2 = `${cleanResi}_${userName}_${timestamp}_foto2`;
+
+                showToast('info', 'Uploading...', `Mengupload foto untuk resi: ${noResi}`, 3000);
+
                 const [url1, url2] = await Promise.all([
-                    uploadToCloudinary(photos.slot1, `${noResi}_${timestamp}_1`),
-                    uploadToCloudinary(photos.slot2, `${noResi}_${timestamp}_2`)
+                    uploadToCloudinary(photos.slot1, publicId1),
+                    uploadToCloudinary(photos.slot2, publicId2)
                 ]);
 
                 const entryData = {
@@ -1362,9 +1379,9 @@
                 if (!response.ok) throw new Error('Gagal menyimpan data');
 
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    showToast('success', 'Data Tersimpan', `Resi ${noResi} berhasil disimpan`, 4000);
+                    showToast('success', 'Data Tersimpan', `Resi ${noResi} berhasil disimpan dengan foto: ${publicId1}, ${publicId2}`, 5000);
                     setTimeout(() => {
                         form.reset();
                         photos = { slot1: null, slot2: null };
