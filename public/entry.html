@@ -1067,35 +1067,36 @@
                         const coordsStr = userLocation.coords ? `Lat: ${userLocation.coords.lat}, Lon: ${userLocation.coords.lon}` : '';
                         
                         const lines = [userName, `${dateStr} ${timeStr}`, locationStr, coordsStr].filter(line => line);
-                        
-                        const fontSize = Math.max(12, Math.min(16, width / 50));
+
+                        // Watermark 3x bigger: 36-48px (previously 12-16px)
+                        const fontSize = Math.max(36, Math.min(48, width / 16.67));
                         ctx.font = `bold ${fontSize}px Arial`;
-                        
+
                         const lineHeight = fontSize * 1.4;
-                        const padding = fontSize * 1;
-                        
+                        const padding = fontSize * 1.2;
+
                         let maxWidth = 0;
                         lines.forEach(line => {
                             const textWidth = ctx.measureText(line).width;
                             if (textWidth > maxWidth) maxWidth = textWidth;
                         });
-                        
+
                         const boxWidth = maxWidth + (padding * 2);
                         const boxHeight = (lines.length * lineHeight) + (padding * 1.5);
-                        const margin = 10;
+                        const margin = 20;
                         const boxX = width - boxWidth - margin;
                         const boxY = height - boxHeight - margin;
-                        
-                        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
                         ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-                        
+
                         ctx.textAlign = 'left';
                         ctx.textBaseline = 'top';
                         ctx.fillStyle = '#FFFFFF';
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                        ctx.shadowBlur = 2;
-                        ctx.shadowOffsetX = 1;
-                        ctx.shadowOffsetY = 1;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                        ctx.shadowBlur = 4;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
                         
                         lines.forEach((line, index) => {
                             const textX = boxX + padding;
