@@ -11,16 +11,27 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --primary-red: #ff3b3b;
-            --primary-red-dark: #e63535;
-            --primary-red-light: #ff6b6b;
-            --bg-white: #ffffff;
-            --bg-gray: #f5f7fa;
-            --surface: #ffffff;
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
-            --border-radius: 16px;
+            /* Ultra Minimal White Theme */
+            --white: #FFFFFF;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-200: #EEEEEE;
+            --gray-300: #E0E0E0;
+            --gray-400: #BDBDBD;
+            --gray-500: #9E9E9E;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+
+            /* Border */
+            --border-light: 1px solid #E0E0E0;
+            --border-medium: 2px solid #BDBDBD;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,8 +39,8 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 14px;
-            background: var(--bg-gray);
-            color: var(--text-primary);
+            background: var(--white);
+            color: var(--gray-900);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -42,10 +53,7 @@
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background:
-                linear-gradient(90deg, rgba(255, 59, 59, 0.02) 1px, transparent 1px),
-                linear-gradient(rgba(255, 59, 59, 0.02) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background: var(--white);
             pointer-events: none;
             z-index: 0;
         }
@@ -58,26 +66,36 @@
         }
 
         .signup-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow-3d);
-            border: none;
+            box-shadow: var(--shadow-md);
+            border: var(--border-light);
             position: relative;
+        }
+
+        .signup-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gray-900);
+            z-index: 1;
         }
 
         .signup-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
+            box-shadow: var(--shadow-lg);
         }
 
         .signup-header {
-            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
-            padding: 32px 28px;
+            background: var(--white);
+            padding: 28px 24px;
             text-align: center;
             position: relative;
-            border-bottom: 3px solid var(--primary-red);
+            padding-top: 32px;
         }
 
         .signup-icon {
@@ -91,24 +109,24 @@
             margin: 0 auto 16px;
             font-size: 32px;
             color: white;
-            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+            box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
             transition: all 0.3s;
         }
 
         .signup-icon:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
+            box-shadow: 0 6px 16px rgba(33, 33, 33, 0.4);
         }
 
         .signup-header h3 {
-            color: var(--text-primary);
+            color: var(--gray-900);
             font-weight: 700;
             font-size: 24px;
             margin-bottom: 6px;
         }
 
         .signup-header p {
-            color: var(--text-secondary);
+            color: var(--gray-600);
             margin: 0;
             font-size: 14px;
         }
@@ -129,7 +147,7 @@
         }
 
         .form-label {
-            color: var(--text-primary);
+            color: var(--gray-900);
             font-weight: 600;
             margin-bottom: 6px;
             font-size: 13px;
@@ -140,25 +158,25 @@
 
         .form-label i {
             font-size: 14px;
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         .form-control {
             background: var(--bg-white);
             border: 1px solid rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 12px 44px 12px 14px;
             font-size: 14px;
-            color: var(--text-primary);
+            color: var(--gray-900);
             transition: all 0.3s;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         .form-control:focus {
             background: var(--bg-white);
-            border-color: var(--primary-red);
-            color: var(--text-primary);
-            box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
+            border-color: var(--gray-900);
+            color: var(--gray-900);
+            box-shadow: 0 0 0 3px rgba(33, 33, 33, 0.1);
             outline: none;
         }
 
@@ -183,7 +201,7 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--gray-600);
             cursor: pointer;
             padding: 8px;
             border-radius: 6px;
@@ -191,14 +209,14 @@
         }
 
         .password-toggle:hover {
-            color: var(--primary-red);
-            background: rgba(255, 59, 59, 0.05);
+            color: var(--gray-900);
+            background: rgba(33, 33, 33, 0.05);
         }
 
         .strength-bar {
             height: 5px;
             background: rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
             margin-top: 6px;
         }
@@ -206,16 +224,16 @@
         .strength-fill {
             height: 100%;
             width: 0%;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: all 0.4s;
-            background: var(--primary-red);
+            background: var(--gray-900);
         }
 
         .feedback-text {
             font-size: 12px;
             margin-top: 6px;
             display: block;
-            color: var(--text-secondary);
+            color: var(--gray-600);
         }
 
         .invalid-feedback, .valid-feedback {
@@ -225,23 +243,23 @@
 
         .btn-signup {
             width: 100%;
-            background: var(--primary-red);
+            background: var(--gray-900);
             border: none;
             color: white;
             padding: 13px;
             font-weight: 600;
             font-size: 14px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 8px;
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+            box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         .btn-signup:hover {
             transform: translateY(-2px);
-            background: var(--primary-red-dark);
-            box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
+            background: var(--gray-800);
+            box-shadow: 0 6px 16px rgba(33, 33, 33, 0.4);
         }
 
         .btn-signup:disabled {
@@ -254,27 +272,27 @@
             width: 100%;
             border: 2px solid rgba(0, 0, 0, 0.15);
             background: transparent;
-            color: var(--text-primary);
+            color: var(--gray-900);
             padding: 12px;
             font-weight: 600;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 12px;
             transition: all 0.3s;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         .btn-back:hover {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+            box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
         }
 
         .alert-holographic {
             background: var(--surface);
             border: 1px solid;
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 12px 14px;
             margin-top: 16px;
             font-size: 13px;
@@ -285,19 +303,19 @@
 
         .alert-success {
             border-color: #10b981;
-            color: var(--text-primary);
+            color: var(--gray-900);
             background: linear-gradient(135deg, #f0fdf4, var(--surface));
         }
 
         .alert-danger {
             border-color: #ef4444;
-            color: var(--text-primary);
+            color: var(--gray-900);
             background: linear-gradient(135deg, #fef2f2, var(--surface));
         }
 
         .alert-info {
-            border-color: var(--primary-red);
-            color: var(--text-primary);
+            border-color: var(--gray-900);
+            color: var(--gray-900);
             background: linear-gradient(135deg, #fff5f5, var(--surface));
         }
 
