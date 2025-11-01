@@ -1250,24 +1250,49 @@
 
             Quagga.onDetected(function(result) {
                 if (result && result.codeResult && result.codeResult.code) {
-                    const code = result.codeResult.code;
+                    let code = result.codeResult.code;
                     const confidence = result.codeResult.decodedCodes.reduce((acc, code) => acc + (code.error || 0), 0) / result.codeResult.decodedCodes.length;
-                    
-                    if (confidence > 0.15) return;
-                    
+
+                    // Reject low confidence scans
+                    if (confidence > 0.15) {
+                        scanStatus.textContent = '⚠ Scan tidak jelas, coba lagi';
+                        scanStatus.style.color = 'var(--gray-600)';
+                        return;
+                    }
+
+                    // Sanitize: remove spaces, dashes, and other common chars
+                    code = code.replace(/[\s\-_\/\\]/g, '').toUpperCase();
+
+                    // Quick length validation before regex (performance)
+                    if (code.length !== 10 && code.length !== 12) {
+                        scanStatus.textContent = `✗ Format salah (${code.length} karakter)`;
+                        scanStatus.style.color = 'var(--gray-600)';
+                        return;
+                    }
+
                     let isValid = false;
                     let resiType = '';
-                    
+
+                    // Filter 1: Exactly 10 digits
                     if (/^\d{10}$/.test(code)) {
                         isValid = true;
-                        resiType = 'REGULAR';
-                    } else if (/^[A-Z]{2}\d{10}$/i.test(code)) {
+                        resiType = 'REGULAR (10 digit)';
+                    }
+                    // Filter 2: 2 letters + 10 digits
+                    else if (/^[A-Z]{2}\d{10}$/.test(code)) {
                         const validPrefixes = ['JX', 'JP', 'JT', 'JN', 'SI', 'SC', 'NI', 'NJ', 'AN', 'AT', 'ID', 'IE', 'LI', 'LE', 'LP', 'PO', 'PS', 'TI', 'TK', 'SP', 'SX', 'SA'];
-                        const prefix = code.substring(0, 2).toUpperCase();
+                        const prefix = code.substring(0, 2);
                         if (validPrefixes.includes(prefix)) {
                             isValid = true;
-                            resiType = 'NON-REGULAR';
+                            resiType = `NON-REGULAR (${prefix})`;
+                        } else {
+                            scanStatus.textContent = `✗ Prefix '${prefix}' tidak valid`;
+                            scanStatus.style.color = 'var(--gray-600)';
+                            return;
                         }
+                    } else {
+                        scanStatus.textContent = `✗ Format tidak sesuai: ${code}`;
+                        scanStatus.style.color = 'var(--gray-600)';
                     }
                     
                     if (isValid) {
