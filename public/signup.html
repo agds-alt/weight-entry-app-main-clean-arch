@@ -328,11 +328,127 @@
             border-width: 2px;
         }
 
+        /* Mobile Responsive Font Sizing */
         @media (max-width: 768px) {
-            .signup-container { max-width: 100%; }
-            .signup-header { padding: 30px 20px; }
-            .signup-header h3 { font-size: 24px; }
-            .signup-body { padding: 25px 20px; }
+            body {
+                font-size: 13px;
+                padding: 12px;
+            }
+
+            .signup-container {
+                max-width: 100%;
+            }
+
+            .signup-card {
+                padding: 0;
+            }
+
+            .signup-header {
+                padding: 24px 20px;
+            }
+
+            .logo-img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .signup-header h3 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            .signup-header p {
+                font-size: 12px;
+            }
+
+            .signup-body {
+                padding: 24px 20px;
+            }
+
+            .form-control {
+                font-size: 13px;
+                padding: 11px 40px 11px 12px;
+            }
+
+            .form-label {
+                font-size: 12px;
+            }
+
+            .btn-signup, .btn-back {
+                font-size: 14px;
+                padding: 13px 18px;
+                letter-spacing: 0.2px;
+            }
+
+            .feedback-text {
+                font-size: 11px;
+            }
+
+            .invalid-feedback, .valid-feedback {
+                font-size: 11px;
+            }
+
+            .alert-holographic {
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .signup-header {
+                padding: 20px 16px;
+            }
+
+            .logo-img {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 12px;
+            }
+
+            .signup-header h3 {
+                font-size: 17px;
+            }
+
+            .signup-header p {
+                font-size: 11px;
+            }
+
+            .signup-body {
+                padding: 20px 16px;
+            }
+
+            .form-control {
+                font-size: 12px;
+                padding: 10px 38px 10px 11px;
+            }
+
+            .form-label {
+                font-size: 11px;
+            }
+
+            .btn-signup, .btn-back {
+                font-size: 13px;
+                padding: 12px 16px;
+                letter-spacing: 0.2px;
+            }
+
+            .feedback-text {
+                font-size: 10px;
+            }
+
+            .invalid-feedback, .valid-feedback {
+                font-size: 10px;
+            }
+
+            .alert-holographic {
+                font-size: 11px;
+                padding: 9px 11px;
+            }
         }
 
         /* Floating particles effect */

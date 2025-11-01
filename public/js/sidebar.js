@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <div class="logo-section">
-                    <i class="fas fa-weight-hanging logo-icon"></i>
+                    <img src="/logo.png" alt="J&T Express" class="logo-icon">
                     <span class="logo-text">Aplikasi Deteksi Selisih Berat</span>
                 </div>
             </div>
@@ -239,8 +239,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             .logo-icon {
-                font-size: 24px;
-                color: var(--gray-900);
+                width: 36px;
+                height: 36px;
+                object-fit: contain;
                 transition: transform 0.3s;
             }
 
@@ -455,12 +456,125 @@ document.addEventListener('DOMContentLoaded', function() {
 
             /* Mobile Responsive */
             @media (max-width: 768px) {
+                body {
+                    font-size: 13px;
+                }
+
                 body.sidebar-open {
                     padding-left: 0;
                 }
 
                 body.sidebar-open .sidebar-toggle-btn {
                     left: 20px;
+                }
+
+                .sidebar-toggle-btn {
+                    width: 46px;
+                    height: 46px;
+                    font-size: 16px;
+                }
+
+                .sidebar {
+                    width: 260px;
+                }
+
+                .logo-icon {
+                    width: 32px;
+                    height: 32px;
+                }
+
+                .logo-text {
+                    font-size: 13px;
+                }
+
+                .user-name {
+                    font-size: 13px;
+                }
+
+                .user-role {
+                    font-size: 10px;
+                }
+
+                .nav-link {
+                    font-size: 13px;
+                    padding: 11px 14px;
+                }
+
+                .nav-link i {
+                    font-size: 15px;
+                }
+
+                .logout-btn {
+                    font-size: 13px;
+                    padding: 12px 14px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                body {
+                    font-size: 12px;
+                }
+
+                .sidebar-toggle-btn {
+                    width: 44px;
+                    height: 44px;
+                    font-size: 15px;
+                    top: 16px;
+                    left: 16px;
+                }
+
+                .sidebar {
+                    width: 240px;
+                }
+
+                .sidebar-header {
+                    padding: 20px 16px;
+                }
+
+                .logo-icon {
+                    width: 28px;
+                    height: 28px;
+                }
+
+                .logo-text {
+                    font-size: 12px;
+                    line-height: 1.2;
+                }
+
+                .user-info {
+                    padding: 16px;
+                }
+
+                .user-avatar {
+                    font-size: 32px;
+                }
+
+                .user-name {
+                    font-size: 12px;
+                }
+
+                .user-role {
+                    font-size: 9px;
+                }
+
+                .nav-link {
+                    font-size: 12px;
+                    padding: 10px 12px;
+                    margin: 3px 10px;
+                }
+
+                .nav-link i {
+                    font-size: 14px;
+                    width: 18px;
+                }
+
+                .logout-btn {
+                    font-size: 12px;
+                    padding: 11px 12px;
+                }
+
+                .nav-footer {
+                    padding: 14px;
                 }
             }
         </style>
