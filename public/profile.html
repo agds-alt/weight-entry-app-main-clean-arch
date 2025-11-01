@@ -204,43 +204,6 @@
             font-size: 16px;
         }
 
-        /* Period Selector */
-        .period-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .period-btn {
-            padding: 12px 28px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            color: var(--gray-900);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        .period-btn:hover {
-            background: rgba(0, 243, 255, 0.1);
-            border-color: var(--gray-900);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 243, 255, 0.2);
-        }
-
-        .period-btn.active {
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            animation: holographicWave 6s linear infinite;
-            color: white;
-            border-color: transparent;
-            box-shadow: var(--shadow-holographic);
-        }
-
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -313,176 +276,6 @@
             letter-spacing: 1px;
         }
 
-        /* Entry Table */
-        .entry-table-card {
-            background: var(--white);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 35px;
-            transform: perspective(1000px) rotateX(2deg);
-            transition: all 0.4s;
-            box-shadow: var(--shadow-holographic);
-            border: 1px solid var(--glass-border);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        .entry-table-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            opacity: 0.03;
-            animation: holographicWave 15s linear infinite;
-            z-index: -1;
-        }
-
-        .entry-table-card:hover {
-            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
-        }
-
-        .card-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--glass-border);
-            color: var(--gray-900);
-            text-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
-        }
-
-        .card-title i {
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicWave 6s linear infinite;
-        }
-
-        .table-holographic {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-
-        .table-holographic thead th {
-            color: var(--neon-lime);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 1px;
-            padding: 12px 15px;
-            border: none;
-        }
-
-        .table-holographic tbody tr {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-
-        .table-holographic tbody tr:hover {
-            background: rgba(0, 243, 255, 0.1);
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.2);
-        }
-
-        .table-holographic tbody td {
-            padding: 18px 15px;
-            border: none;
-            color: var(--gray-900);
-        }
-
-        .table-holographic tbody tr td:first-child {
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
-        }
-
-        .table-holographic tbody tr td:last-child {
-            border-top-right-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-
-        .badge-holographic {
-            padding: 6px 14px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            animation: holographicWave 6s linear infinite;
-            color: white;
-        }
-
-        .badge-up {
-            background: linear-gradient(45deg, #26de81, #20bf6b);
-        }
-
-        .badge-down {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-        }
-
-        .badge-stable {
-            background: linear-gradient(45deg, #fdcb6e, #f39c12);
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-state i {
-            font-size: 64px;
-            background: var(--hologram-gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: holographicWave 6s linear infinite;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-
-        .empty-state h3 {
-            color: var(--gray-900);
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            color: var(--gray-900);
-            opacity: 0.7;
-        }
-
-        /* Loading Spinner */
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid var(--neon-cyan);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .profile-content {
@@ -495,48 +288,11 @@
             }
 
             .stats-grid {
-            display: none; /* Hidden - not needed */
                 grid-template-columns: 1fr;
-            }
-
-            .period-selector {
-                justify-content: center;
             }
 
             .main-content {
                 padding: 20px;
-            }
-
-            .table-holographic {
-                font-size: 12px;
-            }
-
-            .table-holographic thead {
-                display: none;
-            }
-
-            .table-holographic tbody tr {
-                display: block;
-                margin-bottom: 15px;
-                border-radius: 12px;
-                padding: 15px;
-            }
-
-            .table-holographic tbody td {
-                display: flex;
-                justify-content: space-between;
-                padding: 8px 0;
-                border-bottom: 1px solid var(--glass-border);
-            }
-
-            .table-holographic tbody td:last-child {
-                border-bottom: none;
-            }
-
-            .table-holographic tbody td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: var(--neon-lime);
             }
         }
     </style>
@@ -567,19 +323,6 @@
             </div>
         </div>
 
-        <!-- Period Selector -->
-        <div class="period-selector">
-            <button class="period-btn active" onclick="changePeriod('daily')">
-                <i class="fas fa-calendar-day me-2"></i>Harian
-            </button>
-            <button class="period-btn" onclick="changePeriod('weekly')">
-                <i class="fas fa-calendar-week me-2"></i>Mingguan
-            </button>
-            <button class="period-btn" onclick="changePeriod('monthly')">
-                <i class="fas fa-calendar-alt me-2"></i>Bulanan
-            </button>
-        </div>
-
         <!-- Earnings Stats -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -603,44 +346,6 @@
                 <div class="stat-label">Omset Hari Ini</div>
             </div>
         </div>
-
-        <!-- Entry Table -->
-        <div class="entry-table-card">
-            <h3 class="card-title">
-                <i class="fas fa-table me-2"></i>
-                <span id="tableTitle">Data Entry Harian</span>
-            </h3>
-            
-            <div id="loadingState" class="loading-spinner" style="display: none;">
-                <div class="spinner"></div>
-                <p class="mt-3" style="color: var(--gray-900);">Memuat data...</p>
-            </div>
-
-            <div id="tableContent">
-                <div class="table-responsive">
-                    <table class="table-holographic">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Berat (kg)</th>
-                                <th>Selisih</th>
-                                <th>Status</th>
-                                <th>Pendapatan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="entryTableBody">
-                            <!-- Data will be inserted here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <i class="fas fa-inbox"></i>
-                <h3>Belum Ada Data</h3>
-                <p>Data entry untuk periode ini belum tersedia</p>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -652,35 +357,10 @@
             last_login: new Date().toISOString()
         };
 
-        // Sample data entries (dalam aplikasi real, ini akan dari API)
-        const sampleEntries = {
-            daily: [
-                { date: '2025-10-07', weight: 72.5, diff: -0.3, earnings: 15000 },
-                { date: '2025-10-06', weight: 72.8, diff: -0.2, earnings: 10000 },
-                { date: '2025-10-05', weight: 73.0, diff: 0.1, earnings: 0 },
-                { date: '2025-10-04', weight: 72.9, diff: -0.4, earnings: 20000 },
-                { date: '2025-10-03', weight: 73.3, diff: -0.1, earnings: 5000 }
-            ],
-            weekly: [
-                { date: 'Minggu 1 Okt', weight: 72.6, diff: -0.8, earnings: 45000 },
-                { date: 'Minggu 4 Sep', weight: 73.4, diff: -0.5, earnings: 30000 },
-                { date: 'Minggu 3 Sep', weight: 73.9, diff: -0.3, earnings: 15000 },
-                { date: 'Minggu 2 Sep', weight: 74.2, diff: -0.6, earnings: 35000 }
-            ],
-            monthly: [
-                { date: 'Oktober 2025', weight: 72.5, diff: -1.5, earnings: 85000 },
-                { date: 'September 2025', weight: 74.0, diff: -2.1, earnings: 120000 },
-                { date: 'Agustus 2025', weight: 76.1, diff: -1.8, earnings: 95000 }
-            ]
-        };
-
-        let currentPeriod = 'daily';
-
         // Initialize page
         window.addEventListener('DOMContentLoaded', () => {
             loadUserData();
             loadEarningsData();
-            loadEntryData(currentPeriod);
         });
 
         function loadUserData() {
@@ -746,92 +426,6 @@
             document.getElementById('todayEntries').textContent = data.today_entries || 0;
             document.getElementById('todayEarnings').textContent = formatRupiah(data.today_earnings || 0);
         }
-
-        function changePeriod(period) {
-            currentPeriod = period;
-
-            // Update active button
-            document.querySelectorAll('.period-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('.period-btn').classList.add('active');
-
-            // Update table title
-            const titles = {
-                daily: 'Data Entry Harian',
-                weekly: 'Data Entry Mingguan',
-                monthly: 'Data Entry Bulanan'
-            };
-            document.getElementById('tableTitle').textContent = titles[period];
-
-            // Load data
-            loadEntryData(period);
-        }
-
-        function loadEntryData(period) {
-            // Show loading
-            document.getElementById('loadingState').style.display = 'block';
-            document.getElementById('tableContent').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'none';
-
-            // Simulate API call
-            setTimeout(() => {
-                const entries = sampleEntries[period];
-
-                if (entries && entries.length > 0) {
-                    // Stats cards are handled by loadEarningsData() from API
-                    // No need to update stats from sample data
-                    renderTable(entries);
-                    document.getElementById('loadingState').style.display = 'none';
-                    document.getElementById('tableContent').style.display = 'block';
-                } else {
-                    document.getElementById('loadingState').style.display = 'none';
-                    document.getElementById('emptyState').style.display = 'block';
-                }
-            }, 800);
-        }
-
-        // updateStats removed - stats cards now updated via API in updateEarningsStats()
-
-        function renderTable(entries) {
-            const tbody = document.getElementById('entryTableBody');
-            tbody.innerHTML = '';
-
-            entries.forEach(entry => {
-                const tr = document.createElement('tr');
-                
-                let statusBadge, statusText;
-                if (entry.diff < 0) {
-                    statusBadge = 'badge-down';
-                    statusText = 'Turun';
-                } else if (entry.diff > 0) {
-                    statusBadge = 'badge-up';
-                    statusText = 'Naik';
-                } else {
-                    statusBadge = 'badge-stable';
-                    statusText = 'Stabil';
-                }
-
-                tr.innerHTML = `
-                    <td data-label="Tanggal">${entry.date}</td>
-                    <td data-label="Berat">${entry.weight} kg</td>
-                    <td data-label="Selisih">${entry.diff > 0 ? '+' : ''}${entry.diff} kg</td>
-                    <td data-label="Status">
-                        <span class="badge-holographic ${statusBadge}">${statusText}</span>
-                    </td>
-                    <td data-label="Pendapatan">Rp ${entry.earnings.toLocaleString('id-ID')}</td>
-                `;
-                
-                tbody.appendChild(tr);
-            });
-        }
-
-        // Add keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === '1') changePeriod('daily');
-            if (e.key === '2') changePeriod('weekly');
-            if (e.key === '3') changePeriod('monthly');
-        });
     </script>
     <script src="/js/sidebar.js"></script>
 </body>
