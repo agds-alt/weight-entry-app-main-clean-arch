@@ -7,8 +7,10 @@
     <link rel="icon" type="image/png" href="/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
             /* Ultra Minimal White Theme */
@@ -37,7 +39,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 14px;
             background: var(--white);
             color: var(--gray-900);
@@ -98,24 +100,12 @@
             padding-top: 32px;
         }
 
-        .signup-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .logo-img {
+            width: 100px;
+            height: 100px;
             margin: 0 auto 16px;
-            font-size: 32px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
-            transition: all 0.3s;
-        }
-
-        .signup-icon:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(33, 33, 33, 0.4);
+            display: block;
+            object-fit: contain;
         }
 
         .signup-header h3 {
@@ -162,18 +152,18 @@
         }
 
         .form-control {
-            background: var(--bg-white);
+            background: var(--white);
             border: 1px solid rgba(0, 0, 0, 0.15);
             border-radius: 8px;
             padding: 12px 44px 12px 14px;
             font-size: 14px;
             color: var(--gray-900);
             transition: all 0.3s;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         .form-control:focus {
-            background: var(--bg-white);
+            background: var(--white);
             border-color: var(--gray-900);
             color: var(--gray-900);
             box-shadow: 0 0 0 3px rgba(33, 33, 33, 0.1);
@@ -246,20 +236,26 @@
             background: var(--gray-900);
             border: none;
             color: white;
-            padding: 13px;
+            padding: 14px 20px;
             font-weight: 600;
-            font-size: 14px;
-            border-radius: 8px;
+            font-size: 15px;
+            border-radius: 10px;
             margin-top: 8px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(33, 33, 33, 0.2);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            letter-spacing: 0.3px;
         }
 
         .btn-signup:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.01);
             background: var(--gray-800);
-            box-shadow: 0 6px 16px rgba(33, 33, 33, 0.4);
+            box-shadow: 0 8px 20px rgba(33, 33, 33, 0.3);
+        }
+
+        .btn-signup:active {
+            transform: translateY(-1px) scale(0.99);
+            box-shadow: 0 2px 8px rgba(33, 33, 33, 0.2);
         }
 
         .btn-signup:disabled {
@@ -270,23 +266,30 @@
 
         .btn-back {
             width: 100%;
-            border: 2px solid rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--gray-900);
             background: transparent;
             color: var(--gray-900);
-            padding: 12px;
+            padding: 13px 20px;
             font-weight: 600;
-            border-radius: 8px;
+            font-size: 15px;
+            border-radius: 10px;
             margin-top: 12px;
-            transition: all 0.3s;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            letter-spacing: 0.3px;
         }
 
         .btn-back:hover {
             background: var(--gray-900);
             color: white;
             border-color: var(--gray-900);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(33, 33, 33, 0.3);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 8px 20px rgba(33, 33, 33, 0.25);
+        }
+
+        .btn-back:active {
+            transform: translateY(-1px) scale(0.99);
+            box-shadow: 0 2px 8px rgba(33, 33, 33, 0.2);
         }
 
         .alert-holographic {
