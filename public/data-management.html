@@ -12,20 +12,27 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-            /* 🇮🇩 MERAH PUTIH - Indonesian Flag Theme */
-            --primary-red: #ff3b3b;
-            --primary-red-dark: #ce1126;  /* Official Indonesian Red */
-            --primary-red-light: #ff8a8a;
-            --bg-white: #ffffff;
-            --bg-gray: #f5f7fa;
-            --surface: #ffffff;
-            --surface-light: #f9fafb;
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
-            --border-radius: 16px;
-            --red-success: #ff6b6b;  /* Light red for success */
+            /* Ultra Minimal White Theme */
+            --white: #FFFFFF;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-200: #EEEEEE;
+            --gray-300: #E0E0E0;
+            --gray-400: #BDBDBD;
+            --gray-500: #9E9E9E;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+
+            /* Border */
+            --border-light: 1px solid #E0E0E0;
+            --border-medium: 2px solid #BDBDBD;
         }
 
         * {
@@ -37,8 +44,8 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 14px;
-            background: var(--bg-gray);
-            color: var(--text-primary);
+            background: var(--white);
+            color: var(--gray-900);
             overflow-x: hidden;
             min-height: 100vh;
         }
@@ -55,12 +62,12 @@
 
         /* Header */
         .isometric-header {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 24px 28px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-3d);
-            border-top: 4px solid var(--primary-red);
+            box-shadow: var(--shadow-md);
+            border-top: 4px solid var(--gray-900);
             transition: all 0.3s;
         }
 
@@ -71,12 +78,12 @@
         .header-title {
             font-size: 26px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--gray-900);
             margin-bottom: 6px;
         }
 
         .header-title i {
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         /* Stats Cards */
@@ -89,10 +96,10 @@
         }
 
         .holo-stat-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 20px;
-            box-shadow: var(--shadow-3d);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
             transition: all 0.3s;
         }
@@ -111,7 +118,7 @@
             justify-content: center;
             font-size: 22px;
             margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--primary-red-light) 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
@@ -119,12 +126,12 @@
         .holo-stat-value {
             font-size: 28px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--gray-900);
             margin-bottom: 4px;
         }
 
         .holo-stat-label {
-            color: var(--text-secondary);
+            color: var(--gray-600);
             font-size: 13px;
             margin-bottom: 8px;
         }
@@ -138,28 +145,28 @@
             font-size: 14px;
             font-weight: 600;
             background: rgba(255, 59, 59, 0.1);
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         /* Filter Card */
         .glass-filter-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-3d);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
         }
 
         .glass-filter-card h5 {
-            color: var(--text-primary);
+            color: var(--gray-900);
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 16px;
         }
 
         .glass-filter-card h5 i {
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         .filter-section {
@@ -178,14 +185,14 @@
         .filter-label {
             font-size: 13px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--gray-900);
             margin-bottom: 6px;
         }
 
         .holographic-input, .holographic-select {
-            background: var(--surface);
+            background: var(--white);
             border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            color: var(--gray-900);
             border-radius: 10px;
             padding: 10px 14px;
             font-size: 14px;
@@ -194,13 +201,13 @@
         }
 
         .holographic-input:focus, .holographic-select:focus {
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
             box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
             outline: none;
         }
 
         .btn-holographic {
-            background: var(--primary-red);
+            background: var(--gray-900);
             border: none;
             color: white;
             padding: 10px 20px;
@@ -220,7 +227,7 @@
 
         .btn-export {
             /* 🇮🇩 Red for Export */
-            background: var(--primary-red);
+            background: var(--gray-900);
             box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
 
@@ -241,11 +248,11 @@
 
         /* Table Container */
         .table-3d-container {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-3d);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
             overflow-x: auto;
         }
@@ -254,18 +261,18 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            color: var(--text-primary);
+            color: var(--gray-900);
             min-width: 1000px;  /* Reduced from 1400px */
             font-size: 13px;
         }
 
         .holographic-table thead th {
-            background: var(--bg-gray);
-            color: var(--text-primary);
+            background: var(--white);
+            color: var(--gray-900);
             padding: 12px;
             text-align: left;
             font-weight: 600;
-            border-bottom: 2px solid var(--primary-red);
+            border-bottom: 2px solid var(--gray-900);
             position: sticky;
             top: 0;
             z-index: 10;
@@ -284,11 +291,11 @@
 
         .holographic-table tbody tr {
             transition: all 0.2s;
-            background: var(--surface);
+            background: var(--white);
         }
 
         .holographic-table tbody tr:hover {
-            background: var(--bg-gray);
+            background: var(--white);
         }
 
         .table-image {
@@ -324,9 +331,9 @@
 
         .badge-approved {
             /* 🇮🇩 White - Approved/Success */
-            background: var(--bg-white);
-            color: var(--primary-red);
-            border: 1px solid var(--primary-red);
+            background: var(--white);
+            color: var(--gray-900);
+            border: 1px solid var(--gray-900);
         }
 
         .badge-rejected {
@@ -353,12 +360,12 @@
         .btn-edit {
             /* 🇮🇩 Light Red for Edit */
             background: rgba(255, 59, 59, 0.1);
-            color: var(--primary-red);
-            border: 1px solid var(--primary-red);
+            color: var(--gray-900);
+            border: 1px solid var(--gray-900);
         }
 
         .btn-edit:hover {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
         }
 
@@ -377,11 +384,11 @@
         .loading, .no-data {
             text-align: center;
             padding: 60px;
-            color: var(--text-secondary);
+            color: var(--gray-600);
         }
 
         .loading i, .no-data i {
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         .pagination {
@@ -393,9 +400,9 @@
         }
 
         .pagination button {
-            background: var(--surface);
+            background: var(--white);
             border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            color: var(--gray-900);
             padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
@@ -404,9 +411,9 @@
         }
 
         .pagination button:hover:not(:disabled) {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
         }
 
         .pagination button:disabled {
@@ -415,9 +422,9 @@
         }
 
         .pagination button.active {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
         }
 
         @media (max-width: 1024px) {
@@ -489,8 +496,8 @@
         }
 
         .modal-container {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             max-width: 600px;
             width: 100%;
             max-height: 90vh;
@@ -515,14 +522,14 @@
         .modal-title {
             font-size: 20px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--gray-900);
         }
 
         .modal-close {
             background: none;
             border: none;
             font-size: 24px;
-            color: var(--text-secondary);
+            color: var(--gray-600);
             cursor: pointer;
             transition: all 0.3s;
             width: 32px;
@@ -534,8 +541,8 @@
         }
 
         .modal-close:hover {
-            background: var(--bg-gray);
-            color: var(--primary-red);
+            background: var(--white);
+            color: var(--gray-900);
         }
 
         .modal-body {
@@ -550,12 +557,12 @@
             display: block;
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--gray-900);
             margin-bottom: 8px;
         }
 
         .form-label .required {
-            color: var(--primary-red);
+            color: var(--gray-900);
             margin-left: 2px;
         }
 
@@ -565,19 +572,19 @@
             font-size: 14px;
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            background: var(--surface);
-            color: var(--text-primary);
+            background: var(--white);
+            color: var(--gray-900);
             transition: all 0.3s;
         }
 
         .form-control:focus {
             outline: none;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
             box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
         }
 
         .form-control:disabled {
-            background: var(--bg-gray);
+            background: var(--white);
             cursor: not-allowed;
         }
 
@@ -622,8 +629,8 @@
         }
 
         .btn-modal-cancel {
-            background: var(--bg-gray);
-            color: var(--text-primary);
+            background: var(--white);
+            color: var(--gray-900);
         }
 
         .btn-modal-cancel:hover {
@@ -631,7 +638,7 @@
         }
 
         .btn-modal-save {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
         }
 
@@ -667,11 +674,11 @@
                         <i class="fas fa-database me-2"></i>
                         Data Management
                     </h1>
-                    <p style="color: var(--text-secondary); font-size: 14px;">Kelola dan analisis data pengukuran berat dengan presisi</p>
+                    <p style="color: var(--gray-600); font-size: 14px;">Kelola dan analisis data pengukuran berat dengan presisi</p>
                 </div>
                 <div class="text-end">
-                    <div style="color: var(--text-secondary); font-size: 13px;">Last Updated</div>
-                    <div id="currentDateTime" style="font-size: 20px; font-weight: 600; color: var(--primary-red);"></div>
+                    <div style="color: var(--gray-600); font-size: 13px;">Last Updated</div>
+                    <div id="currentDateTime" style="font-size: 20px; font-weight: 600; color: var(--gray-900);"></div>
                 </div>
             </div>
         </div>
@@ -810,15 +817,15 @@
                 <!-- Pagination Controls -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 15px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <label for="itemsPerPageSelector" style="color: var(--text-primary); font-weight: 500;">Rows per page:</label>
-                        <select id="itemsPerPageSelector" onchange="changeItemsPerPage()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface); color: var(--text-primary); font-size: 14px; cursor: pointer;">
+                        <label for="itemsPerPageSelector" style="color: var(--gray-900); font-weight: 500;">Rows per page:</label>
+                        <select id="itemsPerPageSelector" onchange="changeItemsPerPage()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--white); color: var(--gray-900); font-size: 14px; cursor: pointer;">
                             <option value="10">10</option>
                             <option value="50">50</option>
                             <option value="100" selected>100</option>
                             <option value="500">500</option>
                             <option value="1000">1000</option>
                         </select>
-                        <span id="paginationInfo" style="color: var(--text-secondary); font-size: 14px; margin-left: 10px;"></span>
+                        <span id="paginationInfo" style="color: var(--gray-600); font-size: 14px; margin-left: 10px;"></span>
                     </div>
                     <div class="pagination" id="pagination"></div>
                 </div>
@@ -836,7 +843,7 @@
         <div class="modal-container">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-edit" style="color: var(--primary-red); margin-right: 8px;"></i>
+                    <i class="fas fa-edit" style="color: var(--gray-900); margin-right: 8px;"></i>
                     Edit Data Entry
                 </h3>
                 <button class="modal-close" onclick="closeEditModal()">
@@ -1048,7 +1055,7 @@
             } catch (error) {
                 console.error('❌ fetchData ERROR:', error);
                 document.getElementById('loadingState').innerHTML =
-                    '<i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--primary-red);"></i><div>Error loading data: ' + error.message + '</div>';
+                    '<i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--gray-900);"></i><div>Error loading data: ' + error.message + '</div>';
             }
         }
 
@@ -1156,17 +1163,17 @@
                     <tr>
                         <td><strong>#${item.id}</strong></td>
                         <td>${item.nama}</td>
-                        <td><strong style="color: var(--primary-red);">${item.no_resi}</strong></td>
+                        <td><strong style="color: var(--gray-900);">${item.no_resi}</strong></td>
                         <td>${item.berat_resi} kg</td>
                         <td>${item.berat_aktual} kg</td>
-                        <td style="color: ${item.selisih > 0 ? 'var(--primary-red)' : item.selisih < 0 ? 'var(--red-success)' : 'var(--text-primary)'}; font-weight: 600;">
+                        <td style="color: ${item.selisih > 0 ? 'var(--gray-900)' : item.selisih < 0 ? 'var(--red-success)' : 'var(--gray-900)'}; font-weight: 600;">
                             ${item.selisih > 0 ? '+' : ''}${item.selisih} kg
                         </td>
                         <td><span class="badge-holographic ${statusClass}">${item.status}</span></td>
                         <td>${item.created_by || '-'}</td>
                         <td>
                             <div>${dateStr}</div>
-                            <small style="color: var(--text-secondary);">${timeStr}</small>
+                            <small style="color: var(--gray-600);">${timeStr}</small>
                         </td>
                         <td>
                             <div class="action-buttons">
@@ -1212,7 +1219,7 @@
                         </button>
                     `;
                 } else if (i === currentPage - 3 || i === currentPage + 3) {
-                    html += '<span style="color: var(--text-secondary);">...</span>';
+                    html += '<span style="color: var(--gray-600);">...</span>';
                 }
             }
 

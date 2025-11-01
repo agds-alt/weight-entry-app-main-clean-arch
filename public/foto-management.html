@@ -13,20 +13,27 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-            /* 🇮🇩 MERAH PUTIH - Indonesian Flag Theme */
-            --primary-red: #ff3b3b;
-            --primary-red-dark: #ce1126;  /* Official Indonesian Red */
-            --primary-red-light: #ff8a8a;
-            --bg-white: #ffffff;
-            --bg-gray: #f5f7fa;
-            --surface: #ffffff;
-            --surface-light: #f9fafb;
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --shadow-3d: 8px 8px 16px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.9);
-            --border-radius: 16px;
-            --red-success: #ff6b6b;  /* Light red for success */
+            /* Ultra Minimal White Theme */
+            --white: #FFFFFF;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-200: #EEEEEE;
+            --gray-300: #E0E0E0;
+            --gray-400: #BDBDBD;
+            --gray-500: #9E9E9E;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+
+            /* Border */
+            --border-light: 1px solid #E0E0E0;
+            --border-medium: 2px solid #BDBDBD;
         }
 
         * {
@@ -38,8 +45,8 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 14px;
-            background: var(--bg-gray);
-            color: var(--text-primary);
+            background: var(--white);
+            color: var(--gray-900);
             overflow-x: hidden;
             min-height: 100vh;
             padding: 20px;
@@ -52,27 +59,28 @@
 
         /* Header */
         .header {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 24px 28px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-3d);
-            border-top: 4px solid var(--primary-red);
+            box-shadow: var(--shadow-md);
+            border: var(--border-light);
+            border-top: 2px solid var(--gray-900);
             transition: all 0.3s;
         }
 
         .header:hover {
-            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 1);
+            box-shadow: var(--shadow-lg);
         }
 
         .header-title {
             font-size: 20px;
-            font-weight: 500;
-            color: var(--text-primary);
+            font-weight: 700;
+            color: var(--gray-900);
         }
 
         .header-title i {
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         /* Stats */
@@ -85,10 +93,10 @@
         }
 
         .stat-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 20px;
-            box-shadow: var(--shadow-3d);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
             text-align: center;
             transition: all 0.3s;
@@ -102,34 +110,34 @@
         .stat-value {
             font-size: 20px;
             font-weight: 500;
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         .stat-label {
-            color: var(--text-secondary);
+            color: var(--gray-600);
             font-size: 13px;
             margin-top: 4px;
         }
 
         /* Filter Card */
         .filter-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-3d);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
         }
 
         .filter-card h5 {
-            color: var(--text-primary);
+            color: var(--gray-900);
             font-size: 12px;
             font-weight: 500;
             margin-bottom: 16px;
         }
 
         .filter-card h5 i {
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         .filter-grid {
@@ -142,14 +150,14 @@
         .filter-label {
             font-size: 13px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--gray-900);
             margin-bottom: 6px;
         }
 
         .holographic-input {
-            background: var(--surface);
+            background: var(--white);
             border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            color: var(--gray-900);
             border-radius: 10px;
             padding: 10px 14px;
             font-size: 12px;
@@ -158,14 +166,14 @@
         }
 
         .holographic-input:focus {
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
             box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
             outline: none;
         }
 
         /* Buttons */
         .btn-holographic {
-            background: var(--primary-red);
+            background: var(--gray-900);
             border: none;
             color: white;
             padding: 10px 20px;
@@ -178,14 +186,14 @@
         }
 
         .btn-holographic:hover {
-            background: var(--primary-red-dark);
+            background: var(--gray-800);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
         }
 
         .btn-danger {
             /* 🇮🇩 Dark Red for Delete */
-            background: var(--primary-red-dark);
+            background: var(--gray-800);
             box-shadow: 0 4px 12px rgba(206, 17, 38, 0.3);
         }
 
@@ -196,12 +204,12 @@
 
         .btn-success {
             /* 🇮🇩 Light Red for Download */
-            background: var(--primary-red);
+            background: var(--gray-900);
             box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
 
         .btn-success:hover {
-            background: var(--primary-red-dark);
+            background: var(--gray-800);
             box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
         }
 
@@ -221,10 +229,10 @@
         }
 
         .photo-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: var(--shadow-3d);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
             transition: all 0.3s;
             position: relative;
@@ -236,7 +244,7 @@
         }
 
         .photo-card.selected {
-            border: 2px solid var(--primary-red);
+            border: 2px solid var(--gray-900);
             box-shadow: 0 0 20px rgba(255, 59, 59, 0.3);
         }
 
@@ -255,7 +263,7 @@
             height: 220px;
             overflow: hidden;
             position: relative;
-            background: var(--bg-gray);
+            background: var(--white);
         }
 
         .photo-img {
@@ -275,7 +283,7 @@
 
         .photo-name {
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--gray-900);
             margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
@@ -285,13 +293,13 @@
 
         .photo-date {
             font-size: 10px;
-            color: var(--text-secondary);
+            color: var(--gray-600);
             margin-bottom: 8px;
         }
 
         .photo-size {
             font-size: 14px;
-            color: var(--primary-red);
+            color: var(--gray-900);
             font-weight: 500;
         }
 
@@ -314,12 +322,12 @@
         .btn-view {
             /* 🇮🇩 Red for View */
             background: rgba(255, 59, 59, 0.1);
-            color: var(--primary-red);
-            border: 1px solid var(--primary-red);
+            color: var(--gray-900);
+            border: 1px solid var(--gray-900);
         }
 
         .btn-view:hover {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
         }
 
@@ -338,12 +346,12 @@
         .btn-delete {
             /* 🇮🇩 Dark Red for Delete */
             background: rgba(206, 17, 38, 0.1);
-            color: var(--primary-red-dark);
-            border: 1px solid var(--primary-red-dark);
+            color: var(--gray-800);
+            border: 1px solid var(--gray-800);
         }
 
         .btn-delete:hover {
-            background: var(--primary-red-dark);
+            background: var(--gray-800);
             color: white;
         }
 
@@ -351,20 +359,20 @@
         .loading, .no-photos {
             text-align: center;
             padding: 60px;
-            color: var(--text-secondary);
+            color: var(--gray-600);
         }
 
         .loading i, .no-photos i {
-            color: var(--primary-red);
+            color: var(--gray-900);
         }
 
         /* Lazy Loading Skeleton */
         .photo-img.lazy-loading {
             background: linear-gradient(
                 90deg,
-                var(--bg-gray) 25%,
+                var(--white) 25%,
                 #e5e7eb 50%,
-                var(--bg-gray) 75%
+                var(--white) 75%
             );
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
@@ -420,7 +428,7 @@
             position: absolute;
             top: -40px;
             right: 0;
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
             border: none;
             width: 40px;
@@ -432,7 +440,7 @@
         }
 
         .lightbox-close:hover {
-            background: var(--primary-red-dark);
+            background: var(--gray-800);
             transform: rotate(90deg);
         }
 
@@ -465,8 +473,8 @@
         }
 
         .progress-modal-content {
-            background: var(--surface);
-            border-radius: var(--border-radius);
+            background: var(--white);
+            border-radius: 12px;
             padding: 40px;
             max-width: 500px;
             width: 90%;
@@ -477,21 +485,21 @@
         .progress-modal-title {
             font-size: 20px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--gray-900);
             margin-bottom: 10px;
         }
 
         .progress-modal-subtitle {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--gray-600);
             margin-bottom: 24px;
         }
 
         .progress-bar-container {
             width: 100%;
             height: 40px;
-            background: var(--bg-gray);
-            border-radius: 20px;
+            background: var(--white);
+            border-radius: 8px;
             overflow: hidden;
             margin-bottom: 16px;
             position: relative;
@@ -499,8 +507,8 @@
 
         .progress-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary-red), var(--primary-red-light));
-            border-radius: 20px;
+            background: linear-gradient(90deg, var(--gray-900), var(--primary-red-light));
+            border-radius: 8px;
             transition: width 0.3s ease;
             display: flex;
             align-items: center;
@@ -512,7 +520,7 @@
 
         .progress-status {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--gray-600);
             margin-top: 8px;
         }
 
@@ -520,8 +528,8 @@
             display: inline-block;
             width: 50px;
             height: 50px;
-            border: 4px solid var(--bg-gray);
-            border-top: 4px solid var(--primary-red);
+            border: 4px solid var(--white);
+            border-top: 4px solid var(--gray-900);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 16px;
@@ -541,9 +549,9 @@
         }
 
         .view-mode-btn {
-            background: var(--surface);
+            background: var(--white);
             border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            color: var(--gray-900);
             padding: 10px 20px;
             border-radius: 10px;
             cursor: pointer;
@@ -556,15 +564,15 @@
         }
 
         .view-mode-btn:hover {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
         }
 
         .view-mode-btn.active {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
             box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
         }
 
@@ -597,9 +605,9 @@
         }
 
         .pagination button {
-            background: var(--surface);
+            background: var(--white);
             border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            color: var(--gray-900);
             padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
@@ -608,9 +616,9 @@
         }
 
         .pagination button:hover:not(:disabled) {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
         }
 
         .pagination button:disabled {
@@ -619,9 +627,9 @@
         }
 
         .pagination button.active {
-            background: var(--primary-red);
+            background: var(--gray-900);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--gray-900);
         }
 
         /* Responsive */
@@ -673,7 +681,7 @@
                         <i class="fas fa-images me-2"></i>
                         Photo Management
                     </h1>
-                    <p style="color: var(--text-secondary); font-size: 14px;">Kelola foto dari Cloudinary dengan mudah</p>
+                    <p style="color: var(--gray-600); font-size: 14px;">Kelola foto dari Cloudinary dengan mudah</p>
                 </div>
                 <button class="btn-holographic" onclick="window.location.href='/data-management.html'">
                     <i class="fas fa-arrow-left me-2"></i> Back
@@ -727,10 +735,10 @@
                 <button class="btn-holographic" onclick="resetFilters()">
                     <i class="fas fa-redo me-2"></i> Reset
                 </button>
-                <div style="flex: 1; min-width: 150px; text-align: right; padding: 10px 0; color: var(--text-secondary); font-size: 13px;">
+                <div style="flex: 1; min-width: 150px; text-align: right; padding: 10px 0; color: var(--gray-600); font-size: 13px;">
                     <i class="fas fa-info-circle me-1"></i>
                     Showing <strong id="filteredCount">0</strong> of <strong id="totalCount">0</strong> photos
-                    <span id="virtualScrollInfo" style="display: none; color: var(--primary-red); margin-left: 10px;">
+                    <span id="virtualScrollInfo" style="display: none; color: var(--gray-900); margin-left: 10px;">
                         <i class="fas fa-bolt"></i> <strong id="renderedCount">0</strong> rendered
                     </span>
                 </div>
@@ -1129,7 +1137,7 @@
                         </button>
                     `;
                 } else if (i === currentPage - 3 || i === currentPage + 3) {
-                    html += '<span style="color: var(--text-secondary);">...</span>';
+                    html += '<span style="color: var(--gray-600);">...</span>';
                 }
             }
 
