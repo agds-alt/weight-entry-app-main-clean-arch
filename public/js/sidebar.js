@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Minimal white sidebar styles
     const sidebarStyles = `
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
             :root {
                 --sidebar-width: 280px;
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             body {
                 margin: 0;
                 padding: 0;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
                 transition: padding-left 0.3s ease;
             }
 
@@ -194,25 +194,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 left: 20px;
                 z-index: 1001;
                 background: var(--gray-900);
-                border: var(--border-medium);
+                border: none;
                 color: var(--white);
-                width: 48px;
-                height: 48px;
-                border-radius: 8px;
+                width: 50px;
+                height: 50px;
+                border-radius: 10px;
                 cursor: pointer;
-                transition: all 0.3s ease;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-size: 18px;
-                box-shadow: var(--shadow-md);
+                box-shadow: 0 4px 12px rgba(33, 33, 33, 0.2);
+                font-family: 'Poppins', sans-serif;
             }
 
             .sidebar-toggle-btn:hover {
                 background: var(--gray-800);
                 color: var(--white);
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-lg);
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 8px 20px rgba(33, 33, 33, 0.3);
+            }
+
+            .sidebar-toggle-btn:active {
+                transform: translateY(-1px) scale(1.02);
+                box-shadow: 0 2px 8px rgba(33, 33, 33, 0.2);
             }
 
             body.sidebar-open .sidebar-toggle-btn {
@@ -392,25 +398,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 display: flex;
                 align-items: center;
                 gap: 12px;
-                padding: 12px 16px;
+                padding: 13px 16px;
                 background: var(--white);
-                border: var(--border-light);
+                border: 2px solid var(--gray-900);
                 color: var(--gray-900);
-                border-radius: 8px;
+                border-radius: 10px;
                 cursor: pointer;
-                transition: all 0.3s ease;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 font-size: 14px;
                 font-weight: 600;
-                box-shadow: var(--shadow-sm);
-                font-family: 'Inter', sans-serif;
+                box-shadow: 0 2px 6px rgba(33, 33, 33, 0.1);
+                font-family: 'Poppins', sans-serif;
+                letter-spacing: 0.3px;
             }
 
             .logout-btn:hover {
                 background: var(--gray-900);
                 color: var(--white);
-                transform: translateY(-1px);
-                box-shadow: var(--shadow-md);
-                border-color: var(--gray-700);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 6px 16px rgba(33, 33, 33, 0.25);
+                border-color: var(--gray-900);
+            }
+
+            .logout-btn:active {
+                transform: translateY(-1px) scale(1.01);
+                box-shadow: 0 2px 8px rgba(33, 33, 33, 0.15);
             }
 
             .logout-btn i {
