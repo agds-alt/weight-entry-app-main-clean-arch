@@ -23,7 +23,6 @@ router.get('/photos', authenticateToken, async (req, res) => {
         const sortBy = req.query.sort_by || 'created_at';
         const sortOrder = req.query.sort_order || 'desc';
 
-        console.log('📸 Foto Management - Fetching photos:', { page, limit, sortBy, sortOrder });
 
         // Calculate range for pagination
         const start = (page - 1) * limit;
@@ -45,7 +44,6 @@ router.get('/photos', authenticateToken, async (req, res) => {
             throw error;
         }
 
-        console.log('✅ Fetched photos:', {
             count: data.length,
             totalCount: count,
             page,
@@ -81,7 +79,6 @@ router.get('/photos', authenticateToken, async (req, res) => {
  */
 router.get('/photos/count', authenticateToken, async (req, res) => {
     try {
-        console.log('📊 Fetching total photos count');
 
         const { count, error } = await supabase
             .from('entries')
@@ -90,7 +87,6 @@ router.get('/photos/count', authenticateToken, async (req, res) => {
 
         if (error) throw error;
 
-        console.log('✅ Total entries with photos:', count);
 
         res.json({
             success: true,
@@ -127,7 +123,6 @@ router.delete('/photos/:entryId/:field', authenticateToken, async (req, res) => 
             });
         }
 
-        console.log(`🗑️ Deleting photo: entry ${entryId}, field ${field}`);
 
         // Update database - set URL to null
         const { error } = await supabase
@@ -140,7 +135,6 @@ router.delete('/photos/:entryId/:field', authenticateToken, async (req, res) => 
             throw error;
         }
 
-        console.log(`✅ Photo deleted: entry ${entryId}, field ${field}`);
 
         res.json({
             success: true,
@@ -177,7 +171,6 @@ router.post('/photos/bulk-delete', authenticateToken, async (req, res) => {
             });
         }
 
-        console.log(`🗑️ Bulk deleting ${photos.length} photos...`);
 
         let successCount = 0;
         let failCount = 0;
@@ -226,7 +219,6 @@ router.post('/photos/bulk-delete', authenticateToken, async (req, res) => {
             }
         }
 
-        console.log(`✅ Bulk delete complete: ${successCount} success, ${failCount} failed`);
 
         res.json({
             success: failCount === 0,

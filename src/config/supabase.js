@@ -7,8 +7,6 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.warn('⚠️  Supabase Storage/Auth client not configured');
-  console.warn('   Add SUPABASE_URL and SUPABASE_SERVICE_KEY (or SUPABASE_ANON_KEY) to .env');
 }
 
 const supabase = supabaseUrl && supabaseServiceKey

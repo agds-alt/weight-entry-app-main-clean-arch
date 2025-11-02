@@ -6,7 +6,6 @@ class DashboardController {
      */
     async getGlobalStats(req, res) {
         try {
-            console.log('📊 Fetching global stats (all users)');
 
             const stats = await dashboardService.getGlobalStats();
 
@@ -37,7 +36,6 @@ class DashboardController {
                 });
             }
 
-            console.log('📊 Fetching user stats for:', username);
 
             const stats = await dashboardService.getUserStats(username);
             
@@ -59,7 +57,6 @@ class DashboardController {
      */
     async getLeaderboard(req, res) {
         try {
-            console.log('🏆 Fetching leaderboard data');
             
             const leaderboard = await dashboardService.getLeaderboard();
             
@@ -90,7 +87,6 @@ class DashboardController {
                 });
             }
 
-            console.log('📈 Fetching performance data for:', username);
 
             const performanceData = await dashboardService.getPerformanceData(username);
             

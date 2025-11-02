@@ -6,7 +6,6 @@ class DashboardRepository {
      */
     async getGlobalStats() {
         try {
-            console.log('🔍 Fetching global stats using COUNT queries...');
 
             // Calculate date boundaries
             const now = new Date();
@@ -55,10 +54,6 @@ class DashboardRepository {
             if (monthResult.error) throw monthResult.error;
             if (recentResult.error) throw recentResult.error;
 
-            console.log(`✅ Total entries: ${totalResult.count}`);
-            console.log(`✅ Today entries: ${todayResult.count}`);
-            console.log(`✅ Week entries: ${weekResult.count}`);
-            console.log(`✅ Month entries: ${monthResult.count}`);
 
             // Calculate avg_selisih and verified_count from recent data
             const recentEntries = recentResult.data || [];
@@ -91,7 +86,6 @@ class DashboardRepository {
                 verified_count: verifiedCount
             };
 
-            console.log('📊 Final global stats:', {
                 total: stats.total_entries,
                 today: stats.today_entries,
                 week: stats.week_entries,

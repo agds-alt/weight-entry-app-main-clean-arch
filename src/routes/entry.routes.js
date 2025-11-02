@@ -10,7 +10,6 @@ const {
 } = require('../middleware/validation');
 
 // Debug: Check if controller methods are available
-console.log('📋 Entry Controller Methods:', Object.keys(entryController));
 
 /**
  * @route   POST /api/entries

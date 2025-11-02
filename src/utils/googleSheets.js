@@ -6,7 +6,6 @@ let spreadsheetId = null;
 function initializeGoogleSheets() {
     try {
         if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-            console.log('⚠️ Google Sheets not configured (optional)');
             return false;
         }
 
@@ -21,11 +20,9 @@ function initializeGoogleSheets() {
         spreadsheetId = process.env.SPREADSHEET_ID;
 
         if (!spreadsheetId) {
-            console.log('⚠️ SPREADSHEET_ID not set');
             return false;
         }
 
-        console.log('✅ Google Sheets configured');
         return true;
     } catch (error) {
         console.error('❌ Google Sheets initialization failed:', error.message);
@@ -35,7 +32,6 @@ function initializeGoogleSheets() {
 
 async function syncToGoogleSheets(entry, username) {
     if (!sheets || !spreadsheetId) {
-        console.log('⚠️ Google Sheets not available');
         return null;
     }
 
@@ -70,7 +66,6 @@ async function syncToGoogleSheets(entry, username) {
             rowNumber = match ? parseInt(match[0]) : null;
         }
 
-        console.log('✅ Google Sheets sync successful, row:', rowNumber);
         return rowNumber;
     } catch (error) {
         console.error('⚠️ Google Sheets sync failed:', error.message);

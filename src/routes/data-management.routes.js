@@ -27,7 +27,6 @@ router.get('/entries', authenticateToken, async (req, res) => {
         const status = req.query.status;
         const search = req.query.search;
 
-        console.log('📊 Data Management - Fetching entries:', {
             page,
             limit,
             sortBy,
@@ -68,7 +67,6 @@ router.get('/entries', authenticateToken, async (req, res) => {
             throw error;
         }
 
-        console.log('✅ Fetched entries:', {
             count: data.length,
             totalCount: count,
             page,
@@ -104,7 +102,6 @@ router.get('/entries', authenticateToken, async (req, res) => {
  */
 router.get('/entries/count', authenticateToken, async (req, res) => {
     try {
-        console.log('📊 Fetching total entries count');
 
         const { count, error } = await supabase
             .from('entries')
@@ -112,7 +109,6 @@ router.get('/entries/count', authenticateToken, async (req, res) => {
 
         if (error) throw error;
 
-        console.log('✅ Total entries:', count);
 
         res.json({
             success: true,
@@ -137,7 +133,6 @@ router.get('/entries/:id', authenticateToken, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
 
-        console.log('📊 Fetching entry:', id);
 
         const { data, error } = await supabase
             .from('entries')
@@ -154,7 +149,6 @@ router.get('/entries/:id', authenticateToken, async (req, res) => {
             });
         }
 
-        console.log('✅ Entry found:', id);
 
         res.json({
             success: true,
@@ -187,7 +181,6 @@ router.put('/entries/:id', authenticateToken, async (req, res) => {
             notes
         } = req.body;
 
-        console.log('✏️ Updating entry:', id, req.body);
 
         // Validation
         if (!nama || !no_resi || berat_resi === undefined || berat_aktual === undefined || !status) {
@@ -227,7 +220,6 @@ router.put('/entries/:id', authenticateToken, async (req, res) => {
             });
         }
 
-        console.log('✅ Entry updated:', data[0]);
 
         res.json({
             success: true,
@@ -252,7 +244,6 @@ router.delete('/entries/:id', authenticateToken, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
 
-        console.log('🗑️ Deleting entry:', id);
 
         const { error } = await supabase
             .from('entries')
@@ -264,7 +255,6 @@ router.delete('/entries/:id', authenticateToken, async (req, res) => {
             throw error;
         }
 
-        console.log('✅ Entry deleted:', id);
 
         res.json({
             success: true,
@@ -286,7 +276,6 @@ router.delete('/entries/:id', authenticateToken, async (req, res) => {
  */
 router.get('/stats', authenticateToken, async (req, res) => {
     try {
-        console.log('📊 Fetching data management stats');
 
         // Get all entries for stats calculation
         const { data: entries, error } = await supabase
@@ -303,7 +292,6 @@ router.get('/stats', authenticateToken, async (req, res) => {
         const today = new Date().toISOString().split('T')[0];
         const todayEntries = entries.filter(e => e.created_at && e.created_at.startsWith(today)).length;
 
-        console.log('✅ Stats calculated:', { totalEntries, avgSelisih, todayEntries });
 
         res.json({
             success: true,

@@ -276,36 +276,46 @@ class EntryRepository {
     }
 
     /**
-     * Get statistics
+     * Get statistics using efficient SQL aggregation
      */
     async getStats() {
         try {
-            // Get all entries to calculate stats
-            const { data, error } = await supabase
-                .from('entries')
-                .select('selisih, created_at');
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 
-            if (error) {
-                throw error;
+            // Use parallel queries with count and aggregation
+            const [totalResult, todayResult, avgResult] = await Promise.all([
+                // Total count
+                supabase
+                    .from('entries')
+                    .select('*', { count: 'exact', head: true }),
+
+                // Today's count
+                supabase
+                    .from('entries')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('created_at', startOfToday),
+
+                // Average selisih (get all selisih values for avg calculation)
+                // Note: Supabase doesn't support AVG() directly, so we get minimal data
+                supabase
+                    .from('entries')
+                    .select('selisih')
+            ]);
+
+            // Calculate average from minimal dataset
+            let avgSelisih = 0;
+            if (avgResult.data && avgResult.data.length > 0) {
+                const sum = avgResult.data.reduce((acc, entry) => acc + parseFloat(entry.selisih || 0), 0);
+                avgSelisih = sum / avgResult.data.length;
             }
 
-            const total = data.length;
-            const today = new Date().toDateString();
-            const todayEntries = data.filter(entry =>
-                new Date(entry.created_at).toDateString() === today
-            );
-
-            const avgSelisih = total > 0
-                ? data.reduce((sum, entry) => sum + parseFloat(entry.selisih || 0), 0) / total
-                : 0;
-
             return {
-                total,
-                today: todayEntries.length,
+                total: totalResult.count || 0,
+                today: todayResult.count || 0,
                 avg_selisih: avgSelisih
             };
         } catch (error) {
-            console.error('Repository getStats error:', error);
             return { total: 0, today: 0, avg_selisih: 0 };
         }
     }

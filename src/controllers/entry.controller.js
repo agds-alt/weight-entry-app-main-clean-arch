@@ -10,16 +10,6 @@ class EntryController {
             const username = req.user?.username || req.session?.user?.username;
             const entryData = req.body;
 
-            console.log('📨 Received entry data from:', username);
-            console.log('📊 Entry data:', {
-                nama: entryData.nama,
-                no_resi: entryData.no_resi,
-                berat_resi: entryData.berat_resi,
-                berat_aktual: entryData.berat_aktual,
-                foto_url_1: entryData.foto_url_1 ? '✅ URL provided' : '❌ No URL',
-                foto_url_2: entryData.foto_url_2 ? '✅ URL provided' : '❌ No URL'
-            });
-
             // Validasi data wajib
             if (!entryData.nama || !entryData.no_resi || !entryData.berat_resi || !entryData.berat_aktual) {
                 return res.status(400).json({
@@ -38,12 +28,6 @@ class EntryController {
 
             // Panggil service untuk membuat entry
             const result = await entryService.createEntryWithUrls(entryData, username);
-
-            console.log('✅ Entry created successfully:', {
-                id: result.id,
-                no_resi: result.no_resi,
-                created_at: result.created_at
-            });
 
             return res.status(201).json({
                 success: true,
@@ -102,7 +86,6 @@ class EntryController {
                 role: req.user?.role || req.session?.user?.role
             };
 
-            console.log('📋 Getting entries with options:', options);
 
             const result = await entryService.getEntries(options);
 
@@ -129,7 +112,6 @@ class EntryController {
             const username = req.user?.username || req.session?.user?.username;
             const userRole = req.user?.role || req.session?.user?.role;
 
-            console.log('🕒 Getting recent entries, limit:', limit);
 
             const result = await entryService.getRecentEntries(limit, username, userRole);
 
@@ -155,7 +137,6 @@ class EntryController {
             const { status, catatan, notes } = req.body;
             const username = req.user?.username || req.session?.user?.username;
 
-            console.log('✏️ Updating entry:', { id, status, catatan, notes, username });
 
             if (!id) {
                 return res.status(400).json({ 
@@ -208,7 +189,6 @@ class EntryController {
             const { id } = req.params;
             const username = req.user?.username || req.session?.user?.username;
 
-            console.log('🗑️ Deleting entry:', { id, username });
 
             if (!id) {
                 return res.status(400).json({ 
@@ -245,7 +225,6 @@ class EntryController {
      */
     async getStatistics(req, res) {
         try {
-            console.log('📊 Getting statistics');
 
             const stats = await entryService.getStatistics();
 
@@ -281,7 +260,6 @@ class EntryController {
             const username = req.user?.username || req.session?.user?.username;
             const role = req.user?.role || req.session?.user?.role || 'user';
 
-            console.log('💰 Getting user earnings for:', username, 'role:', role);
 
             const earnings = await entryService.getUserEarnings(username, role);
 
@@ -314,7 +292,6 @@ class EntryController {
             const username = req.user?.username || req.session?.user?.username;
             const userRole = req.user?.role || req.session?.user?.role;
 
-            console.log('📤 Exporting entries:', { startDate, endDate, format, username });
 
             const options = {
                 startDate,
