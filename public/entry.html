@@ -1090,8 +1090,8 @@
 
                         const lines = [`${dateStr} ${timeStr}`, locationStr, coordsStr].filter(line => line);
 
-                        // Watermark 3x bigger: 36-48px (previously 12-16px)
-                        const fontSize = Math.max(36, Math.min(48, width / 16.67));
+                        // Watermark size increased: 38-50px (naik 2 angka dari 36-48px)
+                        const fontSize = Math.max(38, Math.min(50, width / 16.67));
                         ctx.font = `bold ${fontSize}px Arial`;
 
                         const lineHeight = fontSize * 1.4;
@@ -1109,7 +1109,8 @@
                         const boxX = width - boxWidth - margin;
                         const boxY = height - boxHeight - margin;
 
-                        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                        // Border more transparent: 0.45 instead of 0.75 (hemat energi!)
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                         ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
 
                         ctx.textAlign = 'left';
