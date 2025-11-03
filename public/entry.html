@@ -1049,7 +1049,80 @@
             }
         }
 
+        // Initialize Web Worker for watermark processing (non-blocking UI)
+        let watermarkWorker = null;
+        const supportsWorker = typeof Worker !== 'undefined' && typeof OffscreenCanvas !== 'undefined';
+
+        if (supportsWorker) {
+            try {
+                watermarkWorker = new Worker('/js/watermark-worker.js');
+            } catch (e) {
+                // Worker not supported, will use fallback
+            }
+        }
+
+        /**
+         * Add watermark to image using Web Worker (non-blocking) or fallback to main thread
+         */
         function addWatermark(file) {
+            // Try Web Worker first for better performance
+            if (watermarkWorker) {
+                return addWatermarkWithWorker(file);
+            }
+
+            // Fallback to main thread processing
+            return addWatermarkMainThread(file);
+        }
+
+        /**
+         * Web Worker watermark processing (NON-BLOCKING - Best for UX!)
+         */
+        function addWatermarkWithWorker(file) {
+            return new Promise((resolve, reject) => {
+                // Set timeout for worker
+                const timeout = setTimeout(() => {
+                    reject(new Error('Watermark timeout'));
+                }, 30000); // 30 second timeout
+
+                watermarkWorker.onmessage = function(e) {
+                    clearTimeout(timeout);
+
+                    if (e.data.success) {
+                        const watermarkedFile = new File([e.data.blob], file.name, {
+                            type: file.type,
+                            lastModified: Date.now()
+                        });
+                        resolve(watermarkedFile);
+                    } else {
+                        reject(new Error(e.data.error || 'Watermark failed'));
+                    }
+                };
+
+                watermarkWorker.onerror = function(error) {
+                    clearTimeout(timeout);
+                    reject(error);
+                };
+
+                // Prepare location data
+                const locationParts = [userLocation.village, userLocation.district, userLocation.city].filter(x => x);
+                const locationData = {
+                    address: locationParts.length > 0 ? locationParts.join(', ') : 'Indonesia',
+                    coords: userLocation.coords || null
+                };
+
+                // Send file to worker for processing
+                watermarkWorker.postMessage({
+                    fileBlob: file,
+                    timestamp: new Date().toISOString(),
+                    location: locationData
+                });
+            });
+        }
+
+        /**
+         * Main thread watermark processing (FALLBACK - blocks UI but compatible)
+         */
+        function addWatermarkMainThread(file) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 const canvas = document.createElement('canvas');
@@ -1062,7 +1135,7 @@
                         let width = img.width;
                         let height = img.height;
                         const maxDimension = 2048;
-                        
+
                         if (width > maxDimension || height > maxDimension) {
                             if (width > height) {
                                 height = (height / width) * maxDimension;
@@ -1072,25 +1145,23 @@
                                 height = maxDimension;
                             }
                         }
-                        
+
                         canvas.width = width;
                         canvas.height = height;
-                        
                         ctx.imageSmoothingEnabled = true;
                         ctx.imageSmoothingQuality = 'high';
                         ctx.drawImage(img, 0, 0, width, height);
-                        
+
                         const now = new Date();
                         const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
                         const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        
+
                         const locationParts = [userLocation.village, userLocation.district, userLocation.city].filter(x => x);
                         const locationStr = locationParts.length > 0 ? locationParts.join(', ') : 'Indonesia';
                         const coordsStr = userLocation.coords ? `Lat: ${userLocation.coords.lat}, Lon: ${userLocation.coords.lon}` : '';
 
                         const lines = [`${dateStr} ${timeStr}`, locationStr, coordsStr].filter(line => line);
 
-                        // Watermark size increased: 38-50px (naik 2 angka dari 36-48px)
                         const fontSize = Math.max(38, Math.min(50, width / 16.67));
                         ctx.font = `bold ${fontSize}px Arial`;
 
@@ -1109,7 +1180,6 @@
                         const boxX = width - boxWidth - margin;
                         const boxY = height - boxHeight - margin;
 
-                        // Border more transparent: 0.45 instead of 0.75 (hemat energi!)
                         ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                         ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
 
@@ -1120,18 +1190,18 @@
                         ctx.shadowBlur = 4;
                         ctx.shadowOffsetX = 2;
                         ctx.shadowOffsetY = 2;
-                        
+
                         lines.forEach((line, index) => {
                             const textX = boxX + padding;
                             const textY = boxY + padding + (index * lineHeight);
                             ctx.fillText(line, textX, textY);
                         });
-                        
+
                         ctx.shadowColor = 'transparent';
                         ctx.shadowBlur = 0;
-                        
+
                         const quality = width > 1500 ? 0.85 : 0.90;
-                        
+
                         canvas.toBlob(blob => {
                             if (!blob) {
                                 reject(new Error('Gagal membuat watermark'));
@@ -1140,7 +1210,7 @@
                             const watermarkedFile = new File([blob], file.name, { type: file.type, lastModified: Date.now() });
                             resolve(watermarkedFile);
                         }, file.type, quality);
-                        
+
                     } catch (error) {
                         reject(error);
                     }

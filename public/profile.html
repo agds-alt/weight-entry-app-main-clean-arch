@@ -280,20 +280,25 @@
             document.getElementById('lastLogin').textContent = `Terakhir login: Hari ini, ${timeStr}`;
         }
 
-        // Fetch earnings data from API
-        async function loadEarningsData() {
-            console.log('🔍 [DEBUG] Starting loadEarningsData...');
+        // Cache configuration
+        const EARNINGS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+        let cachedEarnings = null;
+        let lastFetchTime = 0;
+
+        // Fetch earnings data from API with caching
+        async function loadEarningsData(forceRefresh = false) {
+            const now = Date.now();
+
+            // Return cached data if still valid and not forcing refresh
+            if (!forceRefresh && cachedEarnings && (now - lastFetchTime < EARNINGS_CACHE_TTL)) {
+                updateEarningsStats(cachedEarnings);
+                return;
+            }
+
             try {
                 const token = localStorage.getItem('accessToken');
-                console.log('🔑 [DEBUG] Token exists:', !!token);
-                console.log('🔑 [DEBUG] Token value:', token ? token.substring(0, 20) + '...' : 'null');
+                if (!token) return;
 
-                if (!token) {
-                    console.error('❌ No access token found');
-                    return;
-                }
-
-                console.log('📡 [DEBUG] Fetching from /api/entries/earnings...');
                 const response = await fetch('/api/entries/earnings', {
                     method: 'GET',
                     headers: {
@@ -302,64 +307,44 @@
                     }
                 });
 
-                console.log('📥 [DEBUG] Response status:', response.status);
-                console.log('📥 [DEBUG] Response ok:', response.ok);
-
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ API Error:', errorText);
                     throw new Error(`Failed to fetch earnings data: ${response.status}`);
                 }
 
                 const result = await response.json();
-                console.log('📦 [DEBUG] Full API result:', result);
-                console.log('📦 [DEBUG] result.success:', result.success);
-                console.log('📦 [DEBUG] result.data:', result.data);
 
                 if (result.success && result.data) {
-                    console.log('✅ [DEBUG] Calling updateEarningsStats with data:', result.data);
+                    // Cache the result
+                    cachedEarnings = result.data;
+                    lastFetchTime = now;
                     updateEarningsStats(result.data);
-                } else {
-                    console.warn('⚠️ [DEBUG] API returned success=false or no data');
                 }
             } catch (error) {
-                console.error('❌ Error loading earnings:', error);
-                console.error('❌ Error stack:', error.stack);
+                // Silent fail - display defaults or cached data
+                if (cachedEarnings) {
+                    updateEarningsStats(cachedEarnings);
+                }
             }
         }
 
         function updateEarningsStats(data) {
-            console.log('🎨 [DEBUG] updateEarningsStats called with:', data);
-
             // Format number to Indonesian Rupiah
             const formatRupiah = (amount) => {
-                const formatted = 'Rp ' + amount.toLocaleString('id-ID');
-                console.log(`💰 [DEBUG] formatRupiah(${amount}) = ${formatted}`);
-                return formatted;
+                return 'Rp ' + amount.toLocaleString('id-ID');
             };
 
             // Update stats cards
-            console.log('📝 [DEBUG] Updating totalEntries:', data.total_entries);
             const totalEntriesEl = document.getElementById('totalEntries');
-            console.log('📝 [DEBUG] totalEntries element:', totalEntriesEl);
             if (totalEntriesEl) totalEntriesEl.textContent = data.total_entries || 0;
 
-            console.log('📝 [DEBUG] Updating totalEarnings:', data.total_earnings);
             const totalEarningsEl = document.getElementById('totalEarnings');
-            console.log('📝 [DEBUG] totalEarnings element:', totalEarningsEl);
             if (totalEarningsEl) totalEarningsEl.textContent = formatRupiah(data.total_earnings || 0);
 
-            console.log('📝 [DEBUG] Updating todayEntries:', data.today_entries);
             const todayEntriesEl = document.getElementById('todayEntries');
-            console.log('📝 [DEBUG] todayEntries element:', todayEntriesEl);
             if (todayEntriesEl) todayEntriesEl.textContent = data.today_entries || 0;
 
-            console.log('📝 [DEBUG] Updating todayEarnings:', data.today_earnings);
             const todayEarningsEl = document.getElementById('todayEarnings');
-            console.log('📝 [DEBUG] todayEarnings element:', todayEarningsEl);
             if (todayEarningsEl) todayEarningsEl.textContent = formatRupiah(data.today_earnings || 0);
-
-            console.log('✅ [DEBUG] All stats updated successfully!');
         }
     </script>
     <script src="/js/sidebar.js"></script>

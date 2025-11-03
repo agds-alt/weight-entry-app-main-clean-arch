@@ -179,7 +179,6 @@ class AuthService {
 
             // TODO: Generate reset token and send email
             // For now, just log it
-            console.log('Password reset requested for:', email);
 
             return { success: true, message: 'Link reset password telah dikirim ke email Anda' };
         } catch (error) {
@@ -195,7 +194,6 @@ class AuthService {
         try {
             // TODO: Implement token verification and password reset
             // For now, this is a placeholder
-            console.log('Password reset with token:', resetToken);
 
             return { success: true };
         } catch (error) {
@@ -318,7 +316,6 @@ class AuthService {
         try {
             // TODO: Implement token blacklisting if needed
             // For JWT, logout is typically handled client-side
-            console.log('User logged out');
             return { success: true };
         } catch (error) {
             console.error('Logout service error:', error);

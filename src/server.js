@@ -161,32 +161,13 @@ async function startServer() {
         if (cloudinary.isConfigured()) {
             const cloudinaryConnected = await cloudinary.testConnection();
             if (cloudinaryConnected) {
-                console.log('✅ Cloudinary connected successfully');
             } else {
-                console.warn('⚠️  Cloudinary connection failed. Photo upload may not work.');
             }
         } else {
-            console.warn('⚠️  Cloudinary not configured. Photo upload will not work.');
         }
 
         // Start server
         app.listen(PORT, () => {
-            console.log('');
-            console.log('╔════════════════════════════════════════╗');
-            console.log('║   🚀 Selisih Berat API Server          ║');
-            console.log('╚════════════════════════════════════════╝');
-            console.log('');
-            console.log(`🌐 Server running on: http://localhost:${PORT}`);
-            console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`📦 API Base: http://localhost:${PORT}/api`);
-            console.log('');
-            console.log('Available endpoints:');
-            console.log('  📝 Auth:    http://localhost:${PORT}/api/auth');
-            console.log('  📊 Entries: http://localhost:${PORT}/api/entries');
-            console.log('  ❤️  Health:  http://localhost:${PORT}/api/health');
-            console.log('');
-            console.log('Press CTRL+C to stop');
-            console.log('');
         });
 
     } catch (error) {
@@ -199,13 +180,11 @@ async function startServer() {
 
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {
-    console.log('SIGTERM signal received: closing HTTP server');
     await db.closePool();
     process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-    console.log('\nSIGINT signal received: closing HTTP server');
     await db.closePool();
     process.exit(0);
 });

@@ -9,7 +9,6 @@ router.get('/user-stats', authenticateToken, async (req, res) => {
     try {
         const username = req.user.username || req.user.userName;
 
-        console.log('📊 Fetching user stats for:', username);
 
         // Fetch entries for the user
         const { data: entries, error } = await supabase
@@ -21,7 +20,6 @@ router.get('/user-stats', authenticateToken, async (req, res) => {
             throw error;
         }
 
-        console.log('📊 Retrieved entries count:', entries.length);
 
         // Calculate statistics
         const now = new Date();
@@ -62,7 +60,6 @@ router.get('/user-stats', authenticateToken, async (req, res) => {
             disputed_count: disputedCount
         };
 
-        console.log('📊 Final response:', response);
         res.json(response);
 
     } catch (error) {
@@ -84,7 +81,6 @@ router.get('/global-stats', authenticateToken, dashboardController.getGlobalStat
 // 1. Daily Top Performers (from view)
 router.get('/leaderboard/daily', authenticateToken, async (req, res) => {
     try {
-        console.log('🏆 Fetching daily top performers from view');
 
         const { data, error } = await supabase
             .from('daily_top_performers')
@@ -96,7 +92,6 @@ router.get('/leaderboard/daily', authenticateToken, async (req, res) => {
             throw error;
         }
 
-        console.log('✅ Daily top performers:', data);
         res.json(data || []);
 
     } catch (error) {
@@ -112,7 +107,6 @@ router.get('/leaderboard/daily', authenticateToken, async (req, res) => {
 // 2. Total Top Performers (from view)
 router.get('/leaderboard/total', authenticateToken, async (req, res) => {
     try {
-        console.log('🏆 Fetching total top performers from view');
 
         const { data, error } = await supabase
             .from('total_top_performers')
@@ -124,7 +118,6 @@ router.get('/leaderboard/total', authenticateToken, async (req, res) => {
             throw error;
         }
 
-        console.log('✅ Total top performers:', data);
         res.json(data || []);
 
     } catch (error) {
@@ -140,7 +133,6 @@ router.get('/leaderboard/total', authenticateToken, async (req, res) => {
 // 3. User Statistics (from table - with cache)
 router.get('/leaderboard/statistics', authenticateToken, async (req, res) => {
     try {
-        console.log('📊 Fetching user statistics from table');
 
         const { data, error } = await supabase
             .from('user_statistics')
@@ -153,7 +145,6 @@ router.get('/leaderboard/statistics', authenticateToken, async (req, res) => {
             throw error;
         }
 
-        console.log('✅ User statistics:', data);
         res.json(data || []);
 
     } catch (error) {
@@ -170,7 +161,6 @@ router.get('/leaderboard/statistics', authenticateToken, async (req, res) => {
 // Now uses user_statistics table for better performance
 router.get('/leaderboard', authenticateToken, async (req, res) => {
     try {
-        console.log('🏆 Fetching leaderboard (using user_statistics table)');
 
         const { data, error } = await supabase
             .from('user_statistics')
@@ -194,7 +184,6 @@ router.get('/leaderboard', authenticateToken, async (req, res) => {
             daily_earnings: parseFloat(item.daily_earnings) || 0
         }));
 
-        console.log('✅ Leaderboard result:', leaderboard);
         res.json(leaderboard);
 
     } catch (error) {
@@ -213,7 +202,6 @@ router.get('/debug-info', authenticateToken, async (req, res) => {
         const username = req.user.username || req.user.userName;
         const userId = req.user.id;
 
-        console.log('🔍 Debug info for:', { username, userId });
 
         // 1. Check user in database
         const { data: userData, error: userError } = await supabase

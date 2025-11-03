@@ -242,7 +242,6 @@ const logActivity = (action) => {
             const username = req.user?.username || req.session?.user?.username || 'anonymous';
             const timestamp = new Date().toISOString();
             
-            console.log(`[${timestamp}] ${username} - ${action} - ${req.method} ${req.originalUrl}`);
             
             // TODO: Save to audit_logs table if needed
             

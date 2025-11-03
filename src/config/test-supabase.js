@@ -3,19 +3,11 @@ require('dotenv').config();
 const { Client } = require('pg');
 
 async function testSupabaseConnection() {
-  console.log('🚀 Testing Supabase connection...\n');
   
   // Show config (hide password)
-  console.log('📋 Configuration:');
   if (process.env.DATABASE_URL) {
-    console.log('   Using DATABASE_URL');
   } else {
-    console.log('   Host:', process.env.DB_HOST);
-    console.log('   Port:', process.env.DB_PORT);
-    console.log('   Database:', process.env.DB_NAME);
-    console.log('   User:', process.env.DB_USER);
   }
-  console.log('');
 
   // Create client
   const config = process.env.DATABASE_URL 
@@ -35,14 +27,11 @@ async function testSupabaseConnection() {
   const client = new Client(config);
 
   try {
-    console.log('🔄 Connecting to Supabase...');
     await client.connect();
     
-    console.log('✅ Connected to Supabase!\n');
     
     // Test query
     const res = await client.query('SELECT NOW()');
-    console.log('⏰ Server time:', res.rows[0].now);
     
     // Check tables
     const tablesQuery = `
@@ -53,18 +42,13 @@ async function testSupabaseConnection() {
     `;
     const tables = await client.query(tablesQuery);
     
-    console.log('\n📊 Tables in database:');
     if (tables.rows.length > 0) {
       tables.rows.forEach(row => {
-        console.log('   -', row.table_name);
       });
     } else {
-      console.log('   No tables yet');
     }
     
     await client.end();
-    console.log('\n✅ Supabase test successful!');
-    console.log('👉 Run "npm run dev" to start your app');
     
   } catch (error) {
     console.error('\n❌ Connection failed:', error.message);

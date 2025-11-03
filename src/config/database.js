@@ -11,9 +11,6 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Supabase configuration missing');
 }
 
-console.log('🔄 Attempting database connection...');
-console.log('📍 Method: Supabase Client SDK');
-console.log('📍 Database: selisih-berat-jnt-migrasi');
 
 // Create Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey, {
@@ -29,7 +26,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 // Legacy pool export for backward compatibility (deprecated)
 const pool = {
   query: async (text, params) => {
-    console.warn('⚠️  Direct pool.query() is deprecated. Use Supabase client methods instead.');
     throw new Error('Direct SQL queries not supported with Supabase client. Use repository methods.');
   }
 };
@@ -47,8 +43,6 @@ async function testConnection() {
       throw error;
     }
 
-    console.log('✅ Supabase client connected successfully!');
-    console.log('⏰ Server time:', new Date().toISOString());
     return true;
   } catch (error) {
     console.error('❌ Supabase connection failed:', error.message);
@@ -62,7 +56,6 @@ async function testConnection() {
 
 // Query functions (using Supabase RPC for raw SQL if needed)
 async function execute(query, params = []) {
-  console.warn('⚠️  execute() uses raw SQL. Consider using Supabase query builder instead.');
   try {
     // For DDL queries (CREATE TABLE, etc.), use RPC with a custom function
     // or handle specific cases
@@ -78,7 +71,6 @@ async function execute(query, params = []) {
 }
 
 async function query(text, params) {
-  console.warn('⚠️  query() uses raw SQL. Consider using Supabase query builder instead.');
   try {
     // For complex queries, consider using Supabase RPC functions
     throw new Error('Raw SQL query() not supported. Use Supabase query builder or RPC.');
@@ -89,7 +81,6 @@ async function query(text, params) {
 }
 
 async function queryOne(text, params = []) {
-  console.warn('⚠️  queryOne() uses raw SQL. Consider using Supabase query builder instead.');
   try {
     // For complex queries, consider using Supabase RPC functions
     throw new Error('Raw SQL queryOne() not supported. Use Supabase query builder or RPC.');
@@ -102,7 +93,6 @@ async function queryOne(text, params = []) {
 // Initialize tables - Note: Tables should be created via Supabase dashboard or migrations
 async function initializeTables() {
   try {
-    console.log('📋 Checking database tables...');
 
     // Check if users table exists
     const { error: usersError } = await supabase
@@ -149,7 +139,6 @@ CREATE TABLE IF NOT EXISTS entries (
       return false;
     }
 
-    console.log('✅ Users table ready');
 
     // Check if entries table exists
     const { error: entriesError } = await supabase
@@ -162,8 +151,6 @@ CREATE TABLE IF NOT EXISTS entries (
       return false;
     }
 
-    console.log('✅ Entries table ready');
-    console.log('✅ All tables initialized successfully');
     return true;
   } catch (error) {
     console.error('Initialize tables error:', error.message);
@@ -182,7 +169,6 @@ async function createDefaultAdmin() {
       .single();
 
     if (existing) {
-      console.log('ℹ️  Admin user already exists');
       return false;
     }
 
@@ -205,12 +191,8 @@ async function createDefaultAdmin() {
       throw error;
     }
 
-    console.log('✅ Default admin created');
-    console.log('   Username: admin');
-    console.log('   Password: admin123');
     return true;
   } catch (error) {
-    console.log('Admin creation:', error.message);
     return false;
   }
 }
@@ -246,7 +228,6 @@ async function getStats() {
 async function closePool() {
   try {
     // Supabase client doesn't require explicit connection closing
-    console.log('ℹ️  Supabase client cleanup (no action needed)');
   } catch (error) {
     console.error('Close connection error:', error.message);
   }
