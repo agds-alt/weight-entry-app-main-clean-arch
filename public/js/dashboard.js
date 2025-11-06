@@ -136,6 +136,11 @@ class RealtimeDashboard {
         this.updateElement('globalTotalEntries', 'textContent', globalTotal.toLocaleString('id-ID'));
         console.log('📊 Global Total Entries displayed:', globalTotal);
 
+        // 📸 Update NEW Global Total Photos Card (entries × 2 because each entry has 2 photos)
+        const globalTotalPhotos = globalTotal * 2;
+        this.updateElement('globalTotalPhotos', 'textContent', globalTotalPhotos.toLocaleString('id-ID'));
+        console.log('📸 Global Total Photos displayed:', globalTotalPhotos);
+
         // Update period earnings
         this.updateElement('todayEarnings', 'textContent', this.formatCurrency(todayEarnings));
         this.updateElement('weekEarnings', 'textContent', this.formatCurrency(weekEarnings));
