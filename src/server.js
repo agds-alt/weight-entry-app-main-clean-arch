@@ -143,64 +143,89 @@ app.use((error, req, res, next) => {
 // Initialize database and start server
 async function startServer() {
     try {
-        // Test database connection
+        // Test database connection (non-blocking for serverless)
         const dbConnected = await db.testConnection();
         if (!dbConnected) {
             console.error('❌ Database connection failed. Please check your configuration.');
-            process.exit(1);
+            // Don't exit in serverless - let requests fail gracefully
+            if (process.env.VERCEL !== '1') {
+                process.exit(1);
+            }
         }
 
-        // Initialize database tables
-        await db.initializeTables();
+        // Initialize database tables (non-blocking)
+        if (dbConnected) {
+            await db.initializeTables().catch(err => {
+                console.error('⚠️ Table initialization error:', err.message);
+                // Continue anyway - tables might already exist
+            });
 
-        // Create default admin user
-        await db.createDefaultAdmin();
+            // Create default admin user (non-blocking)
+            await db.createDefaultAdmin().catch(err => {
+                console.error('⚠️ Admin creation error:', err.message);
+                // Continue anyway - admin might already exist
+            });
+        }
 
-        // Test Cloudinary connection (optional)
+        // Test Cloudinary connection (optional, non-blocking)
         const cloudinary = require('./config/cloudinary');
         if (cloudinary.isConfigured()) {
-            const cloudinaryConnected = await cloudinary.testConnection();
-            if (cloudinaryConnected) {
-            } else {
-            }
-        } else {
+            cloudinary.testConnection().catch(err => {
+                console.error('⚠️ Cloudinary connection test failed:', err.message);
+            });
         }
 
-        // Start server
-        app.listen(PORT, () => {
-        });
+        // Start server (only in non-serverless environment)
+        if (process.env.VERCEL !== '1') {
+            app.listen(PORT, () => {
+                console.log(`✅ Server running on port ${PORT}`);
+            });
+        } else {
+            console.log('✅ Serverless mode - app ready');
+        }
 
     } catch (error) {
         console.error('❌ Failed to start server:', error);
-        process.exit(1);
+        // Don't exit in serverless environment
+        if (process.env.VERCEL !== '1') {
+            process.exit(1);
+        }
     }
 }
 
 
 
-// Handle graceful shutdown
-process.on('SIGTERM', async () => {
-    await db.closePool();
-    process.exit(0);
+// Handle graceful shutdown (skip in serverless)
+if (process.env.VERCEL !== '1') {
+    process.on('SIGTERM', async () => {
+        console.log('SIGTERM received, closing connections...');
+        await db.closePool();
+        process.exit(0);
+    });
+
+    process.on('SIGINT', async () => {
+        console.log('SIGINT received, closing connections...');
+        await db.closePool();
+        process.exit(0);
+    });
+
+    // Handle uncaught exceptions
+    process.on('uncaughtException', (error) => {
+        console.error('Uncaught Exception:', error);
+        process.exit(1);
+    });
+
+    process.on('unhandledRejection', (reason, promise) => {
+        console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+        process.exit(1);
+    });
+}
+
+// Initialize on startup
+// In serverless, this runs on each cold start
+startServer().catch(err => {
+    console.error('Startup error:', err);
 });
 
-process.on('SIGINT', async () => {
-    await db.closePool();
-    process.exit(0);
-});
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-    process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    process.exit(1);
-});
-
-// Start the server
-startServer();
-
+// Export app for Vercel serverless
 module.exports = app;
