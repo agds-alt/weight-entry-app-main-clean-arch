@@ -242,6 +242,14 @@
                 <div class="stat-value" id="todayEarnings">Rp 0</div>
                 <div class="stat-label">Omset Hari Ini</div>
             </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #212121 0%, #424242 100%); color: white;">
+                <i class="fas fa-chart-line stat-icon" style="color: #4CAF50;"></i>
+                <div class="stat-value" id="dailyOmzset" style="color: white;">Rp 0</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">Omzet Harian + Bonus</div>
+                <div style="font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 4px;">
+                    (Entry × Rp 500) + Rp 50.000
+                </div>
+            </div>
         </div>
     </div>
 
@@ -258,6 +266,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadUserData();
             loadEarningsData();
+            loadOmzsetData();
         });
 
         function loadUserData() {
@@ -360,6 +369,47 @@
             if (todayEarningsEl) todayEarningsEl.textContent = formatRupiah(data.today_earnings || 0);
 
             console.log('✅ [DEBUG] All stats updated successfully!');
+        }
+
+        // Fetch omzset data from new API endpoint
+        async function loadOmzsetData() {
+            console.log('💰 [DEBUG] Loading omzset data...');
+            try {
+                const token = localStorage.getItem('accessToken');
+
+                if (!token) {
+                    console.error('❌ No access token found for omzset');
+                    return;
+                }
+
+                console.log('📡 [DEBUG] Fetching from /api/dashboard/omzset...');
+                const response = await fetch('/api/dashboard/omzset', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('📡 [DEBUG] Omzset response status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('💰 [DEBUG] Omzset data received:', result);
+
+                    if (result.success && result.data) {
+                        const omzsetEl = document.getElementById('dailyOmzset');
+                        if (omzsetEl) {
+                            omzsetEl.textContent = formatRupiah(result.data.total_omzset);
+                            console.log('✅ [DEBUG] Omzset updated:', result.data.total_omzset);
+                        }
+                    }
+                } else {
+                    console.error('❌ Failed to fetch omzset:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Error loading omzset:', error);
+            }
         }
     </script>
     <script src="/js/sidebar.js"></script>

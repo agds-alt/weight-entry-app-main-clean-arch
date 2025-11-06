@@ -207,6 +207,61 @@ router.get('/leaderboard', authenticateToken, async (req, res) => {
     }
 });
 
+// Get daily omzset calculation
+router.get('/omzset', authenticateToken, async (req, res) => {
+    try {
+        const username = req.user.username || req.user.userName;
+        console.log('💰 Fetching omzset for:', username);
+
+        // Get today's date range
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const todayEnd = new Date(todayStart);
+        todayEnd.setDate(todayEnd.getDate() + 1);
+
+        // Fetch today's entries for this user
+        const { data: entries, error } = await supabase
+            .from('entries')
+            .select('id')
+            .eq('created_by', username)
+            .gte('created_at', todayStart.toISOString())
+            .lt('created_at', todayEnd.toISOString());
+
+        if (error) {
+            console.error('❌ Error fetching today entries:', error);
+            throw error;
+        }
+
+        const todayEntries = entries ? entries.length : 0;
+
+        // Formula: (total entries hari ini × 500) + 50,000
+        const entryEarnings = todayEntries * 500;
+        const dailyBonus = 50000;
+        const totalOmzset = entryEarnings + dailyBonus;
+
+        const response = {
+            success: true,
+            data: {
+                today_entries: todayEntries,
+                entry_earnings: entryEarnings,
+                daily_bonus: dailyBonus,
+                total_omzset: totalOmzset,
+                date: todayStart.toISOString().split('T')[0]
+            }
+        };
+
+        console.log('💰 Omzset calculated:', response.data);
+        res.json(response);
+
+    } catch (error) {
+        console.error('❌ Error calculating omzset:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error calculating omzset: ' + error.message
+        });
+    }
+});
+
 // Debug endpoint for troubleshooting
 router.get('/debug-info', authenticateToken, async (req, res) => {
     try {
