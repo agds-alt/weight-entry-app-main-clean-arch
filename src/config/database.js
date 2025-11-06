@@ -8,20 +8,28 @@ const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANO
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase configuration!');
   console.error('   Required: SUPABASE_URL and SUPABASE_SERVICE_KEY (or SUPABASE_ANON_KEY)');
-  throw new Error('Supabase configuration missing');
+  console.error('   Current SUPABASE_URL:', supabaseUrl ? 'SET' : 'NOT SET');
+  console.error('   Current SUPABASE_KEY:', supabaseKey ? 'SET' : 'NOT SET');
+
+  // In serverless, don't throw immediately - let connection tests fail gracefully
+  if (process.env.VERCEL !== '1') {
+    throw new Error('Supabase configuration missing');
+  }
 }
 
 
-// Create Supabase client
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false
-  },
-  db: {
-    schema: 'public'
-  }
-});
+// Create Supabase client (with fallback for missing config)
+const supabase = (supabaseUrl && supabaseKey)
+  ? createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      },
+      db: {
+        schema: 'public'
+      }
+    })
+  : null;
 
 // Legacy pool export for backward compatibility (deprecated)
 const pool = {
@@ -33,6 +41,11 @@ const pool = {
 // Test connection
 async function testConnection() {
   try {
+    if (!supabase) {
+      console.error('❌ Supabase client not initialized');
+      return false;
+    }
+
     // Test connection by querying a table (users table should exist)
     const { data, error } = await supabase
       .from('users')
@@ -47,8 +60,8 @@ async function testConnection() {
   } catch (error) {
     console.error('❌ Supabase connection failed:', error.message);
     console.error('\n💡 Troubleshooting:');
-    console.error('   1. Check SUPABASE_URL in .env');
-    console.error('   2. Check SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY in .env');
+    console.error('   1. Check SUPABASE_URL in .env or Vercel environment variables');
+    console.error('   2. Check SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY in .env or Vercel');
     console.error('   3. Verify project is not paused in Supabase dashboard');
     return false;
   }
@@ -93,6 +106,10 @@ async function queryOne(text, params = []) {
 // Initialize tables - Note: Tables should be created via Supabase dashboard or migrations
 async function initializeTables() {
   try {
+    if (!supabase) {
+      console.error('❌ Supabase client not initialized - skipping table check');
+      return false;
+    }
 
     // Check if users table exists
     const { error: usersError } = await supabase
@@ -161,6 +178,11 @@ CREATE TABLE IF NOT EXISTS entries (
 // Create default admin
 async function createDefaultAdmin() {
   try {
+    if (!supabase) {
+      console.error('❌ Supabase client not initialized - skipping admin creation');
+      return false;
+    }
+
     // Check if admin exists
     const { data: existing, error: selectError } = await supabase
       .from('users')
@@ -172,7 +194,7 @@ async function createDefaultAdmin() {
       return false;
     }
 
-    const bcrypt = require('bcrypt');
+    const bcrypt = require('bcryptjs');
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
     // Create admin user
@@ -200,6 +222,11 @@ async function createDefaultAdmin() {
 // Get stats
 async function getStats() {
   try {
+    if (!supabase) {
+      console.error('❌ Supabase client not initialized');
+      return { users: 0, entries: 0 };
+    }
+
     // Count users
     const { count: usersCount, error: usersError } = await supabase
       .from('users')
