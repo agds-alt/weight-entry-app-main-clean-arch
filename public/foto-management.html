@@ -49,7 +49,7 @@
             color: var(--gray-900);
             overflow-x: hidden;
             min-height: 100vh;
-            padding: 20px;
+            padding: 8px;
         }
 
         .container-fluid {
@@ -60,10 +60,10 @@
         /* Header */
         .header {
             background: var(--white);
-            border-radius: 12px;
-            padding: 24px 28px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-md);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
             border: var(--border-light);
             border-top: 2px solid var(--gray-900);
             transition: all 0.3s;
@@ -74,7 +74,7 @@
         }
 
         .header-title {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--gray-900);
         }
@@ -635,28 +635,56 @@
         /* Responsive */
         @media (max-width: 768px) {
             body {
-                padding: 15px;
+                padding: 6px;
             }
 
             .header {
-                padding: 20px;
+                padding: 10px 12px;
+                margin-bottom: 8px;
             }
 
             .header-title {
-                font-size: 22px;
+                font-size: 14px;
             }
 
             .photo-gallery {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 8px;
             }
 
             .photo-img-container {
-                height: 180px;
+                height: 140px;
             }
 
             .stats-grid {
             display: none; /* Hidden - not needed */
                 grid-template-columns: 1fr 1fr;
+            }
+
+            .btn-holographic, .btn-danger, .btn-success {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+
+            .btn-small {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            .filter-card {
+                padding: 10px;
+            }
+
+            .photo-info {
+                padding: 8px;
+            }
+
+            .photo-title {
+                font-size: 11px;
+            }
+
+            .photo-meta {
+                font-size: 9px;
             }
         }
 

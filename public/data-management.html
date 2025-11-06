@@ -51,7 +51,7 @@
         }
 
         .main-content {
-            padding: 20px;
+            padding: 8px;
             margin-left: 0;
             transition: margin-left 0.3s;
         }
@@ -63,11 +63,11 @@
         /* Header */
         .isometric-header {
             background: var(--white);
-            border-radius: 12px;
-            padding: 24px 28px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-md);
-            border-top: 4px solid var(--gray-900);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            border-top: 3px solid var(--gray-900);
             transition: all 0.3s;
         }
 
@@ -76,10 +76,10 @@
         }
 
         .header-title {
-            font-size: 26px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--gray-900);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .header-title i {
@@ -210,13 +210,13 @@
             background: var(--gray-900);
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 14px;
             font-weight: 600;
-            border-radius: 10px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+            font-size: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .btn-holographic:hover {
@@ -435,7 +435,7 @@
 
         @media (max-width: 768px) {
             .main-content {
-                padding: 15px;
+                padding: 6px;
             }
 
             .holographic-stats {
@@ -445,6 +445,7 @@
 
             .filter-section {
                 flex-direction: column;
+                gap: 8px;
             }
 
             .filter-item {
@@ -452,15 +453,56 @@
             }
 
             .header-title {
-                font-size: 22px;
+                font-size: 16px;
             }
 
             .isometric-header {
-                padding: 20px;
+                padding: 10px 12px;
+                margin-bottom: 8px;
             }
 
             .glass-filter-card, .table-3d-container {
-                padding: 20px;
+                padding: 10px;
+                border-radius: 6px;
+            }
+
+            .btn-holographic {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+
+            .btn-action {
+                padding: 5px 8px;
+                font-size: 10px;
+            }
+
+            .holographic-input, .holographic-select {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .holographic-table {
+                font-size: 11px;
+            }
+
+            .holographic-table thead th {
+                padding: 8px 6px;
+                font-size: 10px;
+            }
+
+            .holographic-table tbody td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+
+            .table-image {
+                width: 40px;
+                height: 40px;
+            }
+
+            .action-buttons {
+                gap: 4px;
+                flex-wrap: wrap;
             }
         }
 
