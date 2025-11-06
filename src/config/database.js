@@ -194,7 +194,7 @@ async function createDefaultAdmin() {
       return false;
     }
 
-    const bcrypt = require('bcrypt');
+    const bcrypt = require('bcryptjs');
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
     // Create admin user

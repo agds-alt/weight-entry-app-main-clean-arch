@@ -5,17 +5,32 @@ const session = require('express-session');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
-const db = require('./config/database');
-const dashboardRoutes = require('./routes/dashboard.routes');
 
-
-// Initialize Express app
+// Initialize Express app first
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Load database config with error handling
+let db;
+try {
+    db = require('./config/database');
+} catch (error) {
+    console.error('❌ Failed to load database config:', error.message);
+    if (process.env.VERCEL !== '1') {
+        throw error;
+    }
+    // In Vercel, create dummy db object
+    db = {
+        testConnection: async () => false,
+        initializeTables: async () => false,
+        createDefaultAdmin: async () => false,
+        closePool: async () => {}
+    };
+}
+
 // Trust proxy (important for rate limiting behind proxy)
 app.set('trust proxy', 1);
-app.use('/api/dashboard', dashboardRoutes);
+
 // Middleware
 //app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' }
@@ -45,16 +60,27 @@ if (process.env.USE_SESSION === 'true') {
 // Serve static files
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// API Routes
-const authRoutes = require('./routes/auth.routes');
-const entryRoutes = require('./routes/entry.routes');
-const dataManagementRoutes = require('./routes/data-management.routes');
-const fotoManagementRoutes = require('./routes/foto-management.routes');
+// API Routes - Load with error handling
+try {
+    const dashboardRoutes = require('./routes/dashboard.routes');
+    const authRoutes = require('./routes/auth.routes');
+    const entryRoutes = require('./routes/entry.routes');
+    const dataManagementRoutes = require('./routes/data-management.routes');
+    const fotoManagementRoutes = require('./routes/foto-management.routes');
 
-app.use('/api/auth', authRoutes);
-app.use('/api/entries', entryRoutes);
-app.use('/api/data-management', dataManagementRoutes);
-app.use('/api/foto-management', fotoManagementRoutes);
+    app.use('/api/dashboard', dashboardRoutes);
+    app.use('/api/auth', authRoutes);
+    app.use('/api/entries', entryRoutes);
+    app.use('/api/data-management', dataManagementRoutes);
+    app.use('/api/foto-management', fotoManagementRoutes);
+} catch (error) {
+    console.error('❌ Failed to load routes:', error.message);
+    if (process.env.VERCEL !== '1') {
+        throw error;
+    }
+    // In Vercel, log but continue - health check will still work
+    console.error('⚠️ Routes not loaded, only health check will work');
+}
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -67,13 +93,21 @@ app.get('/api/health', (req, res) => {
 
 // Cloudinary config endpoint for frontend
 app.get('/api/config/cloudinary', (req, res) => {
-    const cloudinary = require('./config/cloudinary');
-    const config = cloudinary.getUnsignedConfig();
+    try {
+        const cloudinary = require('./config/cloudinary');
+        const config = cloudinary.getUnsignedConfig();
 
-    res.json({
-        success: true,
-        data: config
-    });
+        res.json({
+            success: true,
+            data: config
+        });
+    } catch (error) {
+        console.error('Cloudinary config error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Cloudinary not configured'
+        });
+    }
 });
 
 
@@ -143,50 +177,47 @@ app.use((error, req, res, next) => {
 // Initialize database and start server
 async function startServer() {
     try {
-        // Test database connection (non-blocking for serverless)
+        // In serverless (Vercel), skip all initialization
+        // Let each request handle its own connection lazily
+        if (process.env.VERCEL === '1') {
+            console.log('✅ Serverless mode - skipping initialization');
+            return;
+        }
+
+        // Local development mode - do full initialization
+        console.log('🚀 Starting server in local mode...');
+
+        // Test database connection
         const dbConnected = await db.testConnection();
         if (!dbConnected) {
             console.error('❌ Database connection failed. Please check your configuration.');
-            // Don't exit in serverless - let requests fail gracefully
-            if (process.env.VERCEL !== '1') {
-                process.exit(1);
+            process.exit(1);
+        }
+
+        // Initialize database tables
+        await db.initializeTables();
+
+        // Create default admin user
+        await db.createDefaultAdmin();
+
+        // Test Cloudinary connection (optional)
+        const cloudinary = require('./config/cloudinary');
+        if (cloudinary.isConfigured()) {
+            const cloudinaryConnected = await cloudinary.testConnection();
+            if (cloudinaryConnected) {
+                console.log('✅ Cloudinary connected');
+            } else {
+                console.log('⚠️ Cloudinary connection failed');
             }
         }
 
-        // Initialize database tables (non-blocking)
-        if (dbConnected) {
-            await db.initializeTables().catch(err => {
-                console.error('⚠️ Table initialization error:', err.message);
-                // Continue anyway - tables might already exist
-            });
-
-            // Create default admin user (non-blocking)
-            await db.createDefaultAdmin().catch(err => {
-                console.error('⚠️ Admin creation error:', err.message);
-                // Continue anyway - admin might already exist
-            });
-        }
-
-        // Test Cloudinary connection (optional, non-blocking)
-        const cloudinary = require('./config/cloudinary');
-        if (cloudinary.isConfigured()) {
-            cloudinary.testConnection().catch(err => {
-                console.error('⚠️ Cloudinary connection test failed:', err.message);
-            });
-        }
-
-        // Start server (only in non-serverless environment)
-        if (process.env.VERCEL !== '1') {
-            app.listen(PORT, () => {
-                console.log(`✅ Server running on port ${PORT}`);
-            });
-        } else {
-            console.log('✅ Serverless mode - app ready');
-        }
+        // Start HTTP server
+        app.listen(PORT, () => {
+            console.log(`✅ Server running on port ${PORT}`);
+        });
 
     } catch (error) {
         console.error('❌ Failed to start server:', error);
-        // Don't exit in serverless environment
         if (process.env.VERCEL !== '1') {
             process.exit(1);
         }
@@ -221,11 +252,17 @@ if (process.env.VERCEL !== '1') {
     });
 }
 
-// Initialize on startup
-// In serverless, this runs on each cold start
-startServer().catch(err => {
-    console.error('Startup error:', err);
-});
+// Initialize on startup only if not in serverless
+// In Vercel, skip initialization to avoid cold start crashes
+if (process.env.VERCEL === '1') {
+    console.log('✅ Vercel serverless - app module loaded');
+} else {
+    // Local mode - start server
+    startServer().catch(err => {
+        console.error('Startup error:', err);
+        process.exit(1);
+    });
+}
 
 // Export app for Vercel serverless
 module.exports = app;
