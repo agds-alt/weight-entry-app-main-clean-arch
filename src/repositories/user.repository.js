@@ -38,14 +38,14 @@ class UserRepository {
     }
 
     /**
-     * Find user by username
+     * Find user by username (case-insensitive)
      */
     async findByUsername(username) {
         try {
             const { data, error } = await supabase
                 .from('users')
                 .select('id, username, password, email, full_name, role, is_active, created_at, updated_at, last_login')
-                .eq('username', username)
+                .ilike('username', username)  // Case-insensitive search
                 .single();
 
             if (error) {
@@ -423,14 +423,14 @@ class UserRepository {
     }
 
     /**
-     * Check if username exists
+     * Check if username exists (case-insensitive)
      */
     async usernameExists(username) {
         try {
             const { data, error } = await supabase
                 .from('users')
                 .select('id')
-                .eq('username', username)
+                .ilike('username', username)  // Case-insensitive search
                 .maybeSingle();
 
             if (error) {
