@@ -183,11 +183,11 @@ async function createDefaultAdmin() {
       return false;
     }
 
-    // Check if admin exists
+    // Check if admin exists (case-insensitive for safety)
     const { data: existing, error: selectError } = await supabase
       .from('users')
       .select('id')
-      .eq('username', 'admin')
+      .ilike('username', 'admin')
       .single();
 
     if (existing) {
