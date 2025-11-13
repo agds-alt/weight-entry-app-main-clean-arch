@@ -138,33 +138,51 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Calculate and display selisih (difference)
     function calculateSelisih() {
-        const beratResi = parseFloat(beratResiInput.value) || 0;
-        const beratAktual = parseFloat(beratAktualInput.value) || 0;
-        
+        const beratResi = parseFloat(beratResiInput?.value) || 0;
+        const beratAktual = parseFloat(beratAktualInput?.value) || 0;
+
         if (beratResi > 0 && beratAktual > 0) {
             const selisih = beratAktual - beratResi;
-            
-            // Display selisih
-            selisihDisplay.style.display = 'block';
-            selisihValue.textContent = `${Math.abs(selisih).toFixed(2)} kg`;
-            
+
+            // Display selisih (with null checks)
+            if (selisihDisplay) {
+                selisihDisplay.style.display = 'block';
+            }
+            if (selisihValue) {
+                selisihValue.textContent = `${Math.abs(selisih).toFixed(2)} kg`;
+            }
+
             // Update styling based on positive/negative difference
             if (selisih > 0) {
-                selisihDisplay.classList.remove('selisih-negative');
-                selisihDisplay.classList.add('selisih-positive');
-                selisihStatus.textContent = 'Berat aktual lebih berat dari resi';
+                if (selisihDisplay) {
+                    selisihDisplay.classList.remove('selisih-negative');
+                    selisihDisplay.classList.add('selisih-positive');
+                }
+                if (selisihStatus) {
+                    selisihStatus.textContent = 'Berat aktual lebih berat dari resi';
+                }
             } else if (selisih < 0) {
-                selisihDisplay.classList.remove('selisih-positive');
-                selisihDisplay.classList.add('selisih-negative');
-                selisihStatus.textContent = 'Berat aktual lebih ringan dari resi';
+                if (selisihDisplay) {
+                    selisihDisplay.classList.remove('selisih-positive');
+                    selisihDisplay.classList.add('selisih-negative');
+                }
+                if (selisihStatus) {
+                    selisihStatus.textContent = 'Berat aktual lebih ringan dari resi';
+                }
             } else {
-                selisihDisplay.classList.remove('selisih-positive', 'selisih-negative');
-                selisihStatus.textContent = 'Berat aktual sama dengan resi';
+                if (selisihDisplay) {
+                    selisihDisplay.classList.remove('selisih-positive', 'selisih-negative');
+                }
+                if (selisihStatus) {
+                    selisihStatus.textContent = 'Berat aktual sama dengan resi';
+                }
             }
-            
+
             return selisih;
         } else {
-            selisihDisplay.style.display = 'none';
+            if (selisihDisplay) {
+                selisihDisplay.style.display = 'none';
+            }
             return 0;
         }
     }
@@ -349,14 +367,26 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Reset form function
     function resetForm() {
-        form.reset();
+        if (form) {
+            form.reset();
+        }
         selectedFiles = { foto1: null, foto2: null };
-        document.getElementById('preview1').style.display = 'none';
-        document.getElementById('preview2').style.display = 'none';
-        document.getElementById('imagePreviewGrid').style.display = 'none';
+
+        // Reset preview elements with null checks
+        const preview1 = document.getElementById('preview1');
+        if (preview1) preview1.style.display = 'none';
+
+        const preview2 = document.getElementById('preview2');
+        if (preview2) preview2.style.display = 'none';
+
+        const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+        if (imagePreviewGrid) imagePreviewGrid.style.display = 'none';
+
         resetUploadSection(1);
         resetUploadSection(2);
-        document.getElementById('selisihDisplay').style.display = 'none';
+
+        const selisihDisplayElement = document.getElementById('selisihDisplay');
+        if (selisihDisplayElement) selisihDisplayElement.style.display = 'none';
     }
 
     // Form submission - ✅ UPLOAD FOTO DI SINI SAAT SUBMIT
