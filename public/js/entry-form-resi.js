@@ -9,100 +9,71 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // Load Cloudinary configuration from backend
-    await loadCloudinaryConfig();
+    // ==================== CLOUDINARY CONFIGURATION ====================
+    // Konfigurasi Cloudinary akan dimuat dari backend API
+    let CLOUDINARY_CONFIG = null;
 
-    // Form elements
-    const form = document.getElementById('entryForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const successMessage = document.getElementById('successMessage');
-    
-    // Weight fields
-    const beratResiInput = document.getElementById('beratResi');
-    const beratAktualInput = document.getElementById('beratAktual');
-    const selisihDisplay = document.getElementById('selisihDisplay');
-    const selisihValue = document.getElementById('selisihValue');
-    const selisihStatus = document.getElementById('selisihStatus');
-    
-    // Image upload elements
-    const uploadSection1 = document.getElementById('uploadSection1');
-    const uploadSection2 = document.getElementById('uploadSection2');
-    const foto1Input = document.getElementById('foto1');
-    const foto2Input = document.getElementById('foto2');
-    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
-    
-    // ✅ Simpan file objects, bukan URL
-    let selectedFiles = {
-        foto1: null,
-        foto2: null
-    };
+    // Fungsi untuk memuat konfigurasi Cloudinary dari backend
+    async function loadCloudinaryConfig() {
+        try {
+            const response = await fetch('/api/config/cloudinary');
+            const result = await response.json();
 
-  // ==================== CLOUDINARY CONFIGURATION ====================
-// Konfigurasi Cloudinary akan dimuat dari backend API
-let CLOUDINARY_CONFIG = null;
-
-// Fungsi untuk memuat konfigurasi Cloudinary dari backend
-async function loadCloudinaryConfig() {
-    try {
-        const response = await fetch('/api/config/cloudinary');
-        const result = await response.json();
-
-        if (result.success) {
-            CLOUDINARY_CONFIG = result.data;
-            console.log('✅ Cloudinary config loaded:', CLOUDINARY_CONFIG.cloudName);
-            return true;
-        } else {
-            console.error('❌ Failed to load Cloudinary config:', result);
+            if (result.success) {
+                CLOUDINARY_CONFIG = result.data;
+                console.log('✅ Cloudinary config loaded:', CLOUDINARY_CONFIG.cloudName);
+                return true;
+            } else {
+                console.error('❌ Failed to load Cloudinary config:', result);
+                return false;
+            }
+        } catch (error) {
+            console.error('❌ Error loading Cloudinary config:', error);
             return false;
         }
-    } catch (error) {
-        console.error('❌ Error loading Cloudinary config:', error);
-        return false;
-    }
-}
-
-// Upload image to Cloudinary - dengan error handling yang lebih baik
-async function uploadToCloudinary(file) {
-    if (!CLOUDINARY_CONFIG) {
-        throw new Error('Cloudinary configuration not loaded');
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-    formData.append('folder', CLOUDINARY_CONFIG.folder)
-
-    try {
-        console.log('📤 Uploading file to Cloudinary...', {
-            file: file.name,
-            size: file.size,
-            type: file.type,
-            preset: CLOUDINARY_CONFIG.uploadPreset,
-            folder: CLOUDINARY_CONFIG.folder
-        });
-
-        const response = await fetch(CLOUDINARY_CONFIG.uploadUrl, {
-            method: 'POST',
-            body: formData
-        });
-
-        console.log('☁️ Cloudinary response status:', response.status);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ Cloudinary upload failed:', errorText);
-            throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+    // Upload image to Cloudinary - dengan error handling yang lebih baik
+    async function uploadToCloudinary(file) {
+        if (!CLOUDINARY_CONFIG) {
+            throw new Error('Cloudinary configuration not loaded');
         }
 
-        const data = await response.json();
-        console.log('✅ Cloudinary upload success:', data.secure_url);
-        return data.secure_url;
-    } catch (error) {
-        console.error('❌ Cloudinary upload error:', error);
-        throw new Error('Gagal upload foto ke Cloudinary: ' + error.message);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+        formData.append('folder', CLOUDINARY_CONFIG.folder)
+
+        try {
+            console.log('📤 Uploading file to Cloudinary...', {
+                file: file.name,
+                size: file.size,
+                type: file.type,
+                preset: CLOUDINARY_CONFIG.uploadPreset,
+                folder: CLOUDINARY_CONFIG.folder
+            });
+
+            const response = await fetch(CLOUDINARY_CONFIG.uploadUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            console.log('☁️ Cloudinary response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Cloudinary upload failed:', errorText);
+                throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Cloudinary upload success:', data.secure_url);
+            return data.secure_url;
+        } catch (error) {
+            console.error('❌ Cloudinary upload error:', error);
+            throw new Error('Gagal upload foto ke Cloudinary: ' + error.message);
+        }
     }
-}
 
     // Upload semua files ke Cloudinary - dipanggil saat submit
     async function uploadAllFiles() {
@@ -135,6 +106,35 @@ async function uploadToCloudinary(file) {
         await Promise.all(uploadPromises);
         return uploadedUrls;
     }
+
+    // Load Cloudinary configuration from backend
+    await loadCloudinaryConfig();
+
+    // Form elements
+    const form = document.getElementById('entryForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const successMessage = document.getElementById('successMessage');
+    
+    // Weight fields
+    const beratResiInput = document.getElementById('beratResi');
+    const beratAktualInput = document.getElementById('beratAktual');
+    const selisihDisplay = document.getElementById('selisihDisplay');
+    const selisihValue = document.getElementById('selisihValue');
+    const selisihStatus = document.getElementById('selisihStatus');
+    
+    // Image upload elements
+    const uploadSection1 = document.getElementById('uploadSection1');
+    const uploadSection2 = document.getElementById('uploadSection2');
+    const foto1Input = document.getElementById('foto1');
+    const foto2Input = document.getElementById('foto2');
+    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+    
+    // ✅ Simpan file objects, bukan URL
+    let selectedFiles = {
+        foto1: null,
+        foto2: null
+    };
 
     // Calculate and display selisih (difference)
     function calculateSelisih() {
@@ -170,19 +170,27 @@ async function uploadToCloudinary(file) {
     }
 
     // Add event listeners for weight inputs
-    beratResiInput.addEventListener('input', calculateSelisih);
-    beratAktualInput.addEventListener('input', calculateSelisih);
+    if (beratResiInput) {
+        beratResiInput.addEventListener('input', calculateSelisih);
+    }
+    if (beratAktualInput) {
+        beratAktualInput.addEventListener('input', calculateSelisih);
+    }
 
     // Upload section click handlers
-    uploadSection1.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-image')) return;
-        foto1Input.click();
-    });
+    if (uploadSection1 && foto1Input) {
+        uploadSection1.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-image')) return;
+            foto1Input.click();
+        });
+    }
 
-    uploadSection2.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-image')) return;
-        foto2Input.click();
-    });
+    if (uploadSection2 && foto2Input) {
+        uploadSection2.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-image')) return;
+            foto2Input.click();
+        });
+    }
 
     // Handle file selection - HANYA SIMPAN FILE, TIDAK UPLOAD
     function handleFileSelect(file, photoNumber) {
@@ -241,17 +249,21 @@ async function uploadToCloudinary(file) {
     }
 
     // File input change handlers
-    foto1Input.addEventListener('change', function(e) {
-        if (e.target.files.length > 0) {
-            handleFileSelect(e.target.files[0], 1);
-        }
-    });
+    if (foto1Input) {
+        foto1Input.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0], 1);
+            }
+        });
+    }
 
-    foto2Input.addEventListener('change', function(e) {
-        if (e.target.files.length > 0) {
-            handleFileSelect(e.target.files[0], 2);
-        }
-    });
+    if (foto2Input) {
+        foto2Input.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0], 2);
+            }
+        });
+    }
 
     // Remove image handler
     window.removeImage = function(photoNumber) {
@@ -350,6 +362,7 @@ async function uploadToCloudinary(file) {
     // Form submission - ✅ UPLOAD FOTO DI SINI SAAT SUBMIT
 // Form submission - dengan debugging yang lebih detail
 // Form submission - perbaiki field names
+if (form) {
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -455,17 +468,24 @@ form.addEventListener('submit', async function(e) {
         submitBtn.innerHTML = '<i class="fas fa-save me-2"></i> Simpan Data';
     }
 });
+}
+
     // Reset button handler
-    resetBtn.addEventListener('click', function() {
-        if (confirm('Reset semua data yang telah diisi?')) {
-            resetForm();
-        }
-    });
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            if (confirm('Reset semua data yang telah diisi?')) {
+                resetForm();
+            }
+        });
+    }
 
     // Auto-format nomor resi to uppercase
-    document.getElementById('noResi').addEventListener('input', function(e) {
-        e.target.value = e.target.value.toUpperCase();
-    });
+    const noResiInput = document.getElementById('noResi');
+    if (noResiInput) {
+        noResiInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+    }
 
     // Add animation to form sections on load
     document.querySelectorAll('.form-section').forEach((section, index) => {
