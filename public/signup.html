@@ -507,19 +507,19 @@
                 <form id="signupForm">
                     <div class="form-group">
                         <label class="form-label">
-                            <i class="fas fa-id-card"></i> Full Name
+                            <i class="fas fa-id-card"></i> Nama Lengkap
                         </label>
-                        <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required>
-                        <div class="invalid-feedback">Full name must be at least 3 characters</div>
+                        <input type="text" class="form-control" id="fullName" placeholder="Masukkan nama lengkap Anda" required>
+                        <div class="invalid-feedback">Nama lengkap minimal 3 karakter</div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">
                             <i class="fas fa-user"></i> Username
                         </label>
-                        <input type="text" class="form-control" id="username" placeholder="Choose a username" required>
+                        <input type="text" class="form-control" id="username" placeholder="pilih username (huruf kecil, tanpa spasi)" required autocomplete="off">
                         <small class="feedback-text text-muted" id="usernameFeedback">
-                            Only letters, numbers, and underscore allowed
+                            Hanya huruf kecil, angka, dan garis bawah (_). Tanpa spasi!
                         </small>
                     </div>
 
@@ -527,8 +527,8 @@
                         <label class="form-label">
                             <i class="fas fa-envelope"></i> Email
                         </label>
-                        <input type="email" class="form-control" id="email" placeholder="your@email.com" required>
-                        <div class="invalid-feedback">Please enter a valid email</div>
+                        <input type="email" class="form-control" id="email" placeholder="email@anda.com" required>
+                        <div class="invalid-feedback">Masukkan email yang valid</div>
                     </div>
 
                     <div class="form-group">
@@ -536,7 +536,7 @@
                             <i class="fas fa-lock"></i> Password
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-control" id="password" placeholder="Minimum 6 characters" required>
+                            <input type="password" class="form-control" id="password" placeholder="Minimal 6 karakter" required>
                             <button type="button" class="password-toggle" id="togglePassword">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -549,23 +549,23 @@
 
                     <div class="form-group">
                         <label class="form-label">
-                            <i class="fas fa-lock"></i> Confirm Password
+                            <i class="fas fa-lock"></i> Konfirmasi Password
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-control" id="confirmPassword" placeholder="Re-enter password" required>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Masukkan password lagi" required>
                             <button type="button" class="password-toggle" id="toggleConfirm">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <div class="invalid-feedback">Passwords do not match</div>
+                        <div class="invalid-feedback">Password tidak cocok</div>
                     </div>
 
                     <button type="submit" class="btn btn-signup" id="signupBtn">
-                        <i class="fas fa-user-plus me-2"></i> Create Account
+                        <i class="fas fa-user-plus me-2"></i> Buat Akun
                     </button>
 
                     <a href="/login.html" class="btn btn-back">
-                        <i class="fas fa-arrow-left me-2"></i> Back to Login
+                        <i class="fas fa-arrow-left me-2"></i> Kembali ke Login
                     </a>
                 </form>
 
@@ -601,24 +601,40 @@
             }
         }
 
-        // Username validation
+        // Username validation - STRICT: lowercase only, no spaces
         const usernameInput = document.getElementById('username');
         const usernameFeedback = document.getElementById('usernameFeedback');
         let usernameTimeout;
 
         usernameInput.addEventListener('input', function() {
-            const value = this.value.trim();
-            this.value = value.replace(/[^a-zA-Z0-9_]/g, '');
+            let value = this.value;
+
+            // Remove spaces immediately
+            value = value.replace(/\s/g, '');
+
+            // Convert to lowercase automatically
+            value = value.toLowerCase();
+
+            // Only allow lowercase letters, numbers, and underscore
+            value = value.replace(/[^a-z0-9_]/g, '');
+
+            // Update input value
+            this.value = value;
 
             clearTimeout(usernameTimeout);
 
             if (value.length >= 3) {
-                usernameFeedback.textContent = 'Checking availability...';
+                usernameFeedback.textContent = 'Mengecek ketersediaan...';
                 usernameFeedback.className = 'feedback-text text-info';
+                this.classList.remove('is-valid', 'is-invalid');
                 usernameTimeout = setTimeout(() => checkUsername(value), 500);
             } else if (value.length > 0) {
-                usernameFeedback.textContent = 'Username must be at least 3 characters';
+                usernameFeedback.textContent = 'Username minimal 3 karakter';
                 usernameFeedback.className = 'feedback-text text-warning';
+                this.classList.remove('is-valid', 'is-invalid');
+            } else {
+                usernameFeedback.textContent = 'Hanya huruf kecil, angka, dan garis bawah (_). Tanpa spasi!';
+                usernameFeedback.className = 'feedback-text text-muted';
                 this.classList.remove('is-valid', 'is-invalid');
             }
         });
@@ -631,16 +647,18 @@
                 if (result.available) {
                     usernameInput.classList.add('is-valid');
                     usernameInput.classList.remove('is-invalid');
-                    usernameFeedback.textContent = 'Username available';
+                    usernameFeedback.textContent = '✓ Username tersedia';
                     usernameFeedback.className = 'feedback-text text-success';
                 } else {
                     usernameInput.classList.add('is-invalid');
                     usernameInput.classList.remove('is-valid');
-                    usernameFeedback.textContent = 'Username already taken';
+                    usernameFeedback.textContent = '✗ Username sudah digunakan';
                     usernameFeedback.className = 'feedback-text text-danger';
                 }
             } catch (error) {
                 console.error('Check username error:', error);
+                usernameFeedback.textContent = 'Gagal mengecek username';
+                usernameFeedback.className = 'feedback-text text-warning';
             }
         }
 
@@ -667,7 +685,7 @@
 
         function updatePasswordStrength(strength, length) {
             const colors = ['#ff6b6b', '#ffa502', '#ffd32a', '#38ef7d', '#11998e'];
-            const labels = ['Very Weak', 'Weak', 'Fair', 'Strong', 'Very Strong'];
+            const labels = ['Sangat Lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
             const widths = ['20%', '40%', '60%', '80%', '100%'];
 
             if (length > 0) {
@@ -704,33 +722,46 @@
             const confirmPassword = confirmPasswordInput.value;
 
             if (fullName.length < 3) {
-                showMessage('Full name must be at least 3 characters', 'danger');
+                showMessage('Nama lengkap minimal 3 karakter', 'danger');
                 return;
             }
 
             if (username.length < 3) {
-                showMessage('Username must be at least 3 characters', 'danger');
+                showMessage('Username minimal 3 karakter', 'danger');
                 return;
             }
 
-            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-                showMessage('Username can only contain letters, numbers, and underscore', 'danger');
+            // Strict username validation - lowercase only, no spaces
+            if (!/^[a-z0-9_]+$/.test(username)) {
+                showMessage('Username hanya boleh huruf kecil, angka, dan garis bawah (_). Tanpa spasi!', 'danger');
+                return;
+            }
+
+            // Check for spaces (double safety)
+            if (/\s/.test(username)) {
+                showMessage('Username tidak boleh mengandung spasi!', 'danger');
+                return;
+            }
+
+            // Check for uppercase (double safety)
+            if (/[A-Z]/.test(username)) {
+                showMessage('Username harus huruf kecil semua!', 'danger');
                 return;
             }
 
             if (password.length < 6) {
-                showMessage('Password must be at least 6 characters', 'danger');
+                showMessage('Password minimal 6 karakter', 'danger');
                 return;
             }
 
             if (password !== confirmPassword) {
-                showMessage('Passwords do not match', 'danger');
+                showMessage('Password tidak cocok', 'danger');
                 confirmPasswordInput.focus();
                 return;
             }
 
             setLoading(true);
-            showMessage('Creating your account...', 'info');
+            showMessage('Membuat akun Anda...', 'info');
 
             try {
                 const response = await fetch('/api/auth/register', {
@@ -753,17 +784,17 @@
                     localStorage.setItem('userName', result.user.username);
                     localStorage.setItem('userEmail', result.user.email);
 
-                    showMessage('Account created successfully! Redirecting...', 'success');
+                    showMessage('Akun berhasil dibuat! Mengalihkan...', 'success');
 
                     setTimeout(() => {
                         window.location.href = '/entry.html';
                     }, 1500);
                 } else {
-                    showMessage(result.message || 'Registration failed', 'danger');
+                    showMessage(result.message || 'Pendaftaran gagal', 'danger');
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                showMessage('An error occurred. Please try again.', 'danger');
+                showMessage('Terjadi kesalahan. Silakan coba lagi.', 'danger');
             } finally {
                 setLoading(false);
             }
@@ -788,9 +819,9 @@
         function setLoading(isLoading) {
             signupBtn.disabled = isLoading;
             if (isLoading) {
-                signupBtn.innerHTML = '<span class="spinner-border me-2"></span> Creating Account...';
+                signupBtn.innerHTML = '<span class="spinner-border me-2"></span> Membuat Akun...';
             } else {
-                signupBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i> Create Account';
+                signupBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i> Buat Akun';
             }
         }
     </script>
