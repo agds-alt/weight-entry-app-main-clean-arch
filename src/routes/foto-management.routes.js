@@ -44,12 +44,6 @@ router.get('/photos', authenticateToken, async (req, res) => {
             throw error;
         }
 
-            count: data.length,
-            totalCount: count,
-            page,
-            totalPages: Math.ceil(count / limit)
-        });
-
         res.json({
             success: true,
             data: data || [],
