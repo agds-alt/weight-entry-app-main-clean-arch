@@ -398,22 +398,36 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         const selisihDisplayElement = document.getElementById('selisihDisplay');
         if (selisihDisplayElement) selisihDisplayElement.style.display = 'none';
+
+        // Reset submit flag juga
+        if (typeof isSubmitting !== 'undefined') {
+            isSubmitting = false;
+        }
     }
 
     // Form submission - ✅ UPLOAD FOTO DI SINI SAAT SUBMIT
 // Form submission - dengan debugging yang lebih detail
 // Form submission - perbaiki field names
+let isSubmitting = false; // Flag untuk prevent double submit
+
 if (form) {
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
+    // Prevent double submit
+    if (isSubmitting) {
+        console.warn('⚠️ Form is already being submitted, ignoring duplicate request');
+        return;
+    }
+
+    isSubmitting = true;
     console.log('🔄 Starting form submission...');
-    
+
     // Calculate selisih
     const beratResi = parseFloat(document.getElementById('beratResi').value) || 0;
     const beratAktual = parseFloat(document.getElementById('beratAktual').value) || 0;
     const selisih = beratAktual - beratResi;
-    
+
     // Validasi client-side
     const validationData = {
         nama: document.getElementById('nama').value.trim(),
@@ -425,13 +439,14 @@ form.addEventListener('submit', async function(e) {
     const validationErrors = validateFormData(validationData);
     if (validationErrors.length > 0) {
         alert('Error validasi:\n' + validationErrors.join('\n'));
+        isSubmitting = false; // Reset flag
         return;
     }
 
     // Show loading state
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Mengupload dan Menyimpan...';
-    
+
     try {
         // ✅ UPLOAD FOTO KE CLOUDINARY
         console.log('☁️ Uploading files to Cloudinary...');
@@ -507,6 +522,7 @@ form.addEventListener('submit', async function(e) {
         // Reset button state
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-save me-2"></i> Simpan Data';
+        isSubmitting = false; // Reset flag untuk allow submit selanjutnya
     }
 });
 }
