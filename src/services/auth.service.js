@@ -64,22 +64,52 @@ class AuthService {
      */
     async login(username, password) {
         try {
+            console.log('🔐 Login attempt:', {
+                originalUsername: username,
+                normalizedUsername: username.toLowerCase(),
+                passwordProvided: !!password
+            });
+
             // Find user
             const user = await userRepository.findByUsername(username.toLowerCase());
+
             if (!user) {
+                console.warn('❌ Login failed: User not found', {
+                    searchedUsername: username.toLowerCase()
+                });
                 throw new Error('Username atau password salah');
             }
 
+            console.log('✅ User found:', {
+                id: user.id,
+                username: user.username,
+                is_active: user.is_active
+            });
+
             // Check if user is active
             if (!user.is_active) {
+                console.warn('❌ Login failed: User is inactive', {
+                    username: user.username,
+                    userId: user.id
+                });
                 throw new Error('Akun Anda telah dinonaktifkan');
             }
 
             // Verify password
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
+                console.warn('❌ Login failed: Invalid password', {
+                    username: user.username,
+                    userId: user.id
+                });
                 throw new Error('Username atau password salah');
             }
+
+            console.log('✅ Login successful:', {
+                username: user.username,
+                userId: user.id,
+                role: user.role
+            });
 
             // Update last login
             await userRepository.updateLastLogin(user.id);
@@ -102,7 +132,7 @@ class AuthService {
                 tokens
             };
         } catch (error) {
-            console.error('Login service error:', error);
+            console.error('Login service error:', error.message);
             throw new Error(error.message || 'Gagal login');
         }
     }
