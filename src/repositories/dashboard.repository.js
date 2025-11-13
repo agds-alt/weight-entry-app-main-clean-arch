@@ -86,13 +86,6 @@ class DashboardRepository {
                 verified_count: verifiedCount
             };
 
-                total: stats.total_entries,
-                today: stats.today_entries,
-                week: stats.week_entries,
-                month: stats.month_entries,
-                avg_selisih: avgSelisih.toFixed(2)
-            });
-
             return stats;
         } catch (error) {
             console.error('Dashboard repository getGlobalStats error:', error);
