@@ -298,7 +298,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Reset upload section
     function resetUploadSection(photoNumber) {
         const uploadSection = document.getElementById(`uploadSection${photoNumber}`);
-        const placeholderHTML = photoNumber === 1 ? 
+
+        // Check if element exists before accessing properties
+        if (!uploadSection) {
+            return;
+        }
+
+        const placeholderHTML = photoNumber === 1 ?
             `<div id="uploadPlaceholder1">
                 <i class="fas fa-cloud-upload-alt upload-icon"></i>
                 <h6>Click untuk upload atau drag & drop</h6>
@@ -309,7 +315,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <h6>Click untuk upload atau drag & drop</h6>
                 <p class="text-muted">Foto hasil timbangan</p>
             </div>`;
-        
+
         uploadSection.classList.remove('has-image');
         uploadSection.innerHTML = placeholderHTML;
     }
@@ -319,13 +325,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         const successText = document.getElementById('successText');
         if (successText) {
             successText.textContent = message;
+        }
+
+        if (successMessage) {
             successMessage.style.display = 'block';
-            
+
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            
+
             setTimeout(() => {
-                successMessage.style.display = 'none';
+                if (successMessage) {
+                    successMessage.style.display = 'none';
+                }
             }, 5000);
         }
     }
