@@ -27,14 +27,6 @@ router.get('/entries', authenticateToken, async (req, res) => {
         const status = req.query.status;
         const search = req.query.search;
 
-            page,
-            limit,
-            sortBy,
-            sortOrder,
-            status,
-            search
-        });
-
         // Calculate range for pagination
         const start = (page - 1) * limit;
         const end = start + limit - 1;
@@ -66,12 +58,6 @@ router.get('/entries', authenticateToken, async (req, res) => {
             console.error('❌ Error fetching entries:', error);
             throw error;
         }
-
-            count: data.length,
-            totalCount: count,
-            page,
-            totalPages: Math.ceil(count / limit)
-        });
 
         res.json({
             success: true,
