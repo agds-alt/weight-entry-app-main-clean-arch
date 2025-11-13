@@ -1,44 +1,6 @@
 ﻿// entry-form-resi.js - Upload saat submit
-document.addEventListener('DOMContentLoaded', async function() {
-    // Check authentication
-    const token = localStorage.getItem('accessToken');
-    const userName = localStorage.getItem('userName');
 
-    if (!token) {
-        window.location.href = '/login.html';
-        return;
-    }
-
-    // Load Cloudinary configuration from backend
-    await loadCloudinaryConfig();
-
-    // Form elements
-    const form = document.getElementById('entryForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const successMessage = document.getElementById('successMessage');
-    
-    // Weight fields
-    const beratResiInput = document.getElementById('beratResi');
-    const beratAktualInput = document.getElementById('beratAktual');
-    const selisihDisplay = document.getElementById('selisihDisplay');
-    const selisihValue = document.getElementById('selisihValue');
-    const selisihStatus = document.getElementById('selisihStatus');
-    
-    // Image upload elements
-    const uploadSection1 = document.getElementById('uploadSection1');
-    const uploadSection2 = document.getElementById('uploadSection2');
-    const foto1Input = document.getElementById('foto1');
-    const foto2Input = document.getElementById('foto2');
-    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
-    
-    // ✅ Simpan file objects, bukan URL
-    let selectedFiles = {
-        foto1: null,
-        foto2: null
-    };
-
-  // ==================== CLOUDINARY CONFIGURATION ====================
+// ==================== CLOUDINARY CONFIGURATION ====================
 // Konfigurasi Cloudinary akan dimuat dari backend API
 let CLOUDINARY_CONFIG = null;
 
@@ -103,6 +65,46 @@ async function uploadToCloudinary(file) {
         throw new Error('Gagal upload foto ke Cloudinary: ' + error.message);
     }
 }
+
+// ==================== DOM CONTENT LOADED ====================
+document.addEventListener('DOMContentLoaded', async function() {
+    // Check authentication
+    const token = localStorage.getItem('accessToken');
+    const userName = localStorage.getItem('userName');
+
+    if (!token) {
+        window.location.href = '/login.html';
+        return;
+    }
+
+    // Load Cloudinary configuration from backend
+    await loadCloudinaryConfig();
+
+    // Form elements
+    const form = document.getElementById('entryForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const successMessage = document.getElementById('successMessage');
+
+    // Weight fields
+    const beratResiInput = document.getElementById('beratResi');
+    const beratAktualInput = document.getElementById('beratAktual');
+    const selisihDisplay = document.getElementById('selisihDisplay');
+    const selisihValue = document.getElementById('selisihValue');
+    const selisihStatus = document.getElementById('selisihStatus');
+
+    // Image upload elements
+    const uploadSection1 = document.getElementById('uploadSection1');
+    const uploadSection2 = document.getElementById('uploadSection2');
+    const foto1Input = document.getElementById('foto1');
+    const foto2Input = document.getElementById('foto2');
+    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+
+    // ✅ Simpan file objects, bukan URL
+    let selectedFiles = {
+        foto1: null,
+        foto2: null
+    };
 
     // Upload semua files ke Cloudinary - dipanggil saat submit
     async function uploadAllFiles() {
