@@ -39,9 +39,22 @@ self.addEventListener('message', async function(e) {
         });
 
         const locationStr = location?.address || 'Lokasi tidak tersedia';
-        const coordsStr = location?.coords
-            ? `Lat: ${location.coords.lat.toFixed(6)}, Lon: ${location.coords.lon.toFixed(6)}`
-            : '';
+
+        // Safely handle coords (might be numbers or strings)
+        let coordsStr = '';
+        if (location?.coords && location.coords.lat != null && location.coords.lon != null) {
+            const lat = typeof location.coords.lat === 'number'
+                ? location.coords.lat
+                : parseFloat(location.coords.lat);
+            const lon = typeof location.coords.lon === 'number'
+                ? location.coords.lon
+                : parseFloat(location.coords.lon);
+
+            // Only format if valid numbers
+            if (!isNaN(lat) && !isNaN(lon)) {
+                coordsStr = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
+            }
+        }
 
         const lines = [`${dateStr} ${timeStr}`, locationStr, coordsStr].filter(line => line);
 
