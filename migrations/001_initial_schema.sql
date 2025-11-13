@@ -105,7 +105,7 @@ CREATE POLICY "Authenticated users can read all entries" ON entries
 INSERT INTO users (username, password, email, full_name, role)
 VALUES (
   'admin',
-  '$2b$10$rZ7LYKqR1L8qJZX5J4Gq7OQZqF8F5F8F5F8F5F8F5F8F5F8F5F8F5u', -- admin123
+  '$2b$10$iVb.rRQreNH8vTD8NE428exJ/CvWsei4jMTjMZzshfEyzPa7vlC1a', -- admin123
   'admin@weighttrack.com',
   'Administrator',
   'admin'
