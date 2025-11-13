@@ -957,9 +957,10 @@
                     async function(position) {
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
-                        userLocation.coords = { 
-                            lat: lat.toFixed(6), 
-                            lon: lon.toFixed(6) 
+                        // Store as numbers, not strings (toFixed returns string!)
+                        userLocation.coords = {
+                            lat: lat,
+                            lon: lon
                         };
                         
                         try {
